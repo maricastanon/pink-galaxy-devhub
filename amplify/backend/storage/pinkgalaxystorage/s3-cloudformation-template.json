@@ -1,0 +1,224 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "S3 storage with versioning and backups for Pink Galaxy DevHub",
+  "Parameters": {
+    "bucketName": {
+      "Type": "String"
+    },
+    "authRoleName": {
+      "Type": "String"
+    },
+    "unauthRoleName": {
+      "Type": "String"
+    },
+    "env": {
+      "Type": "String"
+    }
+  },
+  "Conditions": {
+    "ShouldNotCreateEnvResources": {
+      "Fn::Equals": [
+        {
+          "Ref": "env"
+        },
+        "NONE"
+      ]
+    }
+  },
+  "Resources": {
+    "S3Bucket": {
+      "Type": "AWS::S3::Bucket",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "BucketName": {
+          "Fn::If": [
+            "ShouldNotCreateEnvResources",
+            {
+              "Ref": "bucketName"
+            },
+            {
+              "Fn::Sub": "${bucketName}-${env}"
+            }
+          ]
+        },
+        "VersioningConfiguration": {
+          "Status": "Enabled"
+        },
+        "PublicAccessBlockConfiguration": {
+          "BlockPublicAcls": true,
+          "BlockPublicPolicy": true,
+          "IgnorePublicAcls": true,
+          "RestrictPublicBuckets": true
+        },
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              }
+            }
+          ]
+        },
+        "LifecycleConfiguration": {
+          "Rules": [
+            {
+              "Id": "PinkGalaxyBackupRetention",
+              "Status": "Enabled",
+              "NoncurrentVersionExpirationInDays": 90,
+              "Transitions": [
+                {
+                  "TransitionInDays": 30,
+                  "StorageClass": "STANDARD_IA"
+                },
+                {
+                  "TransitionInDays": 90,
+                  "StorageClass": "GLACIER"
+                }
+              ]
+            }
+          ]
+        },
+        "ReplicationConfiguration": {
+          "Role": {
+            "Fn::GetAtt": [
+              "S3ReplicationRole",
+              "Arn"
+            ]
+          },
+          "Rules": [
+            {
+              "Id": "PinkGalaxyBackupReplication",
+              "Status": "Enabled",
+              "Prefix": "user-data/",
+              "Destination": {
+                "Bucket": {
+                  "Fn::GetAtt": [
+                    "S3BackupBucket",
+                    "Arn"
+                  ]
+                },
+                "StorageClass": "STANDARD_IA"
+              }
+            }
+          ]
+        },
+        "CorsConfiguration": {
+          "CorsRules": [
+            {
+              "AllowedHeaders": ["*"],
+              "AllowedMethods": ["GET", "HEAD", "PUT", "POST", "DELETE"],
+              "AllowedOrigins": ["*"],
+              "ExposedHeaders": [
+                "x-amz-server-side-encryption",
+                "x-amz-request-id",
+                "x-amz-id-2"
+              ],
+              "MaxAge": 3000
+            }
+          ]
+        }
+      }
+    },
+    "S3BackupBucket": {
+      "Type": "AWS::S3::Bucket",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "BucketName": {
+          "Fn::If": [
+            "ShouldNotCreateEnvResources",
+            {
+              "Fn::Sub": "${bucketName}-backup"
+            },
+            {
+              "Fn::Sub": "${bucketName}-backup-${env}"
+            }
+          ]
+        },
+        "VersioningConfiguration": {
+          "Status": "Enabled"
+        },
+        "PublicAccessBlockConfiguration": {
+          "BlockPublicAcls": true,
+          "BlockPublicPolicy": true,
+          "IgnorePublicAcls": true,
+          "RestrictPublicBuckets": true
+        },
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "S3ReplicationRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "s3.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "S3ReplicationPolicy",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:GetObjectVersionForReplication",
+                    "s3:GetObjectVersionAcl"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "${S3Bucket}/*"
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:ReplicateObject",
+                    "s3:ReplicateDelete"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "${S3BackupBucket}/*"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "BucketName": {
+      "Value": {
+        "Ref": "S3Bucket"
+      },
+      "Description": "Bucket name for the S3 bucket"
+    },
+    "BackupBucketName": {
+      "Value": {
+        "Ref": "S3BackupBucket"
+      },
+      "Description": "Backup bucket name for replication"
+    },
+    "Region": {
+      "Value": {
+        "Ref": "AWS::Region"
+      }
+    }
+  }
+}

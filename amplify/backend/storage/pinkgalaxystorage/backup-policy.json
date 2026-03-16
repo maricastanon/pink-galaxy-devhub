@@ -1,0 +1,200 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "AWS Backup configuration for Pink Galaxy DevHub - BULLETPROOF data protection",
+  "Resources": {
+    "PinkGalaxyBackupVault": {
+      "Type": "AWS::Backup::BackupVault",
+      "Properties": {
+        "BackupVaultName": "PinkGalaxyDevHub-Vault",
+        "EncryptionKeyArn": {
+          "Ref": "BackupKMSKey"
+        }
+      }
+    },
+    "BackupKMSKey": {
+      "Type": "AWS::KMS::Key",
+      "Properties": {
+        "Description": "KMS Key for Pink Galaxy DevHub backups",
+        "KeyPolicy": {
+          "Statement": [
+            {
+              "Sid": "Enable IAM User Permissions",
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:root"
+                }
+              },
+              "Action": "kms:*",
+              "Resource": "*"
+            },
+            {
+              "Sid": "Allow Backup Service",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "backup.amazonaws.com"
+              },
+              "Action": [
+                "kms:Decrypt",
+                "kms:DescribeKey",
+                "kms:Encrypt",
+                "kms:GenerateDataKey",
+                "kms:ReEncrypt*"
+              ],
+              "Resource": "*"
+            }
+          ]
+        }
+      }
+    },
+    "DailyBackupPlan": {
+      "Type": "AWS::Backup::BackupPlan",
+      "Properties": {
+        "BackupPlan": {
+          "BackupPlanName": "PinkGalaxyDevHub-DailyBackup",
+          "BackupPlanRule": [
+            {
+              "RuleName": "DailyBackups",
+              "TargetBackupVault": {
+                "Ref": "PinkGalaxyBackupVault"
+              },
+              "ScheduleExpression": "cron(0 5 ? * * *)",
+              "StartWindowMinutes": 60,
+              "CompletionWindowMinutes": 120,
+              "Lifecycle": {
+                "MoveToColdStorageAfterDays": 30,
+                "DeleteAfterDays": 365
+              },
+              "RecoveryPointTags": {
+                "Project": "PinkGalaxyDevHub",
+                "BackupType": "Daily"
+              },
+              "CopyActions": [
+                {
+                  "DestinationBackupVaultArn": {
+                    "Fn::GetAtt": [
+                      "PinkGalaxySecondaryVault",
+                      "BackupVaultArn"
+                    ]
+                  },
+                  "Lifecycle": {
+                    "DeleteAfterDays": 90
+                  }
+                }
+              ]
+            },
+            {
+              "RuleName": "WeeklyBackups",
+              "TargetBackupVault": {
+                "Ref": "PinkGalaxyBackupVault"
+              },
+              "ScheduleExpression": "cron(0 6 ? * SUN *)",
+              "StartWindowMinutes": 60,
+              "CompletionWindowMinutes": 180,
+              "Lifecycle": {
+                "MoveToColdStorageAfterDays": 30,
+                "DeleteAfterDays": 2555
+              },
+              "RecoveryPointTags": {
+                "Project": "PinkGalaxyDevHub",
+                "BackupType": "Weekly"
+              }
+            },
+            {
+              "RuleName": "MonthlyBackups",
+              "TargetBackupVault": {
+                "Ref": "PinkGalaxyBackupVault"
+              },
+              "ScheduleExpression": "cron(0 7 1 * ? *)",
+              "StartWindowMinutes": 60,
+              "CompletionWindowMinutes": 240,
+              "Lifecycle": {
+                "MoveToColdStorageAfterDays": 30,
+                "DeleteAfterDays": 3653
+              },
+              "RecoveryPointTags": {
+                "Project": "PinkGalaxyDevHub",
+                "BackupType": "Monthly"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "PinkGalaxySecondaryVault": {
+      "Type": "AWS::Backup::BackupVault",
+      "Properties": {
+        "BackupVaultName": "PinkGalaxyDevHub-Secondary-Vault",
+        "EncryptionKeyArn": {
+          "Ref": "BackupKMSKey"
+        }
+      }
+    },
+    "BackupSelection": {
+      "Type": "AWS::Backup::BackupSelection",
+      "Properties": {
+        "BackupPlanId": {
+          "Ref": "DailyBackupPlan"
+        },
+        "BackupSelection": {
+          "SelectionName": "PinkGalaxyDevHub-Resources",
+          "IamRoleArn": {
+            "Fn::GetAtt": [
+              "BackupRole",
+              "Arn"
+            ]
+          },
+          "Resources": [
+            "*"
+          ],
+          "Conditions": {
+            "StringEquals": {
+              "aws:ResourceTag/Project": "PinkGalaxyDevHub"
+            }
+          }
+        }
+      }
+    },
+    "BackupRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "backup.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup",
+          "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForRestores"
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "BackupVaultName": {
+      "Description": "Primary backup vault name",
+      "Value": {
+        "Ref": "PinkGalaxyBackupVault"
+      }
+    },
+    "BackupPlanId": {
+      "Description": "Backup plan ID",
+      "Value": {
+        "Ref": "DailyBackupPlan"
+      }
+    },
+    "SecondaryVaultName": {
+      "Description": "Secondary backup vault for cross-region protection",
+      "Value": {
+        "Ref": "PinkGalaxySecondaryVault"
+      }
+    }
+  }
+}

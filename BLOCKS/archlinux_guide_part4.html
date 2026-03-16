@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arch Linux — Pink Galaxy Guide — Part 4: Rice, Hardening & Maintenance</title>
+<style>
+:root{--pink:#e91e63;--pl:#f8bbd0;--pd:#880e4f;--pg:rgba(233,30,99,0.3);--green:#2e7d32;--gl:#c8e6c9;--gd:#1b5e20;--bg:#0a0a12;--bg2:rgba(15,15,30,0.85);--bgc:#1a1a2e;--tx:#e8e6f0;--tx2:#a8a6b8;--mt:#6c6a7e;--bd:rgba(233,30,99,0.2);--bdg:rgba(46,125,50,0.3);--cg:#a5d6a7;--cp:#f48fb1;--cy:#fff59d;--cb:#90caf9;--co:#ffcc80;--cc:#6a6a8a;--cs:#c5e1a5;--cv:#ce93d8;--ok:#4caf50;--wn:#ff9800;--dn:#ff5252;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Calibri,"Segoe UI",sans-serif;font-size:11pt;color:var(--tx);background:var(--bg);line-height:1.7;padding:20px 30px 80px;padding-right:70px;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 20% 50%,rgba(233,30,99,0.07)0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(103,58,183,0.05)0%,transparent 50%);}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background-image:radial-gradient(1px 1px at 10% 20%,rgba(255,255,255,0.35),transparent),radial-gradient(1px 1px at 50% 10%,rgba(233,30,99,0.4),transparent),radial-gradient(1.5px 1.5px at 45% 45%,rgba(255,255,255,0.45),transparent),radial-gradient(1px 1px at 85% 70%,rgba(233,30,99,0.3),transparent);animation:tw 8s ease-in-out infinite alternate;}
+@keyframes tw{0%{opacity:.6}50%{opacity:1}100%{opacity:.7}}
+.w{max-width:1100px;margin:0 auto;position:relative;z-index:1;}
+h1{color:var(--pink);font-size:24pt;margin:40px 0 16px;text-shadow:0 0 30px var(--pg);border-bottom:2px solid var(--pink);padding-bottom:10px;}
+h2{color:var(--green);font-size:18pt;margin:32px 0 14px;border-left:4px solid var(--green);padding-left:14px;}
+h3{color:var(--pink);font-size:14pt;margin:24px 0 10px;}
+h4{color:var(--green);font-size:12pt;margin:18px 0 8px;}
+p{color:var(--tx);margin:10px 0;text-align:justify;}
+a{color:var(--pink);text-decoration:none;}a:hover{color:var(--pl);}
+.ic{font-family:"Courier New",monospace;font-size:9.5pt;background:rgba(233,30,99,0.1);padding:1px 6px;border-radius:4px;color:var(--cp);}
+.cover{text-align:center;padding:50px 40px;margin-bottom:36px;background:linear-gradient(135deg,#1a0533,#0d1b2a,#1b0a2e);border:2px solid var(--pink);border-radius:16px;box-shadow:0 0 60px var(--pg),inset 0 0 120px rgba(233,30,99,0.03);position:relative;overflow:hidden;}
+.cover::before{content:'🌸';position:absolute;font-size:200pt;opacity:0.03;top:-50px;right:-30px;transform:rotate(-15deg);}
+.cover::after{content:'✨';position:absolute;font-size:120pt;opacity:0.03;bottom:-20px;left:-10px;transform:rotate(20deg);}
+.cover h1{border:none;font-size:32pt;background:linear-gradient(90deg,var(--pink),#f48fb1,#ce93d8,#f48fb1,var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 6s ease-in-out infinite;}
+@keyframes shimmer{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.cover .sub{color:var(--tx2);font-size:13pt;margin:6px 0;}
+.cover .part{display:inline-block;background:linear-gradient(135deg,var(--pink),var(--pd));color:#fff;padding:5px 22px;border-radius:18px;font-size:10pt;font-weight:bold;margin:14px 0;letter-spacing:2px;text-transform:uppercase;box-shadow:0 4px 16px rgba(233,30,99,0.3);}
+.cover .info{color:var(--mt);font-size:8.5pt;font-family:"Courier New",monospace;text-align:left;background:rgba(0,0,0,0.3);padding:10px;border-radius:8px;border:1px solid var(--bd);margin-top:16px;}
+.cw{margin:14px 0;border:1px solid var(--bdg);border-radius:10px;overflow:hidden;background:var(--bgc);}
+.ch{display:flex;justify-content:space-between;align-items:center;padding:5px 12px;background:rgba(46,125,50,0.14);border-bottom:1px solid var(--bdg);font-size:8.5pt;}
+.cl{color:var(--green);font-family:"Courier New",monospace;font-weight:bold;text-transform:uppercase;letter-spacing:1px;}
+.cpb{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:var(--tx2);padding:2px 9px;border-radius:4px;cursor:pointer;font-size:8pt;font-family:"Courier New",monospace;}
+.cpb:hover{background:var(--pink);color:#fff;border-color:var(--pink);}
+.cpb.ok{background:var(--green);color:#fff;}
+pre{font-family:"Courier New",monospace;font-size:10pt;background:var(--bgc);padding:14px;overflow-x:auto;white-space:pre;line-height:1.5;margin:0;color:var(--tx);}
+pre .c{color:var(--cc);font-style:italic;}pre .g{color:var(--cg);}pre .p{color:var(--cp);}pre .y{color:var(--cy);}pre .b{color:var(--cb);}pre .o{color:var(--co);}pre .v{color:var(--cv);}pre .s{color:var(--cs);}
+.co{background:rgba(46,125,50,0.07);border-top:2px solid var(--green);padding:10px 14px;font-family:"Courier New",monospace;font-size:9pt;color:var(--cg);}
+.col{color:var(--green);font-weight:bold;font-size:8pt;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;}
+.pv{background:rgba(233,30,99,0.06);border-left:3px solid var(--pink);padding:9px 13px;margin:10px 0 3px;font-size:10pt;border-radius:0 6px 6px 0;}
+.pv .l{color:var(--pink);font-weight:bold;font-size:8.5pt;text-transform:uppercase;letter-spacing:1px;}
+.dt{background:rgba(46,125,50,0.06);border-left:3px solid var(--green);padding:9px 13px;margin:3px 0;font-size:10pt;border-radius:0 6px 6px 0;}
+.dt .l{color:var(--green);font-weight:bold;font-size:8.5pt;text-transform:uppercase;letter-spacing:1px;}
+.cal{border-radius:10px;border:2px solid var(--pink);padding:14px 18px;margin:14px 0;background:rgba(233,30,99,0.04);break-inside:avoid;}
+.cal.g{border-color:var(--green);background:rgba(46,125,50,0.04);}
+.cal.w{border-color:var(--wn);background:rgba(255,152,0,0.04);}
+.ct{font-weight:bold;font-size:9.5pt;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.cal:not(.g):not(.w) .ct{color:var(--pink);}.cal.g .ct{color:var(--green);}.cal.w .ct{color:var(--wn);}
+.cd{text-align:center;margin:44px 0 28px;position:relative;}
+.cd::before{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:linear-gradient(90deg,transparent,var(--pink),transparent);}
+.cn{display:inline-block;background:var(--bg);padding:0 18px;position:relative;color:var(--pink);font-size:10pt;text-transform:uppercase;letter-spacing:4px;font-weight:bold;}
+.btt{display:flex;align-items:center;gap:4px;color:var(--mt);font-size:9pt;margin:14px 0;cursor:pointer;}.btt:hover{color:var(--pink);}
+.pb{page-break-before:always;}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:10pt;}
+th{background:rgba(233,30,99,0.12);color:var(--pl);padding:9px 12px;text-align:left;border-bottom:2px solid var(--pink);}
+td{padding:7px 12px;border-bottom:1px solid var(--bd);color:var(--tx2);vertical-align:top;}
+.sc{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:10px 0;padding:9px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--bd);}
+.cbi{display:flex;align-items:center;gap:4px;cursor:pointer;font-size:9pt;color:var(--tx2);user-select:none;}
+.cbi input{accent-color:var(--pink);width:15px;height:15px;cursor:pointer;}
+.nt{font-size:9pt;color:var(--mt);cursor:pointer;}.nt:hover{color:var(--pink);}
+.na{display:none;margin:6px 0;padding:8px;background:rgba(0,0,0,0.2);border:1px solid var(--bd);border-radius:6px;}
+.na.vis{display:block;}
+.na textarea{width:100%;min-height:50px;background:rgba(0,0,0,0.3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:Calibri,sans-serif;font-size:10pt;padding:6px;resize:vertical;}
+.gp{position:sticky;top:0;z-index:100;background:var(--bg);padding:6px 0;border-bottom:1px solid var(--bd);margin-bottom:18px;}
+.gp-t{display:flex;justify-content:space-between;font-size:8pt;color:var(--mt);}
+.pc{width:100%;height:4px;background:rgba(255,255,255,0.05);border-radius:2px;overflow:hidden;}
+.pf{height:100%;background:linear-gradient(90deg,var(--pink),var(--green));border-radius:2px;transition:width .4s;width:0%;}
+.sf{position:fixed;bottom:16px;right:16px;z-index:9999;}
+.sb{padding:8px 16px;background:var(--green);color:#fff;border:none;border-radius:8px;font-weight:bold;font-size:9.5pt;cursor:pointer;box-shadow:0 4px 16px rgba(46,125,50,0.3);font-family:Calibri,sans-serif;}
+.sb:hover{background:var(--ok);transform:translateY(-1px);}
+.color-swatch{display:inline-block;width:18px;height:18px;border-radius:4px;vertical-align:middle;margin:0 4px;border:1px solid rgba(255,255,255,0.2);}
+hr{border:none;height:1px;background:linear-gradient(90deg,transparent,var(--bd),transparent);margin:28px 0;}
+@media print{body{background:#fff;color:#2c3e50;padding-right:0!important;}body::before,body::after{display:none;}h1{color:#e91e63!important;text-shadow:none;}h2{color:#2e7d32!important;}pre{background:#f8f9fa!important;color:#2c3e50;border:1px solid #ddd;}.cover{box-shadow:none;}p,td{color:#2c3e50!important;}.sf,.gp,.sc,.na{display:none!important;}@page{size:A4;margin:1.5cm 1cm;}.pb{page-break-before:always;}}
+</style>
+</head>
+<body>
+<div class="w">
+
+<div class="cover" id="top">
+  <div class="part">Part 4 — The Grand Finale</div>
+  <h1>🌸 Arch Linux: The Pink Galaxy Guide</h1>
+  <p class="sub">Rice • Hardening • Backups • Maintenance — Making It Truly Yours</p>
+  <div class="info">
+Confirmed scope: Part 4 — Pink Galaxy Rice, System Hardening, Backups &amp; Maintenance<br>
+Prerequisites: Parts 1-3 complete (Arch + Hyprland + Dev Tools + Cloud + BlackArch)<br>
+Target: Dell Inspiron 14 7420 2-in-1 running Arch Linux with Hyprland<br>
+Covers: Ch 14 (Pink Galaxy Rice) → Ch 15 (System Hardening) → Ch 16 (Backups) → Ch 17 (Maintenance)<br>
+This is the final part — after this, your system is complete 🌸
+  </div>
+</div>
+
+<div class="gp"><div class="gp-t"><span>Part 4 Progress</span><span id="gPct">0%</span></div><div class="pc"><div class="pf" id="gBar"></div></div></div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--            CHAPTER 14: THE PINK GALAXY RICE                 -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="cd" id="ch14"><span class="cn">Chapter 14</span></div>
+<h1>The Pink Galaxy Rice 🌸✨</h1>
+
+<div class="sc" data-section="ch14">
+  <div style="display:flex;gap:12px;flex-wrap:wrap;">
+    <label class="cbi"><input type="checkbox" data-type="read" onchange="rc()"> Read</label>
+    <label class="cbi"><input type="checkbox" data-type="applied" onchange="rc()"> Applied</label>
+    <label class="cbi"><input type="checkbox" data-type="memorized" onchange="rc()"> Memorized</label>
+    <label class="cbi"><input type="checkbox" data-type="implemented" onchange="rc()"> Implemented</label>
+  </div>
+  <span class="nt" onclick="this.nextElementSibling.classList.toggle('vis')">📝 Notes</span>
+</div>
+<div class="na"><textarea placeholder="Chapter 14 notes…"></textarea></div>
+
+<p><strong>Layman version:</strong> "Ricing" is the art of customizing your Linux desktop to make it uniquely beautiful. The word comes from the car community where people modify their cars for aesthetics. In Linux, it means customizing every visual element — the status bar, application launcher, terminal colors, window borders, fonts, wallpaper, cursor, and color scheme — until everything coheres into a single gorgeous aesthetic. Our aesthetic is Pink Galaxy: deep space backgrounds with pink and purple nebulae, magenta accent colors, soft green secondary accents, and a feeling of floating through a cosmic flower garden.</p>
+
+<h2 id="s14-1">14.1 The Color Palette</h2>
+
+<p>Every element on your system will use colors from this unified palette. Consistency is what makes a rice look professional rather than patchwork.</p>
+
+<table>
+<tr><th>Role</th><th>Color</th><th>Hex</th><th>Used In</th></tr>
+<tr><td>Background</td><td><span class="color-swatch" style="background:#0a0a12"></span></td><td><span class="ic">#0a0a12</span></td><td>Terminal bg, Waybar bg, Wofi bg</td></tr>
+<tr><td>Surface</td><td><span class="color-swatch" style="background:#1a1a2e"></span></td><td><span class="ic">#1a1a2e</span></td><td>Code blocks, menus, card backgrounds</td></tr>
+<tr><td>Primary (Pink)</td><td><span class="color-swatch" style="background:#e91e63"></span></td><td><span class="ic">#e91e63</span></td><td>Active borders, selections, accents, links</td></tr>
+<tr><td>Primary Light</td><td><span class="color-swatch" style="background:#f48fb1"></span></td><td><span class="ic">#f48fb1</span></td><td>Hover states, active workspace, highlights</td></tr>
+<tr><td>Primary Pale</td><td><span class="color-swatch" style="background:#f8bbd0"></span></td><td><span class="ic">#f8bbd0</span></td><td>Subtle highlights, selected text bg</td></tr>
+<tr><td>Secondary (Green)</td><td><span class="color-swatch" style="background:#2e7d32"></span></td><td><span class="ic">#2e7d32</span></td><td>Inactive borders, success states, headings</td></tr>
+<tr><td>Text Primary</td><td><span class="color-swatch" style="background:#e8e6f0"></span></td><td><span class="ic">#e8e6f0</span></td><td>Main text, terminal foreground</td></tr>
+<tr><td>Text Secondary</td><td><span class="color-swatch" style="background:#a8a6b8"></span></td><td><span class="ic">#a8a6b8</span></td><td>Comments, muted text, placeholders</td></tr>
+<tr><td>Purple</td><td><span class="color-swatch" style="background:#ab47bc"></span></td><td><span class="ic">#ab47bc</span></td><td>Keywords, special accents</td></tr>
+<tr><td>Danger</td><td><span class="color-swatch" style="background:#ff5252"></span></td><td><span class="ic">#ff5252</span></td><td>Errors, urgent notifications</td></tr>
+<tr><td>Warning</td><td><span class="color-swatch" style="background:#ffab00"></span></td><td><span class="ic">#ffab00</span></td><td>Warnings, battery low</td></tr>
+</table>
+
+<h2 id="s14-2">14.2 Waybar — The Status Bar</h2>
+
+<p>Waybar is the bar at the top (or bottom) of your screen showing workspaces, clock, battery, volume, Wi-Fi status, and anything else you want. It is endlessly customizable through CSS and JSON configuration. We will build a Pink Galaxy Waybar with glassmorphism effects, rounded modules, and smooth animations.</p>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># Create Waybar config directory</span>
+<span class="g">mkdir</span> <span class="o">-p</span> <span class="b">~/.config/waybar</span>
+
+<span class="c"># ═══ Waybar Configuration (modules and behavior) ═══</span>
+<span class="g">cat</span> > <span class="b">~/.config/waybar/config.jsonc</span> << <span class="s">'EOF'</span>
+{
+    "layer": "top",
+    "position": "top",
+    "height": 36,
+    "spacing": 6,
+    "margin-top": 6,
+    "margin-left": 10,
+    "margin-right": 10,
+
+    "modules-left": ["hyprland/workspaces", "hyprland/window"],
+    "modules-center": ["clock"],
+    "modules-right": ["pulseaudio", "network", "bluetooth", "battery", "tray"],
+
+    "hyprland/workspaces": {
+        "format": "{icon}",
+        "format-icons": {
+            "1": "一", "2": "二", "3": "三", "4": "四", "5": "五",
+            "active": "●", "default": "○"
+        },
+        "on-click": "activate"
+    },
+    "hyprland/window": {
+        "max-length": 40,
+        "separate-outputs": true
+    },
+    "clock": {
+        "format": "🌸 {:%H:%M  %a %d %b}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt>{calendar}</tt>"
+    },
+    "battery": {
+        "states": { "warning": 20, "critical": 10 },
+        "format": "{icon} {capacity}%",
+        "format-icons": ["", "", "", "", ""],
+        "format-charging": "⚡{capacity}%"
+    },
+    "network": {
+        "format-wifi": " {signalStrength}%",
+        "format-ethernet": " {ipaddr}",
+        "format-disconnected": "⚠ offline",
+        "tooltip-format": "{ifname}: {ipaddr}/{cidr}\n{essid}"
+    },
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-muted": "🔇",
+        "format-icons": { "default": ["🔈", "🔉", "🔊"] },
+        "on-click": "pavucontrol"
+    },
+    "bluetooth": {
+        "format": " {status}",
+        "format-connected": " {num_connections}",
+        "on-click": "bluetoothctl power toggle",
+        "tooltip-format-connected": "{device_alias}: {device_battery_percentage}%"
+    },
+    "tray": {
+        "icon-size": 16,
+        "spacing": 8
+    }
+}
+EOF</pre>
+<div class="co"><div class="col">Config Created</div><pre>~/.config/waybar/config.jsonc</pre></div></div>
+
+<div class="cw">
+<div class="ch"><span class="cl">css</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">/* ═══ Pink Galaxy Waybar Theme ═══ */</span>
+<span class="c">/* Save as: ~/.config/waybar/style.css */</span>
+
+<span class="g">cat</span> > <span class="b">~/.config/waybar/style.css</span> << <span class="s">'EOF'</span>
+/* Global */
+* {
+    font-family: "JetBrainsMono Nerd Font", "Calibri", sans-serif;
+    font-size: 13px;
+    min-height: 0;
+}
+
+window#waybar {
+    background: rgba(10, 10, 18, 0.85);
+    border-bottom: 2px solid rgba(233, 30, 99, 0.3);
+    border-radius: 12px;
+    color: #e8e6f0;
+}
+
+/* Module containers */
+#workspaces button {
+    padding: 0 8px;
+    color: #6c6a7e;
+    border-radius: 8px;
+    margin: 4px 2px;
+    transition: all 0.3s ease;
+}
+#workspaces button.active {
+    color: #e91e63;
+    background: rgba(233, 30, 99, 0.15);
+    box-shadow: 0 0 8px rgba(233, 30, 99, 0.3);
+}
+#workspaces button:hover {
+    color: #f48fb1;
+    background: rgba(233, 30, 99, 0.1);
+}
+
+#window {
+    color: #a8a6b8;
+    padding: 0 12px;
+}
+
+#clock {
+    color: #f48fb1;
+    font-weight: bold;
+    padding: 0 14px;
+    background: rgba(233, 30, 99, 0.08);
+    border-radius: 8px;
+    margin: 4px 0;
+}
+
+#battery, #network, #pulseaudio, #bluetooth, #tray {
+    padding: 0 10px;
+    margin: 4px 2px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+#battery {
+    color: #a5d6a7;
+}
+#battery.warning {
+    color: #ffab00;
+}
+#battery.critical {
+    color: #ff5252;
+    animation: blink 1s steps(2) infinite;
+}
+@keyframes blink { to { opacity: 0.3; } }
+
+#battery.charging {
+    color: #69f0ae;
+}
+
+#network {
+    color: #90caf9;
+}
+#network.disconnected {
+    color: #ff5252;
+}
+
+#pulseaudio {
+    color: #ce93d8;
+}
+#pulseaudio.muted {
+    color: #6c6a7e;
+}
+
+#bluetooth {
+    color: #90caf9;
+}
+
+#tray > .passive {
+    -gtk-icon-effect: dim;
+}
+EOF</pre>
+<div class="co"><div class="col">Theme Created</div><pre>~/.config/waybar/style.css</pre></div></div>
+
+<p>Restart Waybar to see the changes: press <span class="ic">Super+Q</span> to kill the Waybar window (if running), then in a terminal run <span class="ic">waybar &</span>. You should see a translucent dark bar at the top with pink workspace indicators, a cherry blossom clock in the center, and colorful system modules on the right — purple for volume, blue for network and Bluetooth, green for battery.</p>
+
+<h2 id="s14-3">14.3 Wofi — Application Launcher Theme</h2>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="g">mkdir</span> <span class="o">-p</span> <span class="b">~/.config/wofi</span>
+
+<span class="c"># Wofi configuration</span>
+<span class="g">cat</span> > <span class="b">~/.config/wofi/config</span> << <span class="s">'EOF'</span>
+width=500
+height=350
+location=center
+show=drun
+prompt=🌸 Search...
+filter_rate=100
+allow_markup=true
+no_actions=true
+halign=fill
+orientation=vertical
+content_halign=fill
+insensitive=true
+allow_images=true
+image_size=28
+EOF
+
+<span class="c"># Wofi Pink Galaxy CSS theme</span>
+<span class="g">cat</span> > <span class="b">~/.config/wofi/style.css</span> << <span class="s">'EOF'</span>
+window {
+    margin: 0;
+    background-color: rgba(10, 10, 18, 0.92);
+    border: 2px solid rgba(233, 30, 99, 0.4);
+    border-radius: 16px;
+    font-family: "JetBrainsMono Nerd Font", "Calibri";
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(233, 30, 99, 0.15);
+}
+#input {
+    margin: 12px;
+    padding: 10px 16px;
+    border: 1px solid rgba(233, 30, 99, 0.3);
+    border-radius: 10px;
+    background-color: rgba(26, 26, 46, 0.9);
+    color: #e8e6f0;
+    font-size: 14px;
+}
+#input:focus {
+    border-color: #e91e63;
+    box-shadow: 0 0 12px rgba(233, 30, 99, 0.3);
+}
+#inner-box {
+    margin: 0 12px 12px;
+}
+#outer-box {
+    margin: 0;
+}
+#text {
+    color: #a8a6b8;
+    margin: 4px 0;
+}
+#entry {
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+#entry:selected {
+    background-color: rgba(233, 30, 99, 0.2);
+    border: 1px solid rgba(233, 30, 99, 0.5);
+}
+#entry:selected #text {
+    color: #f48fb1;
+    font-weight: bold;
+}
+EOF</pre></div>
+
+<p>Now press <span class="ic">Super+D</span> to launch Wofi. You will see a centered, dark, glassmorphic launcher with a pink border glow, a cherry blossom search prompt, and pink highlighting on the selected application. Type the first few letters of any application name and press Enter to launch.</p>
+
+<h2 id="s14-4">14.4 Animated Wallpaper with swww</h2>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># Install swww (animated wallpaper daemon for Wayland)</span>
+<span class="g">paru</span> <span class="o">-S</span> <span class="s">swww</span>
+
+<span class="c"># Create wallpaper directory</span>
+<span class="g">mkdir</span> <span class="o">-p</span> <span class="b">~/Pictures/wallpapers</span>
+
+<span class="c"># Download some galaxy/space wallpapers (replace with your own!)</span>
+<span class="c"># Good sources: unsplash.com, wallhaven.cc (search "pink galaxy", "nebula")</span>
+<span class="c"># Or use a solid color to start:</span>
+
+<span class="c"># Start swww daemon (add to hyprland.conf exec-once)</span>
+<span class="g">swww-daemon</span> &
+
+<span class="c"># Set a wallpaper with a transition animation</span>
+<span class="g">swww</span> <span class="o">img</span> <span class="b">~/Pictures/wallpapers/pink-galaxy.jpg</span> \
+  <span class="o">--transition-type</span> <span class="y">grow</span> \
+  <span class="o">--transition-duration</span> <span class="y">2</span> \
+  <span class="o">--transition-pos</span> <span class="y">0.5,0.5</span>
+
+<span class="c"># Other cool transition types: wipe, wave, fade, outer, random</span>
+<span class="c"># Create a wallpaper rotation script:</span>
+<span class="g">cat</span> > <span class="b">~/.local/bin/wallpaper-cycle.sh</span> << <span class="s">'WEOF'</span>
+#!/bin/bash
+# Cycle through wallpapers every 30 minutes
+WALLDIR="$HOME/Pictures/wallpapers"
+TRANSITIONS=("grow" "wipe" "wave" "fade" "outer")
+while true; do
+    for img in "$WALLDIR"/*.{jpg,png,jpeg}; do
+        [ -f "$img" ] || continue
+        TRANS=${TRANSITIONS[$RANDOM % ${#TRANSITIONS[@]}]}
+        swww img "$img" --transition-type "$TRANS" --transition-duration 2
+        sleep 1800   # 30 minutes
+    done
+done
+WEOF
+<span class="g">chmod</span> <span class="y">+x</span> <span class="b">~/.local/bin/wallpaper-cycle.sh</span>
+
+<span class="c"># Add to hyprland.conf:</span>
+<span class="c"># exec-once = swww-daemon</span>
+<span class="c"># exec-once = ~/.local/bin/wallpaper-cycle.sh</span></pre></div>
+
+<h2 id="s14-5">14.5 GTK & Qt Theming</h2>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># Install theming tools and themes</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="s">gtk3 gtk4 qt5ct qt6ct kvantum nwg-look</span>
+<span class="g">paru</span> <span class="o">-S</span> <span class="s">catppuccin-gtk-theme-mocha papirus-icon-theme</span>
+
+<span class="c"># Install a cursor theme</span>
+<span class="g">paru</span> <span class="o">-S</span> <span class="s">bibata-cursor-theme</span>
+
+<span class="c"># Set GTK theme via nwg-look (GUI tool)</span>
+<span class="g">nwg-look</span>
+<span class="c"># In nwg-look:</span>
+<span class="c">#   Widget Theme: Catppuccin-Mocha-Standard-Pink-Dark</span>
+<span class="c">#   Icon Theme: Papirus-Dark</span>
+<span class="c">#   Cursor Theme: Bibata-Modern-Classic</span>
+<span class="c">#   Font: Calibri 11</span>
+
+<span class="c"># For Qt applications (VS Code, etc.), configure qt5ct/qt6ct</span>
+<span class="c"># Add to hyprland.conf env section if not already there:</span>
+<span class="c"># env = QT_QPA_PLATFORMTHEME,qt5ct</span>
+<span class="g">qt5ct</span>   <span class="c"># opens Qt5 config tool — select Kvantum style, Papirus icons</span>
+
+<span class="c"># Set Kvantum theme</span>
+<span class="g">kvantummanager</span>   <span class="c"># select CatppuccinMocha or similar dark theme</span>
+
+<span class="c"># Set cursor in Hyprland (add to hyprland.conf)</span>
+<span class="c"># exec-once = hyprctl setcursor Bibata-Modern-Classic 24</span></pre></div>
+
+<p>The Catppuccin Mocha theme with the Pink accent variant gives you dark backgrounds with soft pink highlights across all GTK applications — Firefox, Thunar, Obsidian (when using the Catppuccin community plugin), and any other GTK app. The Papirus icon theme provides clean, modern icons that look consistent across all applications. Bibata cursor theme replaces the default X11 cursor with a smooth, modern pointer. Together, these three elements (GTK theme, icons, cursor) create a cohesive visual language where every element on screen belongs to the same Pink Galaxy aesthetic.</p>
+
+<h2 id="s14-6">14.6 Lock Screen</h2>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># Configure swaylock with Pink Galaxy theme</span>
+<span class="g">mkdir</span> <span class="o">-p</span> <span class="b">~/.config/swaylock</span>
+<span class="g">cat</span> > <span class="b">~/.config/swaylock/config</span> << <span class="s">'EOF'</span>
+image=~/Pictures/wallpapers/pink-galaxy.jpg
+scaling=fill
+font=Calibri
+
+# Ring colors (the lock indicator circle)
+inside-color=0a0a1200
+ring-color=e91e63cc
+key-hl-color=f48fb1ff
+bs-hl-color=ff5252ff
+line-color=00000000
+
+# Wrong password
+inside-wrong-color=ff525233
+ring-wrong-color=ff5252ff
+
+# Verifying
+inside-ver-color=2e7d3233
+ring-ver-color=2e7d32ff
+
+# Cleared
+inside-clear-color=e91e6333
+ring-clear-color=e91e63ff
+
+# Text
+text-color=e8e6f0ff
+text-wrong-color=ff5252ff
+text-ver-color=a5d6a7ff
+
+# Layout
+indicator-radius=100
+indicator-thickness=8
+separator-color=00000000
+
+# Behavior
+show-failed-attempts
+daemonize
+EOF
+
+<span class="c"># Test the lock screen</span>
+<span class="g">swaylock</span></pre></div>
+
+<p>When you press <span class="ic">Super+L</span> (configured in the Hyprland keybindings from Part 2), the screen dims and shows your galaxy wallpaper with a centered ring indicator. The ring glows pink as you type your password, turns green when verifying, and flashes red if the password is wrong. The entire effect feels like a cosmic portal you are unlocking.</p>
+
+<a class="btt" href="#top">↑ Back to top</a>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--            CHAPTER 15: SYSTEM HARDENING                      -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="pb"></div>
+<div class="cd" id="ch15"><span class="cn">Chapter 15</span></div>
+<h1>System Hardening</h1>
+
+<div class="sc" data-section="ch15">
+  <div style="display:flex;gap:12px;flex-wrap:wrap;">
+    <label class="cbi"><input type="checkbox" data-type="read" onchange="rc()"> Read</label>
+    <label class="cbi"><input type="checkbox" data-type="applied" onchange="rc()"> Applied</label>
+    <label class="cbi"><input type="checkbox" data-type="memorized" onchange="rc()"> Memorized</label>
+    <label class="cbi"><input type="checkbox" data-type="implemented" onchange="rc()"> Implemented</label>
+  </div>
+  <span class="nt" onclick="this.nextElementSibling.classList.toggle('vis')">📝 Notes</span>
+</div>
+<div class="na"><textarea placeholder="Chapter 15 notes…"></textarea></div>
+
+<h2 id="s15-1">15.1 Firewall Hardening (ufw)</h2>
+
+<p>We set up ufw in Part 1 with basic deny-incoming/allow-outgoing defaults and an SSH allow rule. Now let's add rate limiting and application-specific rules for your development services.</p>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># Rate-limit SSH (blocks IPs that try more than 6 connections in 30 seconds)</span>
+<span class="g">sudo</span> <span class="g">ufw</span> <span class="o">limit</span> <span class="y">ssh</span>
+
+<span class="c"># Allow local development ports (only from localhost)</span>
+<span class="g">sudo</span> <span class="g">ufw</span> <span class="o">allow</span> <span class="y">from 127.0.0.1 to any port 3000</span>   <span class="c"># Node.js dev server</span>
+<span class="g">sudo</span> <span class="g">ufw</span> <span class="o">allow</span> <span class="y">from 127.0.0.1 to any port 5432</span>   <span class="c"># PostgreSQL</span>
+<span class="g">sudo</span> <span class="g">ufw</span> <span class="o">allow</span> <span class="y">from 127.0.0.1 to any port 6379</span>   <span class="c"># Redis</span>
+<span class="g">sudo</span> <span class="g">ufw</span> <span class="o">allow</span> <span class="y">from 127.0.0.1 to any port 8080</span>   <span class="c"># local web apps</span>
+
+<span class="c"># Block all Docker-exposed ports from external access</span>
+<span class="c"># (Docker creates its own iptables rules that bypass ufw — this fixes it)</span>
+<span class="g">sudo</span> <span class="g">tee</span> <span class="b">/etc/docker/daemon.json</span> << <span class="s">'EOF'</span>
+{
+    "iptables": false
+}
+EOF
+<span class="g">sudo</span> <span class="g">systemctl</span> <span class="o">restart</span> <span class="y">docker</span>
+
+<span class="c"># Verify firewall status</span>
+<span class="g">sudo</span> <span class="g">ufw</span> <span class="o">status</span> <span class="o">verbose</span></pre>
+<div class="co"><div class="col">Expected Output</div><pre>Status: active
+Default: deny (incoming), allow (outgoing), deny (routed)
+To                  Action      From
+--                  ------      ----
+22/tcp              LIMIT       Anywhere
+3000                ALLOW       127.0.0.1
+5432                ALLOW       127.0.0.1
+6379                ALLOW       127.0.0.1
+8080                ALLOW       127.0.0.1</pre></div></div>
+
+<h2 id="s15-2">15.2 fail2ban — Intrusion Prevention</h2>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># Install fail2ban</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="s">fail2ban</span>
+
+<span class="c"># Create local config (never edit the default jail.conf directly)</span>
+<span class="g">sudo</span> <span class="g">cat</span> > <span class="b">/etc/fail2ban/jail.local</span> << <span class="s">'EOF'</span>
+[DEFAULT]
+bantime  = 1h        # ban for 1 hour
+findtime = 10m       # within a 10-minute window
+maxretry = 5         # 5 failed attempts = ban
+banaction = ufw      # use ufw to implement bans
+
+[sshd]
+enabled = true
+port    = ssh
+filter  = sshd
+logpath = /var/log/auth.log
+maxretry = 3         # stricter for SSH: 3 attempts
+EOF
+
+<span class="c"># Enable and start</span>
+<span class="g">sudo</span> <span class="g">systemctl</span> <span class="o">enable</span> <span class="o">--now</span> <span class="s">fail2ban</span>
+
+<span class="c"># Check status</span>
+<span class="g">sudo</span> <span class="g">fail2ban-client</span> <span class="o">status</span> <span class="y">sshd</span></pre>
+<div class="co"><div class="col">Expected Output</div><pre>Status for the jail: sshd
+|- Filter
+|  |- Currently failed: 0
+|  |- Total failed:     0
+|  `- File list:        /var/log/auth.log
+`- Actions
+   |- Currently banned: 0
+   |- Total banned:     0
+   `- Banned IP list:</pre></div></div>
+
+<p><strong>Technical detail:</strong> fail2ban monitors log files (in this case, <span class="ic">/var/log/auth.log</span> where sshd records failed login attempts) using configurable regex patterns. When an IP address triggers more than <span class="ic">maxretry</span> matches within <span class="ic">findtime</span>, fail2ban executes the ban action — in our case, it runs <span class="ic">ufw insert 1 deny from &lt;ip&gt;</span> to add a firewall rule blocking that IP. After <span class="ic">bantime</span> expires, the rule is automatically removed. This protects against brute-force SSH attacks, which are extremely common — any internet-facing SSH server receives thousands of automated login attempts per day.</p>
+
+<h2 id="s15-3">15.3 Kernel Hardening (sysctl)</h2>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># Create security-focused sysctl configuration</span>
+<span class="g">sudo</span> <span class="g">cat</span> > <span class="b">/etc/sysctl.d/99-security.conf</span> << <span class="s">'EOF'</span>
+# ═══ Pink Galaxy Security Hardening ═══
+
+# Prevent IP spoofing
+net.ipv4.conf.all.rp_filter = 1
+net.ipv4.conf.default.rp_filter = 1
+
+# Disable ICMP redirect acceptance (prevents MITM via routing table poisoning)
+net.ipv4.conf.all.accept_redirects = 0
+net.ipv4.conf.default.accept_redirects = 0
+net.ipv6.conf.all.accept_redirects = 0
+
+# Disable source routing (prevents attackers from specifying packet path)
+net.ipv4.conf.all.accept_source_route = 0
+net.ipv6.conf.all.accept_source_route = 0
+
+# Enable SYN flood protection (SYN cookies)
+net.ipv4.tcp_syncookies = 1
+
+# Log suspicious packets (martians = packets with impossible source addresses)
+net.ipv4.conf.all.log_martians = 1
+
+# Disable IPv4 forwarding (you're a workstation, not a router)
+net.ipv4.ip_forward = 0
+
+# Restrict dmesg access to root
+kernel.dmesg_restrict = 1
+
+# Restrict kernel pointer exposure (prevents info leaks for exploits)
+kernel.kptr_restrict = 2
+
+# Restrict ptrace (prevents process memory snooping between users)
+kernel.yama.ptrace_scope = 1
+EOF
+
+<span class="c"># Apply immediately</span>
+<span class="g">sudo</span> <span class="g">sysctl</span> <span class="o">--system</span></pre></div>
+
+<p>These sysctl settings harden the kernel's network stack and process security without affecting normal usage. The SYN cookie protection mitigates SYN flood DoS attacks by using a cryptographic challenge instead of allocating connection state for every incoming SYN packet. Restricting ptrace prevents one user's process from attaching a debugger to another user's process — a common privilege escalation technique. These settings persist across reboots because they are in <span class="ic">/etc/sysctl.d/</span>.</p>
+
+<h2 id="s15-4">15.4 SSH Key Hardening</h2>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># Harden SSH server configuration</span>
+<span class="g">sudo</span> <span class="g">tee</span> <span class="b">/etc/ssh/sshd_config.d/99-hardening.conf</span> << <span class="s">'EOF'</span>
+# Disable password authentication (key-based only)
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+
+# Disable root login entirely
+PermitRootLogin no
+
+# Use only strong ciphers
+Ciphers aes256-gcm@openssh.com,chacha20-poly1305@openssh.com
+MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com
+KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org
+
+# Limit login attempts and sessions
+MaxAuthTries 3
+MaxSessions 3
+
+# Disconnect idle sessions after 10 minutes
+ClientAliveInterval 300
+ClientAliveCountMax 2
+EOF
+
+<span class="c"># Restart SSH to apply</span>
+<span class="g">sudo</span> <span class="g">systemctl</span> <span class="o">restart</span> <span class="s">sshd</span></pre></div>
+
+<div class="cal w">
+<div class="ct">⚠️ IMPORTANT — KEY-BASED AUTH</div>
+<p>After enabling <span class="ic">PasswordAuthentication no</span>, you can ONLY log in via SSH key. Make sure you have already set up your SSH key pair (<span class="ic">ssh-keygen -t ed25519</span>) and copied the public key to the server (<span class="ic">ssh-copy-id user@host</span>) before restarting sshd. If you lock yourself out, you will need physical access to the machine to fix it.</p>
+</div>
+
+<a class="btt" href="#top">↑ Back to top</a>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--            CHAPTER 16: BACKUPS                               -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="pb"></div>
+<div class="cd" id="ch16"><span class="cn">Chapter 16</span></div>
+<h1>Backup Strategy</h1>
+
+<div class="sc" data-section="ch16">
+  <div style="display:flex;gap:12px;flex-wrap:wrap;">
+    <label class="cbi"><input type="checkbox" data-type="read" onchange="rc()"> Read</label>
+    <label class="cbi"><input type="checkbox" data-type="applied" onchange="rc()"> Applied</label>
+    <label class="cbi"><input type="checkbox" data-type="memorized" onchange="rc()"> Memorized</label>
+    <label class="cbi"><input type="checkbox" data-type="implemented" onchange="rc()"> Implemented</label>
+  </div>
+  <span class="nt" onclick="this.nextElementSibling.classList.toggle('vis')">📝 Notes</span>
+</div>
+<div class="na"><textarea placeholder="Chapter 16 notes…"></textarea></div>
+
+<h2 id="s16-1">16.1 Timeshift — System Snapshots</h2>
+
+<p><strong>Layman version:</strong> Timeshift is like a "System Restore" for Linux. It takes snapshots of your system files (not your personal data) so that if a pacman update breaks something, you can roll back to a working state in minutes. Think of it as a save game before a boss fight — if you die, reload and try again.</p>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># Install Timeshift</span>
+<span class="g">paru</span> <span class="o">-S</span> <span class="s">timeshift</span>
+
+<span class="c"># Create your first snapshot (before any major changes)</span>
+<span class="g">sudo</span> <span class="g">timeshift</span> <span class="o">--create</span> <span class="o">--comments</span> <span class="y">"Fresh Arch install — Parts 1-4 complete"</span>
+
+<span class="c"># List snapshots</span>
+<span class="g">sudo</span> <span class="g">timeshift</span> <span class="o">--list</span>
+
+<span class="c"># Restore a snapshot (if something breaks)</span>
+<span class="c"># sudo timeshift --restore</span>
+
+<span class="c"># Configure automatic snapshots (daily + weekly)</span>
+<span class="g">sudo</span> <span class="g">timeshift</span>   <span class="c"># opens GUI for schedule configuration</span>
+<span class="c"># Recommended: Keep 5 daily + 3 weekly snapshots</span>
+
+<span class="c"># PRO TIP: Always run Timeshift before major updates:</span>
+<span class="c"># sudo timeshift --create --comments "pre-update" && sudo pacman -Syu</span></pre>
+<div class="co"><div class="col">Expected Output</div><pre>Created snapshot: 2026-03-15_14-30-00
+Snapshot saved to: /timeshift/snapshots/2026-03-15_14-30-00</pre></div></div>
+
+<h2 id="s16-2">16.2 Borg — Encrypted Data Backup</h2>
+
+<p>Timeshift protects the system, but your personal data (projects, dotfiles, documents, SSH keys) needs separate backup. Borg is a deduplicating, encrypting backup tool — it only stores the bytes that changed since the last backup, and everything is encrypted at rest.</p>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># Install Borg</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="s">borg</span>
+
+<span class="c"># Initialize a backup repository (on an external drive or NAS)</span>
+<span class="c"># Replace /mnt/backup with your backup location</span>
+<span class="g">borg</span> <span class="o">init</span> <span class="o">--encryption=repokey</span> <span class="b">/mnt/backup/borg-repo</span>
+
+<span class="c"># Create a backup script</span>
+<span class="g">cat</span> > <span class="b">~/.local/bin/backup.sh</span> << <span class="s">'EOF'</span>
+#!/bin/bash
+# ═══ Pink Galaxy Backup Script ═══
+REPO="/mnt/backup/borg-repo"
+TIMESTAMP=$(date +%Y-%m-%d_%H-%M)
+
+echo "🌸 Starting backup: $TIMESTAMP"
+
+borg create --progress --stats \
+    "$REPO::home-$TIMESTAMP" \
+    ~/projects \
+    ~/Documents \
+    ~/Pictures \
+    ~/.config \
+    ~/.local/bin \
+    ~/.ssh \
+    ~/.gitconfig \
+    ~/.zshrc \
+    ~/.tmux.conf \
+    --exclude '*.pyc' \
+    --exclude '__pycache__' \
+    --exclude 'node_modules' \
+    --exclude '.venv' \
+    --exclude '.cache' \
+    --exclude '*.o' \
+    --exclude '.git/objects'
+
+# Prune old backups: keep 7 daily, 4 weekly, 6 monthly
+borg prune --stats "$REPO" \
+    --keep-daily=7 \
+    --keep-weekly=4 \
+    --keep-monthly=6
+
+echo "✅ Backup complete!"
+EOF
+<span class="g">chmod</span> <span class="y">+x</span> <span class="b">~/.local/bin/backup.sh</span>
+
+<span class="c"># Run your first backup</span>
+<span class="b">~/.local/bin/backup.sh</span>
+
+<span class="c"># List backup archives</span>
+<span class="g">borg</span> <span class="o">list</span> <span class="b">/mnt/backup/borg-repo</span></pre></div>
+
+<h2 id="s16-3">16.3 Dotfiles Git Repository</h2>
+
+<p>The final backup strategy is version-controlling your configuration files in a Git repository. This way you can rebuild your entire Pink Galaxy setup on any machine by cloning one repo and running a setup script.</p>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># Create dotfiles repo</span>
+<span class="g">mkdir</span> <span class="b">~/dotfiles</span> && <span class="g">cd</span> <span class="b">~/dotfiles</span>
+<span class="g">git</span> <span class="o">init</span>
+
+<span class="c"># Copy your configs into the repo</span>
+<span class="g">cp</span> <span class="o">-r</span> <span class="b">~/.config/hypr</span> <span class="b">./hypr</span>
+<span class="g">cp</span> <span class="o">-r</span> <span class="b">~/.config/waybar</span> <span class="b">./waybar</span>
+<span class="g">cp</span> <span class="o">-r</span> <span class="b">~/.config/wofi</span> <span class="b">./wofi</span>
+<span class="g">cp</span> <span class="o">-r</span> <span class="b">~/.config/kitty</span> <span class="b">./kitty</span>
+<span class="g">cp</span> <span class="b">~/.zshrc</span> <span class="b">./zshrc</span>
+<span class="g">cp</span> <span class="b">~/.tmux.conf</span> <span class="b">./tmux.conf</span>
+<span class="g">cp</span> <span class="b">~/.config/starship.toml</span> <span class="b">./starship.toml</span>
+
+<span class="c"># Create a setup script that symlinks everything</span>
+<span class="g">cat</span> > <span class="b">setup.sh</span> << <span class="s">'EOF'</span>
+#!/bin/bash
+# ═══ Pink Galaxy Dotfiles Setup ═══
+DIR="$(cd "$(dirname "$0")" && pwd)"
+
+ln -sf "$DIR/hypr" ~/.config/hypr
+ln -sf "$DIR/waybar" ~/.config/waybar
+ln -sf "$DIR/wofi" ~/.config/wofi
+ln -sf "$DIR/kitty" ~/.config/kitty
+ln -sf "$DIR/zshrc" ~/.zshrc
+ln -sf "$DIR/tmux.conf" ~/.tmux.conf
+ln -sf "$DIR/starship.toml" ~/.config/starship.toml
+
+echo "🌸 Dotfiles linked! Restart Hyprland to apply."
+EOF
+<span class="g">chmod</span> <span class="y">+x</span> <span class="b">setup.sh</span>
+
+<span class="c"># Commit and push to GitHub</span>
+<span class="g">git</span> <span class="o">add</span> <span class="y">.</span>
+<span class="g">git</span> <span class="o">commit</span> <span class="o">-m</span> <span class="y">"🌸 initial Pink Galaxy dotfiles"</span>
+<span class="g">gh</span> <span class="o">repo</span> <span class="o">create</span> <span class="y">dotfiles</span> <span class="o">--public</span> <span class="o">--source=.</span> <span class="o">--push</span></pre></div>
+
+<a class="btt" href="#top">↑ Back to top</a>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--            CHAPTER 17: SYSTEM MAINTENANCE                    -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="pb"></div>
+<div class="cd" id="ch17"><span class="cn">Chapter 17</span></div>
+<h1>System Maintenance — Keeping Your Galaxy Healthy</h1>
+
+<div class="sc" data-section="ch17">
+  <div style="display:flex;gap:12px;flex-wrap:wrap;">
+    <label class="cbi"><input type="checkbox" data-type="read" onchange="rc()"> Read</label>
+    <label class="cbi"><input type="checkbox" data-type="applied" onchange="rc()"> Applied</label>
+    <label class="cbi"><input type="checkbox" data-type="memorized" onchange="rc()"> Memorized</label>
+    <label class="cbi"><input type="checkbox" data-type="implemented" onchange="rc()"> Implemented</label>
+  </div>
+  <span class="nt" onclick="this.nextElementSibling.classList.toggle('vis')">📝 Notes</span>
+</div>
+<div class="na"><textarea placeholder="Chapter 17 notes…"></textarea></div>
+
+<h2 id="s17-1">17.1 Weekly Maintenance Routine</h2>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ Create a maintenance script ═══</span>
+<span class="g">cat</span> > <span class="b">~/.local/bin/maintain.sh</span> << <span class="s">'EOF'</span>
+#!/bin/bash
+# ═══ Pink Galaxy Weekly Maintenance ═══
+echo "🌸 Starting system maintenance..."
+
+# 1. Create Timeshift snapshot before updating
+echo "📸 Creating snapshot..."
+sudo timeshift --create --comments "pre-maintenance-$(date +%Y%m%d)"
+
+# 2. Update everything (official repos + AUR)
+echo "📦 Updating packages..."
+paru -Syu
+
+# 3. Clean package cache (keep last 3 versions)
+echo "🧹 Cleaning package cache..."
+sudo paccache -r
+sudo paccache -ruk0    # remove all cached versions of uninstalled packages
+
+# 4. Remove orphaned packages
+ORPHANS=$(pacman -Qdtq 2>/dev/null)
+if [ -n "$ORPHANS" ]; then
+    echo "🗑️ Removing orphaned packages..."
+    sudo pacman -Rns $ORPHANS
+else
+    echo "✅ No orphans found"
+fi
+
+# 5. Clear user cache (optional — saves disk space)
+echo "🧹 Cleaning user caches..."
+rm -rf ~/.cache/thumbnails/*
+rm -rf ~/.cache/pip/http/*
+
+# 6. Check failed systemd services
+echo "🔍 Checking for failed services..."
+systemctl --failed
+
+# 7. Check disk health
+echo "💿 SSD health..."
+sudo smartctl -H /dev/nvme0n1
+
+# 8. Show disk usage
+echo "📊 Disk usage..."
+df -h / /home /boot
+
+echo ""
+echo "🌸 Maintenance complete! $(date)"
+EOF
+<span class="g">chmod</span> <span class="y">+x</span> <span class="b">~/.local/bin/maintain.sh</span>
+
+<span class="c"># Run it</span>
+<span class="b">~/.local/bin/maintain.sh</span></pre></div>
+
+<h2 id="s17-2">17.2 SSD TRIM Automation</h2>
+
+<p>TRIM tells the SSD which blocks are no longer in use so the controller can optimize garbage collection and write performance. Modern Arch enables the weekly TRIM timer by default, but let's verify it is active.</p>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># Enable weekly TRIM (if not already enabled)</span>
+<span class="g">sudo</span> <span class="g">systemctl</span> <span class="o">enable</span> <span class="o">--now</span> <span class="s">fstrim.timer</span>
+
+<span class="c"># Verify it's scheduled</span>
+<span class="g">systemctl</span> <span class="o">status</span> <span class="s">fstrim.timer</span>
+
+<span class="c"># Run TRIM manually (if you want it now)</span>
+<span class="g">sudo</span> <span class="g">fstrim</span> <span class="o">-av</span></pre>
+<div class="co"><div class="col">Expected Output</div><pre>● fstrim.timer - Discard unused blocks once a week
+   Active: active (waiting)
+  Trigger: Mon 2026-03-16 00:00:00 CET
+
+/: 45.2 GiB (48561340416 bytes) trimmed on /dev/nvme0n1p3
+/home: 120.8 GiB (129734893568 bytes) trimmed on /dev/nvme0n1p4
+/boot: 480 MiB (503316480 bytes) trimmed on /dev/nvme0n1p1</pre></div></div>
+
+<h2 id="s17-3">17.3 BIOS/Firmware Updates via fwupd</h2>
+
+<p>Because we kept "UEFI Capsule Firmware Updates" enabled in the Dell BIOS, you can update your BIOS firmware directly from Linux without needing a Windows boot USB or Dell's website.</p>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># Install fwupd</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="s">fwupd</span>
+
+<span class="c"># Check for available firmware updates</span>
+<span class="g">fwupdmgr</span> <span class="o">refresh</span>
+<span class="g">fwupdmgr</span> <span class="o">get-updates</span>
+
+<span class="c"># Apply updates (will require a reboot)</span>
+<span class="g">fwupdmgr</span> <span class="o">update</span>
+
+<span class="c"># List devices fwupd can manage</span>
+<span class="g">fwupdmgr</span> <span class="o">get-devices</span></pre>
+<div class="co"><div class="col">Expected Output (get-devices)</div><pre>Dell Inspiron 14 7420 2-in-1
+  Device ID:     xxxxx
+  Current version: 1.30.1
+  Vendor:        Dell Inc.
+  Update State:  Success
+  GUID:          xxxxx</pre></div></div>
+
+<h2 id="s17-4">17.4 Pacman Tips & Tricks</h2>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ USEFUL PACMAN COMMANDS ═══</span>
+
+<span class="c"># Check for updates without installing</span>
+<span class="g">checkupdates</span>                          <span class="c"># from pacman-contrib package</span>
+
+<span class="c"># Downgrade a package (if an update broke something)</span>
+<span class="c"># Packages are cached in /var/cache/pacman/pkg/</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-U</span> <span class="b">/var/cache/pacman/pkg/package-old_version.pkg.tar.zst</span>
+
+<span class="c"># Which package owns a command?</span>
+<span class="g">pacman</span> <span class="o">-Qo</span> <span class="b">/usr/bin/rg</span>               <span class="c"># → ripgrep</span>
+
+<span class="c"># Search for a package that provides a file you need</span>
+<span class="g">pacman</span> <span class="o">-F</span> <span class="y">libcurl.so</span>                <span class="c"># find package providing this library</span>
+
+<span class="c"># List all explicitly installed packages (not dependencies)</span>
+<span class="g">pacman</span> <span class="o">-Qe</span>                            <span class="c"># your "software manifest"</span>
+
+<span class="c"># Export your package list (to recreate on another machine)</span>
+<span class="g">pacman</span> <span class="o">-Qqe</span> > <span class="b">~/dotfiles/pkglist.txt</span>
+
+<span class="c"># Install all packages from a list</span>
+<span class="c"># sudo pacman -S --needed - < ~/dotfiles/pkglist.txt</span>
+
+<span class="c"># Check package for known security issues</span>
+<span class="g">paru</span> <span class="o">-Ss</span> <span class="y">arch-audit</span>
+<span class="g">arch-audit</span>                            <span class="c"># lists packages with known CVEs</span></pre></div>
+
+<h2 id="s17-5">17.5 Kernel Management</h2>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># Install a fallback kernel (in case a kernel update causes issues)</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="s">linux-lts linux-lts-headers</span>
+
+<span class="c"># Create a boot entry for the LTS kernel</span>
+<span class="g">sudo</span> <span class="g">cat</span> > <span class="b">/boot/loader/entries/arch-lts.conf</span> << <span class="s">'EOF'</span>
+title   Arch Linux — LTS Kernel (Fallback)
+linux   /vmlinuz-linux-lts
+initrd  /intel-ucode.img
+initrd  /initramfs-linux-lts.img
+options root=UUID=YOUR-ROOT-UUID-HERE rw
+EOF
+
+<span class="c"># Now your boot menu has two options:</span>
+<span class="c"># 1. Arch Linux — Pink Galaxy 🌸 (latest kernel)</span>
+<span class="c"># 2. Arch Linux — LTS Kernel (stable fallback)</span>
+<span class="c"># If the latest kernel causes issues, select LTS at boot</span>
+
+<span class="c"># Check current kernel version</span>
+<span class="g">uname</span> <span class="o">-r</span></pre>
+<div class="co"><div class="col">Expected Output</div><pre>6.x.x-arch1-1</pre></div></div>
+
+<a class="btt" href="#top">↑ Back to top</a>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--            THE END                                           -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="pb"></div>
+<div style="text-align:center;padding:60px 20px;margin:40px 0;">
+  <h1 style="border:none;font-size:36pt;background:linear-gradient(90deg,var(--pink),#f48fb1,#ce93d8,#f48fb1,var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">🌸 Congratulations! 🌸</h1>
+  <p style="color:var(--tx2);font-size:14pt;margin:16px 0;">You have built a complete Arch Linux system from absolute zero.</p>
+  <p style="color:var(--mt);font-size:11pt;max-width:700px;margin:0 auto;">From a blank SSD and a Dell BIOS showing an HTTP Boot screen, you now have a fully personalized Pink Galaxy developer and security workstation with Hyprland, a complete Python/Node/Rust/Docker toolchain, AWS and Azure and Databricks cloud integration, Claude Code for AI-powered development, 2800+ BlackArch security tools available at your fingertips, a gorgeous rice with matching colors everywhere, encrypted backups, and a hardened kernel. You did all of this without an installer — component by component, understanding every single piece.</p>
+  <p style="color:var(--pink);font-size:12pt;margin-top:20px;font-weight:bold;">Welcome to your galaxy. 🌸✨</p>
+</div>
+
+<div class="cal g">
+<div class="ct">📋 WHAT YOU BUILT — COMPLETE MANIFEST</div>
+<p><strong>Part 1:</strong> Dell BIOS anonymization → Secure disk wipe → Partitioning → Base system → Bootloader → User/sudo → NetworkManager → SSH → Firewall → AUR helper</p>
+<p><strong>Part 2:</strong> Hyprland compositor → Kitty terminal → Zsh + Starship → tmux → PipeWire audio → Bluetooth → Stream Deck → Logitech tools → HDMI monitors</p>
+<p><strong>Part 3:</strong> Python (pyenv/Poetry) → Node (nvm) → Rust → Docker → VS Code → Claude Code → GitHub CLI → Neovim/LazyVim → PostgreSQL + Redis → Obsidian → AWS CLI + SAM + CDK + Amplify → Azure CLI → Databricks CLI + Connect → PySpark + Polars → BlackArch repository → Security lab</p>
+<p><strong>Part 4:</strong> Pink Galaxy rice (Waybar + Wofi + GTK/Qt + wallpapers + lock screen) → Firewall hardening → fail2ban → Kernel sysctl → SSH hardening → Timeshift snapshots → Borg encrypted backups → Dotfiles repo → Maintenance automation → SSD TRIM → fwupd firmware updates → LTS kernel fallback</p>
+</div>
+
+</div><!-- end .w -->
+
+<div class="sf"><button class="sb" onclick="saveF()">💾 Save</button></div>
+
+<script>
+(function(){
+  'use strict';
+  const K='archguide_p4_v1';
+  function ld(){try{return JSON.parse(localStorage.getItem(K))||{};}catch{return {};}}
+  function sv(s){try{localStorage.setItem(K,JSON.stringify(s));}catch{}}
+  window.cpC=function(b){const pre=b.closest('.cw').querySelector('pre');navigator.clipboard.writeText(pre.textContent).then(()=>{b.textContent='✓';b.classList.add('ok');setTimeout(()=>{b.textContent='Copy';b.classList.remove('ok');},1500);});};
+  window.rc=function(){
+    const all=document.querySelectorAll('.sc input[type="checkbox"]');
+    let t=all.length,c=0;all.forEach(cb=>{if(cb.checked)c++;});
+    const pct=t>0?Math.round(c/t*100):0;
+    document.getElementById('gBar').style.width=pct+'%';
+    document.getElementById('gPct').textContent=pct+'%';
+    const s={};all.forEach((cb,i)=>{s['c'+i]=cb.checked;});
+    document.querySelectorAll('.na textarea').forEach((ta,i)=>{if(ta.value)s['n'+i]=ta.value;});
+    sv(s);
+  };
+  const saved=ld();
+  document.querySelectorAll('.sc input[type="checkbox"]').forEach((cb,i)=>{if(saved['c'+i])cb.checked=true;});
+  document.querySelectorAll('.na textarea').forEach((ta,i)=>{if(saved['n'+i])ta.value=saved['n'+i];});
+  rc();
+  window.saveF=function(){rc();const blob=new Blob(['<!DOCTYPE html>\n'+document.documentElement.outerHTML],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='archlinux_guide_part4_SAVED_'+new Date().toISOString().slice(0,10)+'.html';a.click();const b=document.querySelector('.sb');b.textContent='✓ Saved!';setTimeout(()=>{b.textContent='💾 Save';},2000);};
+})();
+</script>
+</body>
+</html>

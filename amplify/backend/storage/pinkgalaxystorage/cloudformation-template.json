@@ -1,0 +1,186 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "DynamoDB tables for Pink Galaxy DevHub",
+  "Parameters": {
+    "AppSyncApiName": {
+      "Type": "String"
+    },
+    "DynamoDBModelTableReadIOPS": {
+      "Type": "Number",
+      "Description": "The number of read IOPS the table should support.",
+      "Default": 5
+    },
+    "DynamoDBModelTableWriteIOPS": {
+      "Type": "Number", 
+      "Description": "The number of write IOPS the table should support.",
+      "Default": 5
+    },
+    "env": {
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "UserProgressTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "TableName": {
+          "Fn::Sub": "UserProgress-${env}"
+        },
+        "BillingMode": "PAY_PER_REQUEST",
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "userId",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "moduleId", 
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "userId",
+            "KeyType": "HASH"
+          },
+          {
+            "AttributeName": "moduleId",
+            "KeyType": "RANGE"
+          }
+        ],
+        "StreamSpecification": {
+          "StreamViewType": "NEW_AND_OLD_IMAGES"
+        },
+        "PointInTimeRecoverySpecification": {
+          "PointInTimeRecoveryEnabled": true
+        },
+        "BackupPolicy": {
+          "PointInTimeRecoveryEnabled": true
+        },
+        "DeletionPolicy": "Retain",
+        "UpdateReplacePolicy": "Retain",
+        "Tags": [
+          {
+            "Key": "Project",
+            "Value": "PinkGalaxyDevHub"
+          }
+        ]
+      }
+    },
+    "UserNotebooksTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "TableName": {
+          "Fn::Sub": "UserNotebooks-${env}"
+        },
+        "BillingMode": "PAY_PER_REQUEST",
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "userId",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "notebookId",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "userId", 
+            "KeyType": "HASH"
+          },
+          {
+            "AttributeName": "notebookId",
+            "KeyType": "RANGE"
+          }
+        ],
+        "StreamSpecification": {
+          "StreamViewType": "NEW_AND_OLD_IMAGES"
+        },
+        "PointInTimeRecoverySpecification": {
+          "PointInTimeRecoveryEnabled": true
+        },
+        "BackupPolicy": {
+          "PointInTimeRecoveryEnabled": true
+        },
+        "DeletionPolicy": "Retain",
+        "UpdateReplacePolicy": "Retain",
+        "Tags": [
+          {
+            "Key": "Project",
+            "Value": "PinkGalaxyDevHub"
+          }
+        ]
+      }
+    },
+    "UserProfilesTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "TableName": {
+          "Fn::Sub": "UserProfiles-${env}"
+        },
+        "BillingMode": "PAY_PER_REQUEST", 
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "userId",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "userId",
+            "KeyType": "HASH"
+          }
+        ],
+        "StreamSpecification": {
+          "StreamViewType": "NEW_AND_OLD_IMAGES"
+        },
+        "PointInTimeRecoverySpecification": {
+          "PointInTimeRecoveryEnabled": true
+        },
+        "BackupPolicy": {
+          "PointInTimeRecoveryEnabled": true
+        },
+        "DeletionPolicy": "Retain",
+        "UpdateReplacePolicy": "Retain",
+        "Tags": [
+          {
+            "Key": "Project", 
+            "Value": "PinkGalaxyDevHub"
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "UserProgressTableName": {
+      "Value": {
+        "Ref": "UserProgressTable"
+      },
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${AWS::StackName}-UserProgressTable"
+        }
+      }
+    },
+    "UserNotebooksTableName": {
+      "Value": {
+        "Ref": "UserNotebooksTable"
+      },
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${AWS::StackName}-UserNotebooksTable"
+        }
+      }
+    },
+    "UserProfilesTableName": {
+      "Value": {
+        "Ref": "UserProfilesTable"
+      },
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${AWS::StackName}-UserProfilesTable"
+        }
+      }
+    }
+  }
+}

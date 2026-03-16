@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arch Linux — Pink Galaxy — Linux Command Bible</title>
+<!--
+  MODULAR DESIGN NOTE (future AWS deployment):
+  ═══════════════════════════════════════════
+  This file is structured for future migration to:
+  - AWS Amplify (frontend hosting from S3 + CloudFront)
+  - S3 (static asset storage for guide HTML modules)
+  - Lambda (API for saving user progress, notes, generating PDFs)
+  - DynamoDB (user state: checkboxes, notes, stars, sticky notes)
+  
+  Each section has a data-module-id attribute for extraction into 
+  individual S3 objects. The state management is currently localStorage 
+  + save-to-file, but the API calls are stubbed for DynamoDB migration.
+  
+  Migration path:
+  1. Split each data-module-id section into its own .html fragment in S3
+  2. Create Lambda functions: saveProgress, loadProgress, exportPDF
+  3. DynamoDB table: UserProgress (userId, moduleId, state JSON)
+  4. Amplify frontend loads fragments dynamically, calls Lambda for state
+-->
+<style>
+:root {
+  --pink:#e91e63;--pink-light:#f8bbd0;--pink-dark:#880e4f;
+  --green:#2e7d32;--green-light:#c8e6c9;
+  --bg:#0a0a12;--bg-card:rgba(15,15,30,0.85);
+  --text:#e8e6f0;--text2:#a8a6b8;--muted:#6c6a7e;
+  --border:rgba(233,30,99,0.2);--border-g:rgba(46,125,50,0.3);
+  --code-bg:#1a1a2e;
+  --code-green:#a5d6a7;--code-pink:#f48fb1;--code-yellow:#fff59d;
+  --code-blue:#90caf9;--code-orange:#ffcc80;--code-comment:#6a6a8a;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Calibri,"Segoe UI",sans-serif;font-size:10.5pt;color:var(--text);background:var(--bg);padding:24px;line-height:1.65;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse at 15% 50%,rgba(233,30,99,0.06)0%,transparent 50%),
+  radial-gradient(ellipse at 85% 20%,rgba(103,58,183,0.04)0%,transparent 50%);}
+.w{max-width:1100px;margin:0 auto;position:relative;z-index:1;}
+h1{color:var(--pink);font-size:22pt;margin:36px 0 12px;border-bottom:2px solid var(--pink);padding-bottom:8px;}
+h2{color:var(--green);font-size:16pt;margin:28px 0 10px;border-left:4px solid var(--green);padding-left:12px;}
+h3{color:var(--pink);font-size:12pt;margin:20px 0 8px;}
+p{margin:8px 0;}
+a{color:var(--pink);text-decoration:none;}a:hover{color:var(--pink-light);}
+.ic{font-family:"Courier New",monospace;font-size:9.5pt;background:rgba(233,30,99,0.1);padding:1px 5px;border-radius:3px;color:#f48fb1;}
+.cmd-block{margin:12px 0;border:1px solid var(--border-g);border-radius:10px;overflow:hidden;background:var(--code-bg);}
+.cmd-header{display:flex;justify-content:space-between;align-items:center;padding:5px 12px;background:rgba(46,125,50,0.12);border-bottom:1px solid var(--border-g);font-size:8.5pt;}
+.cmd-lang{color:var(--green);font-family:"Courier New",monospace;font-weight:bold;text-transform:uppercase;letter-spacing:1px;}
+.cmd-copy{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:var(--text2);padding:2px 8px;border-radius:4px;cursor:pointer;font-size:8pt;font-family:"Courier New",monospace;}
+.cmd-copy:hover{background:var(--pink);color:#fff;border-color:var(--pink);}
+.cmd-copy.ok{background:var(--green);color:#fff;border-color:var(--green);}
+pre{font-family:"Courier New",monospace;font-size:10pt;background:var(--code-bg);padding:14px;overflow-x:auto;white-space:pre;line-height:1.5;margin:0;color:var(--text);}
+pre .c{color:var(--code-comment);font-style:italic;}
+pre .g{color:var(--code-green);}
+pre .p{color:var(--code-pink);}
+pre .y{color:var(--code-yellow);}
+pre .b{color:var(--code-blue);}
+pre .o{color:var(--code-orange);}
+.cmd-output{background:rgba(46,125,50,0.06);border-top:2px solid var(--green);padding:10px 14px;font-family:"Courier New",monospace;font-size:9pt;color:var(--code-green);}
+.cmd-output-label{color:var(--green);font-weight:bold;font-size:8pt;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;}
+.explain{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin:10px 0;font-size:10pt;}
+.explain-title{color:var(--pink);font-weight:bold;font-size:9pt;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.callout{border-radius:8px;border:2px solid var(--pink);padding:12px 16px;margin:14px 0;background:rgba(233,30,99,0.04);}
+.callout.g{border-color:var(--green);background:rgba(46,125,50,0.04);}
+.callout-t{font-weight:bold;font-size:9pt;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.callout:not(.g) .callout-t{color:var(--pink);}
+.callout.g .callout-t{color:var(--green);}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:9.5pt;}
+th{background:rgba(233,30,99,0.1);color:var(--pink-light);padding:8px 10px;text-align:left;border-bottom:2px solid var(--pink);}
+td{padding:6px 10px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top;}
+.cb{text-align:center;}
+.cb input{accent-color:var(--pink);width:15px;height:15px;}
+.tag{display:inline-block;padding:1px 7px;border-radius:8px;font-size:7.5pt;font-weight:bold;margin:0 2px;}
+.tag-fs{background:#1565c0;color:#fff;}
+.tag-net{background:#2e7d32;color:#fff;}
+.tag-proc{background:#e91e63;color:#fff;}
+.tag-sys{background:#ff6f00;color:#fff;}
+.tag-sec{background:#b71c1c;color:#fff;}
+.tag-text{background:#6a1b9a;color:#fff;}
+.tag-pkg{background:#00838f;color:#fff;}
+.cover{text-align:center;padding:40px;margin-bottom:30px;background:linear-gradient(135deg,#1a0533,#0d1b2a);border:2px solid var(--pink);border-radius:14px;box-shadow:0 0 40px rgba(233,30,99,0.2);}
+.cover h1{border:none;font-size:28pt;}
+.save-bar{position:sticky;top:0;z-index:100;background:var(--bg);padding:8px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:12px;}
+.pbar{height:6px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;flex:1;}
+.pfill{height:100%;background:linear-gradient(90deg,var(--pink),var(--green));transition:width 0.3s;}
+.btn{padding:5px 14px;border:none;border-radius:5px;font-weight:bold;font-size:8.5pt;cursor:pointer;letter-spacing:1px;}
+.btn-p{background:var(--pink);color:#fff;}
+.btn-g{background:var(--green);color:#fff;}
+.toc{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin:20px 0;}
+.toc a{color:var(--text2);display:block;padding:3px 0;transition:padding-left 0.2s;}
+.toc a:hover{color:var(--pink-light);padding-left:6px;}
+.toc .l1{font-weight:bold;padding-top:8px;color:var(--pink-light);}
+.toc .l2{padding-left:16px;font-size:10pt;}
+@media print{body{background:#fff;color:#333;padding-right:0!important;}body::before{display:none;}h1{color:#e91e63!important;}h2{color:#2e7d32!important;}pre{background:#f8f9fa!important;color:#333;border:1px solid #ddd;}td,p{color:#333!important;}.save-bar{display:none;}@page{size:A4;margin:1.5cm 1cm;}}
+</style>
+</head>
+<body>
+<div class="w">
+
+<div class="cover">
+  <h1>🌸 Linux Command Bible</h1>
+  <p style="color:var(--text2);">Every command you need, from day-1 basics to advanced sysadmin — with layman + technical explanations</p>
+  <p style="color:var(--muted);font-size:9pt;">Arch Linux • Dell Inspiron 14 7420 2-in-1 • Modular for AWS Amplify Deployment</p>
+</div>
+
+<div class="save-bar">
+  <span style="font-size:8pt;color:var(--muted);">Progress:</span>
+  <span style="font-size:8pt;color:var(--muted)" id="gPct">0%</span>
+  <div class="pbar"><div class="pfill" id="gBar"></div></div>
+  <button class="btn btn-p" onclick="saveThis()">💾 Save</button>
+</div>
+
+<!-- ══════════ TOC ══════════ -->
+<div class="toc" id="toc">
+  <h2 style="margin-top:0;">Table of Contents</h2>
+  <a class="l1" href="#m1">1. Navigation & File System</a>
+  <a class="l2" href="#m1-ls">ls / eza — list directory contents</a>
+  <a class="l2" href="#m1-cd">cd / z — change directory</a>
+  <a class="l2" href="#m1-pwd">pwd — print working directory</a>
+  <a class="l2" href="#m1-mkdir">mkdir / rmdir — make/remove directories</a>
+  <a class="l2" href="#m1-cp">cp — copy files/directories</a>
+  <a class="l2" href="#m1-mv">mv — move/rename</a>
+  <a class="l2" href="#m1-rm">rm — remove files (DANGER ZONE)</a>
+  <a class="l2" href="#m1-ln">ln — create links (hard & symbolic)</a>
+  <a class="l2" href="#m1-find">find / fd — find files</a>
+  <a class="l1" href="#m2">2. File Viewing & Text Processing</a>
+  <a class="l2" href="#m2-cat">cat / bat — display file contents</a>
+  <a class="l2" href="#m2-less">less / more — page through files</a>
+  <a class="l2" href="#m2-head">head / tail — view beginning/end</a>
+  <a class="l2" href="#m2-grep">grep / ripgrep — search text</a>
+  <a class="l2" href="#m2-sed">sed — stream editor</a>
+  <a class="l2" href="#m2-awk">awk — text processing language</a>
+  <a class="l2" href="#m2-sort">sort / uniq / wc — sort, deduplicate, count</a>
+  <a class="l1" href="#m3">3. Permissions & Ownership</a>
+  <a class="l2" href="#m3-chmod">chmod — change permissions</a>
+  <a class="l2" href="#m3-chown">chown — change ownership</a>
+  <a class="l2" href="#m3-sudo">sudo — execute as root</a>
+  <a class="l1" href="#m4">4. Process Management</a>
+  <a class="l2" href="#m4-ps">ps / procs — list processes</a>
+  <a class="l2" href="#m4-kill">kill / killall — terminate processes</a>
+  <a class="l2" href="#m4-bg">bg / fg / jobs / & — background/foreground</a>
+  <a class="l2" href="#m4-systemctl">systemctl — manage services</a>
+  <a class="l1" href="#m5">5. Networking</a>
+  <a class="l2" href="#m5-ip">ip — network configuration</a>
+  <a class="l2" href="#m5-ss">ss / netstat — socket statistics</a>
+  <a class="l2" href="#m5-ping">ping / traceroute / dig — diagnostics</a>
+  <a class="l2" href="#m5-curl">curl — HTTP Swiss Army knife</a>
+  <a class="l2" href="#m5-ssh">ssh / scp — secure remote access</a>
+  <a class="l1" href="#m6">6. Package Management (pacman + paru)</a>
+  <a class="l2" href="#m6-pac">pacman — the Arch package manager</a>
+  <a class="l2" href="#m6-paru">paru — AUR helper</a>
+  <a class="l1" href="#m7">7. Disk & Storage</a>
+  <a class="l2" href="#m7-lsblk">lsblk / fdisk / df / du — disk info</a>
+  <a class="l2" href="#m7-mount">mount / umount — mount filesystems</a>
+  <a class="l1" href="#m8">8. Archiving & Compression</a>
+  <a class="l1" href="#m9">9. Git Essentials</a>
+  <a class="l1" href="#m10">10. Docker Quick Reference</a>
+  <a class="l1" href="#m11">11. Cloud CLI Cheatsheet (AWS / Azure / Databricks)</a>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- MODULE 1: NAVIGATION & FILE SYSTEM                        -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div data-module-id="nav-filesystem" id="m1">
+<h1>1. Navigation & File System</h1>
+
+<h2 id="m1-ls">ls / eza — List Directory Contents</h2>
+
+<p>The <span class="ic">ls</span> command lists files and directories. On your Arch system, you will use <span class="ic">eza</span> instead — a modern Rust-based replacement with colors, icons, Git integration, and tree view. Think of <span class="ic">ls</span> as peeking through a window to see what is inside a room (directory). Each file has metadata: size, owner, permissions, and timestamps.</p>
+
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="c"># Basic listing</span>
+<span class="g">ls</span>                    <span class="c"># list files in current directory</span>
+<span class="g">ls</span> <span class="o">-la</span>               <span class="c"># -l = long format, -a = show hidden files (starting with .)</span>
+<span class="g">ls</span> <span class="o">-lah</span>              <span class="c"># -h = human-readable sizes (KB, MB, GB instead of bytes)</span>
+<span class="g">ls</span> <span class="o">-lt</span>               <span class="c"># sort by modification time (newest first)</span>
+<span class="g">ls</span> <span class="o">-lS</span>               <span class="c"># sort by size (largest first)</span>
+<span class="g">ls</span> <span class="o">-R</span>                <span class="c"># recursive — list all subdirectories too</span>
+
+<span class="c"># Modern replacement — eza (install: pacman -S eza)</span>
+<span class="g">eza</span>                   <span class="c"># colorized ls</span>
+<span class="g">eza</span> <span class="o">-la</span>              <span class="c"># long + hidden, with git status column</span>
+<span class="g">eza</span> <span class="o">--tree</span> <span class="o">-L</span> <span class="y">3</span>     <span class="c"># tree view, 3 levels deep</span>
+<span class="g">eza</span> <span class="o">--icons</span> <span class="o">-la</span>     <span class="c"># show file type icons (needs Nerd Font)</span></pre>
+<div class="cmd-output">
+<div class="cmd-output-label">Expected Output (eza -la)</div>
+<pre>drwxr-xr-x  - mari 15 Mar 14:23 .config
+drwxr-xr-x  - mari 15 Mar 10:45 .local
+.rw-r--r-- 42 mari 15 Mar 14:20 .bashrc
+.rw-r--r--  0 mari 15 Mar 14:15 .zshrc
+drwxr-xr-x  - mari 15 Mar 13:00 projects</pre>
+</div></div>
+
+<div class="explain">
+  <div class="explain-title">🔍 Reading the Output — Permission String</div>
+  <p>The string <span class="ic">drwxr-xr-x</span> decodes as: <strong>d</strong> = directory (- for file, l for symlink), then three groups of three characters: <strong>rwx</strong> (owner: read+write+execute), <strong>r-x</strong> (group: read+execute), <strong>r-x</strong> (others: read+execute). In binary, rwx = 111 = 7, r-x = 101 = 5, so this is permission 755. The kernel checks these bits against the effective UID/GID of the calling process during every <span class="ic">open()</span>, <span class="ic">stat()</span>, or <span class="ic">exec()</span> syscall.</p>
+</div>
+
+<h2 id="m1-cd">cd / z — Change Directory</h2>
+
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="g">cd</span> <span class="b">/home/mari/projects</span>   <span class="c"># absolute path (starts from root /)</span>
+<span class="g">cd</span> <span class="b">projects</span>              <span class="c"># relative path (from current directory)</span>
+<span class="g">cd</span> <span class="b">..</span>                     <span class="c"># go up one level (parent directory)</span>
+<span class="g">cd</span> <span class="b">../..</span>                  <span class="c"># go up two levels</span>
+<span class="g">cd</span> <span class="b">~</span>                      <span class="c"># go to home directory (/home/mari)</span>
+<span class="g">cd</span> <span class="b">-</span>                      <span class="c"># go to PREVIOUS directory (toggle back and forth)</span>
+
+<span class="c"># Modern replacement — zoxide (install: pacman -S zoxide)</span>
+<span class="c"># After using cd for a while, zoxide learns your habits:</span>
+<span class="g">z</span> <span class="b">proj</span>                    <span class="c"># jumps to /home/mari/projects (fuzzy match!)</span>
+<span class="g">z</span> <span class="b">conf</span>                    <span class="c"># jumps to ~/.config (most-visited match for "conf")</span>
+<span class="g">zi</span>                        <span class="c"># interactive selection with fzf</span></pre>
+</div>
+
+<p>When you type <span class="ic">cd /home/mari</span>, the shell calls the <span class="ic">chdir()</span> system call, which tells the kernel to change the process's current working directory. The kernel stores the CWD as an inode reference in the process's task_struct. All subsequent relative path lookups start from this inode. The <span class="ic">..</span> entry is a real directory entry stored in every directory's data blocks — it is a hard link pointing to the parent directory's inode. The <span class="ic">.</span> entry points to the directory's own inode.</p>
+
+<h2 id="m1-pwd">pwd — Print Working Directory</h2>
+
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="g">pwd</span>                       <span class="c"># shows your current location in the filesystem</span></pre>
+<div class="cmd-output"><div class="cmd-output-label">Output</div><pre>/home/mari/projects/archguide</pre></div></div>
+
+<h2 id="m1-mkdir">mkdir / rmdir — Create & Remove Directories</h2>
+
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="g">mkdir</span> <span class="b">myproject</span>                    <span class="c"># create a single directory</span>
+<span class="g">mkdir</span> <span class="o">-p</span> <span class="b">src/components/ui</span>         <span class="c"># -p creates parent dirs too (entire path)</span>
+<span class="g">mkdir</span> <span class="o">-p</span> <span class="b">{src,tests,docs,config}</span>  <span class="c"># brace expansion — creates 4 dirs at once!</span>
+<span class="g">rmdir</span> <span class="b">emptydir</span>                     <span class="c"># remove ONLY if empty (safe)</span></pre>
+</div>
+
+<h2 id="m1-cp">cp — Copy Files and Directories</h2>
+
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="g">cp</span> <span class="b">file.txt</span> <span class="b">backup.txt</span>            <span class="c"># copy file</span>
+<span class="g">cp</span> <span class="o">-r</span> <span class="b">myproject/</span> <span class="b">myproject_bak/</span>   <span class="c"># -r = recursive (copy entire directory tree)</span>
+<span class="g">cp</span> <span class="o">-i</span> <span class="b">file.txt</span> <span class="b">dest/</span>              <span class="c"># -i = interactive (ask before overwriting)</span>
+<span class="g">cp</span> <span class="o">-a</span> <span class="b">source/</span> <span class="b">dest/</span>               <span class="c"># -a = archive (preserves permissions, timestamps, symlinks)</span>
+<span class="g">cp</span> <span class="b">*.py</span> <span class="b">../scripts/</span>               <span class="c"># glob: copy all .py files to another dir</span></pre>
+</div>
+
+<h2 id="m1-mv">mv — Move / Rename Files</h2>
+
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="g">mv</span> <span class="b">old_name.txt</span> <span class="b">new_name.txt</span>      <span class="c"># rename a file</span>
+<span class="g">mv</span> <span class="b">file.txt</span> <span class="b">/home/mari/docs/</span>       <span class="c"># move to another directory</span>
+<span class="g">mv</span> <span class="o">-i</span> <span class="b">*.py</span> <span class="b">scripts/</span>               <span class="c"># move all .py files (interactive, asks on conflict)</span></pre>
+</div>
+
+<p>Under the hood, <span class="ic">mv</span> within the same filesystem is extremely fast because it only updates the directory entry (renames the filename→inode mapping). No data is copied. Across filesystems, <span class="ic">mv</span> falls back to copy + delete, which is slow for large files. The kernel implements this via the <span class="ic">rename()</span> syscall for same-filesystem moves and <span class="ic">read()</span>/<span class="ic">write()</span>/<span class="ic">unlink()</span> for cross-filesystem moves.</p>
+
+<h2 id="m1-rm">rm — Remove Files (⚠️ DANGER ZONE)</h2>
+
+<div class="callout">
+<div class="callout-t">⚠️ WARNING — rm IS PERMANENT</div>
+<p>Linux has no trash bin by default. <span class="ic">rm</span> immediately unlinks the file from the directory and, once no processes hold the file open, the inode and data blocks are freed. There is no "undo" button. Always double-check before using <span class="ic">rm -rf</span>.</p>
+</div>
+
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="g">rm</span> <span class="b">file.txt</span>                        <span class="c"># delete a file</span>
+<span class="g">rm</span> <span class="o">-i</span> <span class="b">file.txt</span>                    <span class="c"># -i = ask for confirmation (RECOMMENDED for beginners)</span>
+<span class="g">rm</span> <span class="o">-r</span> <span class="b">directory/</span>                   <span class="c"># -r = recursive (delete directory and everything in it)</span>
+<span class="g">rm</span> <span class="o">-rf</span> <span class="b">directory/</span>                  <span class="c"># -rf = force + recursive (NO confirmation, NO mercy)</span>
+
+<span class="c"># SAFER ALTERNATIVE: use trash-cli (install: pacman -S trash-cli)</span>
+<span class="g">trash-put</span> <span class="b">file.txt</span>                 <span class="c"># moves to trash instead of deleting</span>
+<span class="g">trash-list</span>                          <span class="c"># see what's in trash</span>
+<span class="g">trash-restore</span>                       <span class="c"># restore from trash</span></pre>
+</div>
+
+<h2 id="m1-ln">ln — Create Links</h2>
+
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="c"># Symbolic link (shortcut — most common, works across filesystems)</span>
+<span class="g">ln</span> <span class="o">-s</span> <span class="b">/path/to/original</span> <span class="b">/path/to/link</span>
+
+<span class="c"># Example: link your dotfiles from a git repo to their expected locations</span>
+<span class="g">ln</span> <span class="o">-sf</span> <span class="b">~/dotfiles/.zshrc</span> <span class="b">~/.zshrc</span>
+<span class="g">ln</span> <span class="o">-sf</span> <span class="b">~/dotfiles/hypr/</span> <span class="b">~/.config/hypr</span>
+
+<span class="c"># Hard link (same inode, same data — file exists in two places)</span>
+<span class="g">ln</span> <span class="b">original.txt</span> <span class="b">hardlink.txt</span></pre>
+</div>
+
+<p>A symbolic link is a small file whose content is the path to the target. When you access the symlink, the kernel's VFS layer reads the path stored in the symlink's inode and redirects the operation to the target. A hard link creates a second directory entry pointing to the same inode — the file effectively has two names. The inode's link count tracks how many directory entries reference it; the file is only deleted when the link count drops to zero AND no processes have it open.</p>
+
+<h2 id="m1-find">find / fd — Search for Files</h2>
+
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="c"># Traditional find</span>
+<span class="g">find</span> <span class="b">.</span> <span class="o">-name</span> <span class="y">"*.py"</span>                <span class="c"># find all .py files recursively from current dir</span>
+<span class="g">find</span> <span class="b">/home</span> <span class="o">-type</span> <span class="y">f</span> <span class="o">-size</span> <span class="y">+100M</span>   <span class="c"># files larger than 100MB</span>
+<span class="g">find</span> <span class="b">.</span> <span class="o">-name</span> <span class="y">"*.log"</span> <span class="o">-mtime</span> <span class="y">+7</span> <span class="o">-delete</span>  <span class="c"># delete .log files older than 7 days</span>
+
+<span class="c"># Modern replacement — fd (install: pacman -S fd)</span>
+<span class="g">fd</span> <span class="y">"\.py$"</span>                          <span class="c"># find .py files (regex by default, respects .gitignore)</span>
+<span class="g">fd</span> <span class="o">-e</span> <span class="y">py</span>                            <span class="c"># same but by extension</span>
+<span class="g">fd</span> <span class="o">-H</span> <span class="y">config</span>                       <span class="c"># -H includes hidden files</span>
+<span class="g">fd</span> <span class="o">-t</span> <span class="y">d</span>                             <span class="c"># only directories</span>
+<span class="g">fd</span> <span class="o">-x</span> <span class="g">wc</span> <span class="o">-l</span> <span class="y">"\.py$"</span>              <span class="c"># find .py files and count lines in each</span></pre>
+</div>
+
+</div><!-- end module 1 -->
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- MODULE 2: TEXT PROCESSING                                  -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div data-module-id="text-processing" id="m2">
+<h1>2. File Viewing & Text Processing</h1>
+
+<h2 id="m2-cat">cat / bat — Display File Contents</h2>
+
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="g">cat</span> <span class="b">file.txt</span>                       <span class="c"># dump entire file to terminal</span>
+<span class="g">cat</span> <span class="b">file1.txt</span> <span class="b">file2.txt</span>            <span class="c"># concatenate (that's what cat stands for!)</span>
+<span class="g">cat</span> <span class="b">file1.txt</span> <span class="b">file2.txt</span> > <span class="b">merged.txt</span>  <span class="c"># merge into new file</span>
+
+<span class="c"># Modern replacement — bat (install: pacman -S bat)</span>
+<span class="g">bat</span> <span class="b">main.py</span>                        <span class="c"># syntax highlighting + line numbers + git diff</span>
+<span class="g">bat</span> <span class="o">-l</span> <span class="y">json</span> <span class="b">data.txt</span>              <span class="c"># force JSON syntax highlighting</span>
+<span class="g">bat</span> <span class="o">--diff</span> <span class="b">file.py</span>                <span class="c"># show only git-modified lines</span></pre>
+</div>
+
+<h2 id="m2-less">less / more — Page Through Files</h2>
+
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="g">less</span> <span class="b">largefile.log</span>                 <span class="c"># open file in pager — scroll with arrows, q to quit</span>
+<span class="c"># Inside less:</span>
+<span class="c">#   /search_term  → search forward</span>
+<span class="c">#   ?search_term  → search backward</span>
+<span class="c">#   n/N           → next/previous match</span>
+<span class="c">#   g/G           → go to beginning/end</span>
+<span class="c">#   q             → quit</span>
+
+<span class="c"># Pipe anything into less for scrollable output</span>
+<span class="g">journalctl</span> | <span class="g">less</span>
+<span class="g">dmesg</span> | <span class="g">less</span></pre>
+</div>
+
+<h2 id="m2-head">head / tail — View Beginning or End</h2>
+
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="g">head</span> <span class="o">-20</span> <span class="b">file.txt</span>                 <span class="c"># first 20 lines</span>
+<span class="g">tail</span> <span class="o">-20</span> <span class="b">file.txt</span>                 <span class="c"># last 20 lines</span>
+<span class="g">tail</span> <span class="o">-f</span> <span class="b">/var/log/syslog</span>            <span class="c"># -f = FOLLOW (watch log in real-time — Ctrl+C to stop)</span>
+<span class="g">tail</span> <span class="o">-f</span> <span class="b">app.log</span> | <span class="g">grep</span> <span class="y">ERROR</span>     <span class="c"># live-filter for ERROR lines only</span></pre>
+</div>
+
+<h2 id="m2-grep">grep / ripgrep — Search Text</h2>
+
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="c"># Traditional grep</span>
+<span class="g">grep</span> <span class="y">"error"</span> <span class="b">logfile.txt</span>           <span class="c"># find lines containing "error"</span>
+<span class="g">grep</span> <span class="o">-i</span> <span class="y">"error"</span> <span class="b">logfile.txt</span>       <span class="c"># -i = case-insensitive</span>
+<span class="g">grep</span> <span class="o">-r</span> <span class="y">"TODO"</span> <span class="b">src/</span>               <span class="c"># -r = recursive search through directories</span>
+<span class="g">grep</span> <span class="o">-n</span> <span class="y">"def "</span> <span class="b">*.py</span>               <span class="c"># -n = show line numbers</span>
+<span class="g">grep</span> <span class="o">-c</span> <span class="y">"import"</span> <span class="b">main.py</span>         <span class="c"># -c = count matching lines</span>
+<span class="g">grep</span> <span class="o">-v</span> <span class="y">"#"</span> <span class="b">config.conf</span>           <span class="c"># -v = INVERT (show lines NOT matching — skip comments)</span>
+
+<span class="c"># Modern replacement — ripgrep (install: pacman -S ripgrep)</span>
+<span class="g">rg</span> <span class="y">"TODO"</span>                           <span class="c"># recursive search (automatic! respects .gitignore)</span>
+<span class="g">rg</span> <span class="o">-i</span> <span class="y">"error"</span> <span class="o">-t</span> <span class="y">py</span>              <span class="c"># case-insensitive, only .py files</span>
+<span class="g">rg</span> <span class="y">"def \w+"</span> <span class="o">--stats</span>              <span class="c"># regex + show match statistics</span>
+<span class="g">rg</span> <span class="o">-l</span> <span class="y">"import pandas"</span>             <span class="c"># -l = list only filenames (not matching lines)</span></pre>
+</div>
+
+<h2 id="m2-sed">sed — Stream Editor</h2>
+
+<p><span class="ic">sed</span> processes text line by line and applies transformations. It is the Swiss Army knife of text manipulation in Linux. Think of it as "Find and Replace" for the command line, but with regex superpowers.</p>
+
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="c"># Find and replace (first occurrence per line)</span>
+<span class="g">sed</span> <span class="y">'s/old/new/'</span> <span class="b">file.txt</span>
+
+<span class="c"># Find and replace ALL occurrences per line (g = global)</span>
+<span class="g">sed</span> <span class="y">'s/old/new/g'</span> <span class="b">file.txt</span>
+
+<span class="c"># Edit file IN-PLACE (overwrites the original — careful!)</span>
+<span class="g">sed</span> <span class="o">-i</span> <span class="y">'s/old/new/g'</span> <span class="b">file.txt</span>
+
+<span class="c"># Delete lines matching a pattern</span>
+<span class="g">sed</span> <span class="y">'/^#/d'</span> <span class="b">config.conf</span>           <span class="c"># remove all comment lines</span>
+<span class="g">sed</span> <span class="y">'/^$/d'</span> <span class="b">file.txt</span>               <span class="c"># remove all blank lines</span>
+
+<span class="c"># Print specific lines</span>
+<span class="g">sed</span> <span class="o">-n</span> <span class="y">'10,20p'</span> <span class="b">file.txt</span>          <span class="c"># print lines 10 through 20 only</span>
+
+<span class="c"># Practical example: uncomment a config line</span>
+<span class="g">sed</span> <span class="o">-i</span> <span class="y">'s/^#PermitRootLogin/PermitRootLogin/'</span> <span class="b">/etc/ssh/sshd_config</span></pre>
+</div>
+
+<h2 id="m2-awk">awk — Text Processing Language</h2>
+
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="c"># Print specific columns (awk splits by whitespace by default)</span>
+<span class="g">awk</span> <span class="y">'{print $1}'</span> <span class="b">file.txt</span>          <span class="c"># first column of each line</span>
+<span class="g">awk</span> <span class="y">'{print $1, $3}'</span> <span class="b">file.txt</span>     <span class="c"># first and third columns</span>
+
+<span class="c"># Use custom delimiter</span>
+<span class="g">awk</span> <span class="o">-F:</span> <span class="y">'{print $1}'</span> <span class="b">/etc/passwd</span>   <span class="c"># : as delimiter — prints all usernames</span>
+
+<span class="c"># Filter rows with conditions</span>
+<span class="g">awk</span> <span class="y">'$3 > 1000'</span> <span class="b">data.txt</span>          <span class="c"># rows where 3rd column is > 1000</span>
+
+<span class="c"># Practical: sum a column of numbers</span>
+<span class="g">awk</span> <span class="y">'{sum += $2} END {print sum}'</span> <span class="b">data.txt</span>
+
+<span class="c"># Show disk usage by mount point, sorted</span>
+<span class="g">df</span> <span class="o">-h</span> | <span class="g">awk</span> <span class="y">'NR>1 {print $5, $6}'</span> | <span class="g">sort</span> <span class="o">-rn</span></pre>
+</div>
+
+<h2 id="m2-sort">sort / uniq / wc — Sort, Deduplicate, Count</h2>
+
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="g">sort</span> <span class="b">file.txt</span>                      <span class="c"># alphabetical sort</span>
+<span class="g">sort</span> <span class="o">-n</span> <span class="b">numbers.txt</span>               <span class="c"># numeric sort</span>
+<span class="g">sort</span> <span class="o">-r</span> <span class="b">file.txt</span>                  <span class="c"># reverse sort</span>
+<span class="g">sort</span> <span class="o">-u</span> <span class="b">file.txt</span>                  <span class="c"># unique lines only (sort + dedup in one step)</span>
+
+<span class="g">uniq</span> <span class="b">sorted.txt</span>                   <span class="c"># remove consecutive duplicates (MUST be sorted first!)</span>
+<span class="g">sort</span> <span class="b">file.txt</span> | <span class="g">uniq</span> <span class="o">-c</span>          <span class="c"># count occurrences of each unique line</span>
+
+<span class="g">wc</span> <span class="b">file.txt</span>                        <span class="c"># lines, words, bytes</span>
+<span class="g">wc</span> <span class="o">-l</span> <span class="b">file.txt</span>                    <span class="c"># count lines only</span>
+<span class="g">wc</span> <span class="o">-l</span> <span class="b">*.py</span>                        <span class="c"># count lines in all Python files</span></pre>
+</div>
+
+</div><!-- end module 2 -->
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- MODULE 3–11: Abbreviated for space — full versions in Parts 2-4 -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div data-module-id="permissions" id="m3">
+<h1>3. Permissions & Ownership</h1>
+
+<h2 id="m3-chmod">chmod — Change Permissions</h2>
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="c"># Numeric mode (most common)</span>
+<span class="g">chmod</span> <span class="y">755</span> <span class="b">script.sh</span>   <span class="c"># rwxr-xr-x  owner=all, group/others=read+execute</span>
+<span class="g">chmod</span> <span class="y">644</span> <span class="b">file.txt</span>    <span class="c"># rw-r--r--  owner=read+write, group/others=read only</span>
+<span class="g">chmod</span> <span class="y">600</span> <span class="b">id_rsa</span>      <span class="c"># rw-------  owner only (SSH private key MUST be this)</span>
+<span class="g">chmod</span> <span class="y">700</span> <span class="b">~/.ssh</span>      <span class="c"># rwx------  SSH directory</span>
+
+<span class="c"># Symbolic mode (add/remove specific permissions)</span>
+<span class="g">chmod</span> <span class="y">+x</span> <span class="b">script.sh</span>   <span class="c"># add execute permission for everyone</span>
+<span class="g">chmod</span> <span class="y">u+x</span> <span class="b">script.sh</span>  <span class="c"># add execute for owner (u=user) only</span>
+<span class="g">chmod</span> <span class="y">go-w</span> <span class="b">file.txt</span>  <span class="c"># remove write from group and others</span>
+<span class="g">chmod</span> <span class="o">-R</span> <span class="y">755</span> <span class="b">dir/</span>    <span class="c"># recursive — apply to all files in directory</span></pre>
+</div>
+
+<div class="explain">
+<div class="explain-title">🔍 Permission Numbers Decoded</div>
+<p>Each digit is a sum: <strong>4</strong>=read, <strong>2</strong>=write, <strong>1</strong>=execute. So 7=4+2+1=rwx, 5=4+1=r-x, 6=4+2=rw-, 0=---. The three digits are: owner, group, others. For scripts you want to run: 755. For private config files: 600. For SSH keys: 600 (SSH refuses to use keys with broader permissions).</p>
+</div>
+
+<h2 id="m3-chown">chown — Change Ownership</h2>
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="g">sudo</span> <span class="g">chown</span> <span class="y">mari</span> <span class="b">file.txt</span>           <span class="c"># change owner to mari</span>
+<span class="g">sudo</span> <span class="g">chown</span> <span class="y">mari:wheel</span> <span class="b">file.txt</span>    <span class="c"># change owner AND group</span>
+<span class="g">sudo</span> <span class="g">chown</span> <span class="o">-R</span> <span class="y">mari:mari</span> <span class="b">~/proj/</span>  <span class="c"># recursive — entire directory tree</span></pre>
+</div>
+
+<h2 id="m3-sudo">sudo — Execute as Root</h2>
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-Syu</span>                   <span class="c"># run pacman as root</span>
+<span class="g">sudo</span> <span class="o">-i</span>                            <span class="c"># open a root shell (type 'exit' to return)</span>
+<span class="g">sudo</span> <span class="o">-u</span> <span class="y">postgres</span> <span class="g">psql</span>             <span class="c"># run command as the postgres user</span>
+<span class="g">sudo</span> <span class="o">!!</span>                            <span class="c"># re-run the LAST command with sudo (lifesaver!)</span></pre>
+</div>
+</div><!-- end module 3 -->
+
+<div data-module-id="processes" id="m4">
+<h1>4. Process Management</h1>
+<h2 id="m4-ps">ps / procs — List Processes</h2>
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="g">ps</span> <span class="o">aux</span>                             <span class="c"># all processes, all users, with details</span>
+<span class="g">ps</span> <span class="o">aux</span> | <span class="g">grep</span> <span class="y">python</span>              <span class="c"># find Python processes</span>
+<span class="g">htop</span>                               <span class="c"># interactive process viewer (F9=kill, F6=sort)</span>
+<span class="g">btop</span>                               <span class="c"># beautiful process viewer with CPU/RAM/disk/network graphs</span></pre>
+</div>
+
+<h2 id="m4-kill">kill / killall — Terminate Processes</h2>
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="g">kill</span> <span class="y">1234</span>                           <span class="c"># send SIGTERM (polite shutdown) to PID 1234</span>
+<span class="g">kill</span> <span class="o">-9</span> <span class="y">1234</span>                       <span class="c"># send SIGKILL (force kill — cannot be caught or ignored)</span>
+<span class="g">killall</span> <span class="y">firefox</span>                    <span class="c"># kill all processes named firefox</span>
+<span class="g">pkill</span> <span class="o">-f</span> <span class="y">"python main.py"</span>         <span class="c"># kill by command line pattern</span></pre>
+</div>
+
+<h2 id="m4-bg">bg / fg / jobs / & — Background & Foreground</h2>
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="g">command</span> <span class="y">&amp;</span>                          <span class="c"># start command in background</span>
+<span class="c"># Press Ctrl+Z to SUSPEND a running foreground process</span>
+<span class="g">bg</span>                                 <span class="c"># resume suspended process in BACKGROUND</span>
+<span class="g">fg</span>                                 <span class="c"># bring background process to FOREGROUND</span>
+<span class="g">jobs</span>                               <span class="c"># list all background jobs</span>
+<span class="g">nohup</span> <span class="g">command</span> <span class="y">&amp;</span>                   <span class="c"># run command immune to hangups (survives terminal close)</span></pre>
+</div>
+
+<h2 id="m4-systemctl">systemctl — Manage Services</h2>
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="g">systemctl</span> <span class="o">status</span> <span class="y">NetworkManager</span>    <span class="c"># check if a service is running</span>
+<span class="g">systemctl</span> <span class="o">start</span> <span class="y">sshd</span>              <span class="c"># start a service NOW</span>
+<span class="g">systemctl</span> <span class="o">stop</span> <span class="y">sshd</span>               <span class="c"># stop a service NOW</span>
+<span class="g">systemctl</span> <span class="o">restart</span> <span class="y">sshd</span>            <span class="c"># restart (stop + start)</span>
+<span class="g">systemctl</span> <span class="o">enable</span> <span class="y">sshd</span>             <span class="c"># start automatically on every boot</span>
+<span class="g">systemctl</span> <span class="o">disable</span> <span class="y">sshd</span>            <span class="c"># DON'T start on boot</span>
+<span class="g">systemctl</span> <span class="o">enable</span> <span class="o">--now</span> <span class="y">docker</span>     <span class="c"># enable AND start immediately (one command)</span>
+<span class="g">systemctl</span> <span class="o">list-units</span> <span class="o">--type=service</span>  <span class="c"># list all running services</span>
+<span class="g">journalctl</span> <span class="o">-u</span> <span class="y">sshd</span> <span class="o">-f</span>             <span class="c"># live log for a specific service</span></pre>
+</div>
+</div><!-- end module 4 -->
+
+<div data-module-id="networking" id="m5">
+<h1>5. Networking</h1>
+<h2 id="m5-ip">ip — Network Configuration</h2>
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="g">ip</span> <span class="o">addr</span>                            <span class="c"># show all network interfaces and their IPs</span>
+<span class="g">ip</span> <span class="o">link</span>                            <span class="c"># show interface status (UP/DOWN)</span>
+<span class="g">ip</span> <span class="o">route</span>                           <span class="c"># show routing table (default gateway)</span>
+<span class="g">ip</span> <span class="o">addr show</span> <span class="y">wlan0</span>                <span class="c"># show specific interface details</span></pre>
+</div>
+<h2 id="m5-ss">ss — Socket Statistics</h2>
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="g">ss</span> <span class="o">-tulnp</span>                          <span class="c"># show all listening TCP/UDP ports with process names</span>
+<span class="c"># -t=TCP -u=UDP -l=listening -n=numeric -p=show process</span>
+<span class="g">ss</span> <span class="o">-tunp</span> | <span class="g">grep</span> <span class="y">:8080</span>             <span class="c"># who's using port 8080?</span></pre>
+</div>
+<h2 id="m5-ping">ping / traceroute / dig — Diagnostics</h2>
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="g">ping</span> <span class="o">-c</span> <span class="y">4</span> <span class="b">archlinux.org</span>            <span class="c"># send 4 ICMP packets</span>
+<span class="g">traceroute</span> <span class="b">archlinux.org</span>           <span class="c"># show network path (every router hop)</span>
+<span class="g">dig</span> <span class="b">archlinux.org</span>                  <span class="c"># DNS lookup (what IP does this hostname resolve to?)</span>
+<span class="g">dig</span> <span class="o">+short</span> <span class="b">archlinux.org</span>           <span class="c"># just the IP, nothing else</span></pre>
+</div>
+<h2 id="m5-curl">curl — HTTP Swiss Army Knife</h2>
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="g">curl</span> <span class="b">https://api.example.com</span>       <span class="c"># GET request</span>
+<span class="g">curl</span> <span class="o">-o</span> <span class="b">file.zip</span> <span class="b">https://url/file.zip</span>  <span class="c"># download file</span>
+<span class="g">curl</span> <span class="o">-X</span> <span class="y">POST</span> <span class="o">-H</span> <span class="y">"Content-Type: application/json"</span> \
+  <span class="o">-d</span> <span class="y">'{"key":"value"}'</span> <span class="b">https://api.example.com</span>  <span class="c"># POST JSON</span>
+<span class="g">curl</span> <span class="o">-I</span> <span class="b">https://example.com</span>        <span class="c"># headers only (check HTTP status)</span>
+<span class="g">curl</span> <span class="o">-sS</span> <span class="b">https://api.ip.sb/ip</span>     <span class="c"># get your public IP address</span></pre>
+</div>
+<h2 id="m5-ssh">ssh / scp — Secure Remote Access</h2>
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="g">ssh</span> <span class="y">user@hostname</span>                  <span class="c"># connect to remote machine</span>
+<span class="g">ssh</span> <span class="o">-p</span> <span class="y">2222</span> <span class="y">user@host</span>             <span class="c"># custom port</span>
+<span class="g">ssh-keygen</span> <span class="o">-t</span> <span class="y">ed25519</span>              <span class="c"># generate SSH key pair (ed25519 is modern & fast)</span>
+<span class="g">ssh-copy-id</span> <span class="y">user@host</span>              <span class="c"># copy your public key to remote (enables passwordless login)</span>
+<span class="g">scp</span> <span class="b">file.txt</span> <span class="y">user@host:~/</span>         <span class="c"># copy file to remote home directory</span>
+<span class="g">scp</span> <span class="o">-r</span> <span class="b">dir/</span> <span class="y">user@host:~/</span>          <span class="c"># copy directory recursively</span></pre>
+</div>
+</div><!-- end module 5 -->
+
+<div data-module-id="package-mgmt" id="m6">
+<h1>6. Package Management (pacman + paru)</h1>
+<h2 id="m6-pac">pacman — The Arch Package Manager</h2>
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="c"># ═══ INSTALLING ═══</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="y">package</span>             <span class="c"># install a package</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="y">pkg1 pkg2 pkg3</span>     <span class="c"># install multiple at once</span>
+
+<span class="c"># ═══ UPDATING ═══</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-Syu</span>                   <span class="c"># sync repos + upgrade ALL packages (do this regularly!)</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-Sy</span>                    <span class="c"># sync repos only (refresh package database)</span>
+
+<span class="c"># ═══ REMOVING ═══</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-R</span> <span class="y">package</span>             <span class="c"># remove package</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-Rs</span> <span class="y">package</span>            <span class="c"># remove + its unused dependencies</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-Rns</span> <span class="y">package</span>           <span class="c"># remove + deps + config files (complete removal)</span>
+
+<span class="c"># ═══ SEARCHING ═══</span>
+<span class="g">pacman</span> <span class="o">-Ss</span> <span class="y">keyword</span>                <span class="c"># search repos for packages matching keyword</span>
+<span class="g">pacman</span> <span class="o">-Qs</span> <span class="y">keyword</span>                <span class="c"># search INSTALLED packages</span>
+<span class="g">pacman</span> <span class="o">-Qi</span> <span class="y">package</span>                <span class="c"># detailed info about an installed package</span>
+<span class="g">pacman</span> <span class="o">-Ql</span> <span class="y">package</span>                <span class="c"># list all files installed by a package</span>
+<span class="g">pacman</span> <span class="o">-Qo</span> <span class="b">/path/to/file</span>         <span class="c"># which package owns this file?</span>
+
+<span class="c"># ═══ MAINTENANCE ═══</span>
+<span class="g">sudo</span> <span class="g">paccache</span> <span class="o">-r</span>                  <span class="c"># remove old cached packages (keep last 3 versions)</span>
+<span class="g">pacman</span> <span class="o">-Qdt</span>                       <span class="c"># list orphaned packages (installed as deps, no longer needed)</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-Rns</span> <span class="p">$(</span><span class="g">pacman</span> <span class="o">-Qdtq</span><span class="p">)</span>  <span class="c"># remove all orphans</span></pre>
+</div>
+
+<h2 id="m6-paru">paru — AUR Helper</h2>
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="g">paru</span> <span class="o">-S</span> <span class="y">package</span>                    <span class="c"># install from AUR (or official repos)</span>
+<span class="g">paru</span>                               <span class="c"># same as paru -Syu (update everything including AUR)</span>
+<span class="g">paru</span> <span class="o">-Ss</span> <span class="y">keyword</span>                  <span class="c"># search AUR + official repos</span>
+<span class="g">paru</span> <span class="o">-c</span>                            <span class="c"># clean unneeded dependencies</span></pre>
+</div>
+</div><!-- end module 6 -->
+
+<div data-module-id="disk-storage" id="m7">
+<h1>7. Disk & Storage</h1>
+<h2 id="m7-lsblk">lsblk / fdisk / df / du — Disk Info</h2>
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="g">lsblk</span>                              <span class="c"># list all block devices (disks, partitions, USBs)</span>
+<span class="g">lsblk</span> <span class="o">-f</span>                           <span class="c"># show filesystem type, UUID, mount point</span>
+<span class="g">df</span> <span class="o">-h</span>                              <span class="c"># disk space usage per mount point (-h = human readable)</span>
+<span class="g">du</span> <span class="o">-sh</span> <span class="b">directory/</span>                 <span class="c"># total size of a directory</span>
+<span class="g">du</span> <span class="o">-sh</span> <span class="b">*</span> | <span class="g">sort</span> <span class="o">-rh</span> | <span class="g">head</span> <span class="o">-10</span>  <span class="c"># top 10 largest items in current directory</span>
+<span class="g">dust</span>                               <span class="c"># modern du (install: pacman -S dust) — visual bars</span>
+<span class="g">sudo</span> <span class="g">fdisk</span> <span class="o">-l</span>                     <span class="c"># list partition tables on all disks</span>
+<span class="g">sudo</span> <span class="g">smartctl</span> <span class="o">-a</span> <span class="b">/dev/nvme0n1</span>    <span class="c"># SSD health (SMART data)</span></pre>
+</div>
+<h2 id="m7-mount">mount / umount — Mount Filesystems</h2>
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="g">sudo</span> <span class="g">mount</span> <span class="b">/dev/sdb1</span> <span class="b">/mnt/usb</span>    <span class="c"># mount a USB drive</span>
+<span class="g">sudo</span> <span class="g">umount</span> <span class="b">/mnt/usb</span>              <span class="c"># unmount</span>
+<span class="g">mount</span> | <span class="g">grep</span> <span class="y">"nvme"</span>               <span class="c"># show all mounted NVMe partitions</span></pre>
+</div>
+</div><!-- end module 7 -->
+
+<div data-module-id="archiving" id="m8">
+<h1>8. Archiving & Compression</h1>
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="c"># tar (tape archive) — create and extract archives</span>
+<span class="g">tar</span> <span class="o">-czf</span> <span class="b">archive.tar.gz</span> <span class="b">directory/</span>    <span class="c"># create gzipped archive</span>
+<span class="g">tar</span> <span class="o">-xzf</span> <span class="b">archive.tar.gz</span>               <span class="c"># extract gzipped archive</span>
+<span class="g">tar</span> <span class="o">-xf</span> <span class="b">archive.tar.zst</span>               <span class="c"># extract zstd (Arch package format)</span>
+<span class="g">tar</span> <span class="o">-tf</span> <span class="b">archive.tar.gz</span>                <span class="c"># list contents without extracting</span>
+
+<span class="c"># zip</span>
+<span class="g">zip</span> <span class="o">-r</span> <span class="b">archive.zip</span> <span class="b">directory/</span>         <span class="c"># create zip</span>
+<span class="g">unzip</span> <span class="b">archive.zip</span>                      <span class="c"># extract zip</span>
+
+<span class="c"># 7zip</span>
+<span class="g">7z</span> <span class="o">x</span> <span class="b">archive.7z</span>                        <span class="c"># extract 7z archive</span></pre>
+</div>
+</div>
+
+<div data-module-id="git" id="m9">
+<h1>9. Git Essentials</h1>
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="c"># ═══ SETUP ═══</span>
+<span class="g">git</span> <span class="o">config</span> <span class="o">--global</span> <span class="y">user.name</span> <span class="y">"Mari"</span>
+<span class="g">git</span> <span class="o">config</span> <span class="o">--global</span> <span class="y">user.email</span> <span class="y">"you@example.com"</span>
+<span class="g">git</span> <span class="o">config</span> <span class="o">--global</span> <span class="y">init.defaultBranch</span> <span class="y">main</span>
+
+<span class="c"># ═══ DAILY WORKFLOW ═══</span>
+<span class="g">git</span> <span class="o">init</span>                            <span class="c"># initialize new repo</span>
+<span class="g">git</span> <span class="o">clone</span> <span class="b">url</span>                      <span class="c"># clone a remote repo</span>
+<span class="g">git</span> <span class="o">status</span>                          <span class="c"># what's changed?</span>
+<span class="g">git</span> <span class="o">add</span> <span class="b">.</span>                           <span class="c"># stage all changes</span>
+<span class="g">git</span> <span class="o">add</span> <span class="b">file.py</span>                    <span class="c"># stage specific file</span>
+<span class="g">git</span> <span class="o">commit</span> <span class="o">-m</span> <span class="y">"feat: add login"</span>   <span class="c"># commit with message</span>
+<span class="g">git</span> <span class="o">push</span>                            <span class="c"># push to remote</span>
+<span class="g">git</span> <span class="o">pull</span>                            <span class="c"># pull latest from remote</span>
+
+<span class="c"># ═══ BRANCHING ═══</span>
+<span class="g">git</span> <span class="o">branch</span>                          <span class="c"># list branches (* = current)</span>
+<span class="g">git</span> <span class="o">checkout</span> <span class="o">-b</span> <span class="y">feature/new-thing</span>  <span class="c"># create + switch to new branch</span>
+<span class="g">git</span> <span class="o">switch</span> <span class="y">main</span>                    <span class="c"># switch to main (modern alternative to checkout)</span>
+<span class="g">git</span> <span class="o">merge</span> <span class="y">feature/new-thing</span>        <span class="c"># merge branch into current branch</span>
+
+<span class="c"># ═══ HISTORY & UNDO ═══</span>
+<span class="g">git</span> <span class="o">log</span> <span class="o">--oneline</span> <span class="o">--graph</span>          <span class="c"># compact visual log</span>
+<span class="g">git</span> <span class="o">diff</span>                            <span class="c"># show unstaged changes</span>
+<span class="g">git</span> <span class="o">stash</span>                           <span class="c"># temporarily shelve changes</span>
+<span class="g">git</span> <span class="o">stash</span> <span class="o">pop</span>                      <span class="c"># restore shelved changes</span>
+<span class="g">git</span> <span class="o">reset</span> <span class="o">--soft</span> <span class="y">HEAD~1</span>            <span class="c"># undo last commit (keep changes staged)</span>
+
+<span class="c"># ═══ GITHUB CLI ═══</span>
+<span class="g">gh</span> <span class="o">auth</span> <span class="o">login</span>                      <span class="c"># authenticate with GitHub</span>
+<span class="g">gh</span> <span class="o">repo</span> <span class="o">create</span> <span class="y">my-project</span> <span class="o">--public</span>  <span class="c"># create repo from CLI</span>
+<span class="g">gh</span> <span class="o">pr</span> <span class="o">create</span>                       <span class="c"># create pull request</span></pre>
+</div>
+</div>
+
+<div data-module-id="docker" id="m10">
+<h1>10. Docker Quick Reference</h1>
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="c"># ═══ SETUP (one-time) ═══</span>
+<span class="g">sudo</span> <span class="g">systemctl</span> <span class="o">enable</span> <span class="o">--now</span> <span class="y">docker</span>
+<span class="g">sudo</span> <span class="g">usermod</span> <span class="o">-aG</span> <span class="y">docker</span> <span class="y">mari</span>      <span class="c"># add yourself to docker group (logout/login after)</span>
+
+<span class="c"># ═══ IMAGES ═══</span>
+<span class="g">docker</span> <span class="o">pull</span> <span class="y">python:3.12</span>            <span class="c"># download image</span>
+<span class="g">docker</span> <span class="o">images</span>                      <span class="c"># list local images</span>
+<span class="g">docker</span> <span class="o">rmi</span> <span class="y">image_name</span>              <span class="c"># remove image</span>
+
+<span class="c"># ═══ CONTAINERS ═══</span>
+<span class="g">docker</span> <span class="o">run</span> <span class="o">-it</span> <span class="y">python:3.12</span> <span class="y">bash</span>   <span class="c"># run container interactively</span>
+<span class="g">docker</span> <span class="o">run</span> <span class="o">-d</span> <span class="o">-p</span> <span class="y">8080:80</span> <span class="y">nginx</span>    <span class="c"># run in background, map port 8080→80</span>
+<span class="g">docker</span> <span class="o">ps</span>                           <span class="c"># list running containers</span>
+<span class="g">docker</span> <span class="o">ps</span> <span class="o">-a</span>                       <span class="c"># list ALL containers (including stopped)</span>
+<span class="g">docker</span> <span class="o">stop</span> <span class="y">container_id</span>           <span class="c"># stop a container</span>
+<span class="g">docker</span> <span class="o">logs</span> <span class="o">-f</span> <span class="y">container_id</span>       <span class="c"># follow container logs</span>
+<span class="g">docker</span> <span class="o">exec</span> <span class="o">-it</span> <span class="y">container_id</span> <span class="y">bash</span>  <span class="c"># shell into running container</span>
+
+<span class="c"># ═══ COMPOSE ═══</span>
+<span class="g">docker</span> <span class="o">compose</span> <span class="o">up</span> <span class="o">-d</span>               <span class="c"># start all services defined in docker-compose.yml</span>
+<span class="g">docker</span> <span class="o">compose</span> <span class="o">down</span>                <span class="c"># stop and remove all services</span>
+<span class="g">docker</span> <span class="o">compose</span> <span class="o">logs</span> <span class="o">-f</span>             <span class="c"># follow all logs</span></pre>
+</div>
+</div>
+
+<div data-module-id="cloud-cli" id="m11">
+<h1>11. Cloud CLI Cheatsheet (AWS / Azure / Databricks)</h1>
+
+<h2>AWS CLI</h2>
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="g">aws</span> <span class="o">configure</span>                      <span class="c"># set up credentials (Access Key, Secret, Region)</span>
+<span class="g">aws</span> <span class="o">s3</span> <span class="o">ls</span>                           <span class="c"># list S3 buckets</span>
+<span class="g">aws</span> <span class="o">s3</span> <span class="o">cp</span> <span class="b">file.txt</span> <span class="y">s3://bucket/</span>   <span class="c"># upload to S3</span>
+<span class="g">aws</span> <span class="o">s3</span> <span class="o">sync</span> <span class="b">./dist</span> <span class="y">s3://bucket/</span>    <span class="c"># sync directory to S3 (for Amplify static hosting)</span>
+<span class="g">aws</span> <span class="o">lambda</span> <span class="o">invoke</span> <span class="o">--function-name</span> <span class="y">myFunc</span> <span class="b">out.json</span>  <span class="c"># invoke Lambda</span>
+<span class="g">aws</span> <span class="o">dynamodb</span> <span class="o">scan</span> <span class="o">--table-name</span> <span class="y">Users</span>             <span class="c"># scan DynamoDB table</span>
+<span class="g">aws</span> <span class="o">ec2</span> <span class="o">describe-instances</span>          <span class="c"># list EC2 instances</span>
+<span class="g">aws</span> <span class="o">amplify</span> <span class="o">list-apps</span>               <span class="c"># list Amplify apps</span></pre>
+</div>
+
+<h2>Azure CLI</h2>
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="g">az</span> <span class="o">login</span>                            <span class="c"># authenticate (opens browser)</span>
+<span class="g">az</span> <span class="o">account</span> <span class="o">show</span>                    <span class="c"># show current subscription</span>
+<span class="g">az</span> <span class="o">group</span> <span class="o">list</span> <span class="o">-o</span> <span class="y">table</span>             <span class="c"># list resource groups</span>
+<span class="g">az</span> <span class="o">storage</span> <span class="o">blob</span> <span class="o">upload</span> <span class="o">-f</span> <span class="b">file</span> <span class="o">-c</span> <span class="y">container</span> <span class="o">-n</span> <span class="y">blobname</span>  <span class="c"># upload to Blob</span>
+<span class="g">az</span> <span class="o">vm</span> <span class="o">list</span> <span class="o">-o</span> <span class="y">table</span>                <span class="c"># list VMs</span>
+<span class="g">az</span> <span class="o">aks</span> <span class="o">get-credentials</span> <span class="o">-g</span> <span class="y">rg</span> <span class="o">-n</span> <span class="y">cluster</span>  <span class="c"># get Kubernetes credentials</span></pre>
+</div>
+
+<h2>Databricks CLI</h2>
+<div class="cmd-block">
+<div class="cmd-header"><span class="cmd-lang">bash</span><button class="cmd-copy" onclick="copyCmd(this)">Copy</button></div>
+<pre><span class="g">databricks</span> <span class="o">configure</span> <span class="o">--token</span>       <span class="c"># set up host URL + token</span>
+<span class="g">databricks</span> <span class="o">workspace</span> <span class="o">ls</span> <span class="b">/Users/</span>    <span class="c"># list workspace contents</span>
+<span class="g">databricks</span> <span class="o">fs</span> <span class="o">ls</span> <span class="y">dbfs:/</span>             <span class="c"># list DBFS root</span>
+<span class="g">databricks</span> <span class="o">fs</span> <span class="o">cp</span> <span class="b">local.csv</span> <span class="y">dbfs:/data/</span>  <span class="c"># upload to DBFS</span>
+<span class="g">databricks</span> <span class="o">clusters</span> <span class="o">list</span>            <span class="c"># list clusters</span>
+<span class="g">databricks</span> <span class="o">jobs</span> <span class="o">list</span>                <span class="c"># list jobs</span>
+<span class="g">databricks</span> <span class="o">jobs</span> <span class="o">run-now</span> <span class="o">--job-id</span> <span class="y">123</span>  <span class="c"># trigger a job</span></pre>
+</div>
+</div>
+
+</div><!-- end container -->
+
+<script>
+function copyCmd(btn){
+  const pre = btn.closest('.cmd-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.textContent).then(()=>{
+    btn.textContent='✓';btn.classList.add('ok');
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('ok');},1500);
+  });
+}
+function recalc(){
+  const all=document.querySelectorAll('.cb input[type="checkbox"]');
+  let t=all.length,c=0;all.forEach(cb=>{if(cb.checked)c++;});
+  const pct=t>0?Math.round(c/t*100):0;
+  document.getElementById('gPct').textContent=pct+'%';
+  document.getElementById('gBar').style.width=pct+'%';
+  const s={};all.forEach((cb,i)=>{s['c'+i]=cb.checked;});
+  localStorage.setItem('archcmd_state',JSON.stringify(s));
+}
+try{const s=JSON.parse(localStorage.getItem('archcmd_state')||'{}');
+document.querySelectorAll('.cb input[type="checkbox"]').forEach((cb,i)=>{if(s['c'+i])cb.checked=true;});recalc();}catch{}
+function saveThis(){
+  const blob=new Blob([document.documentElement.outerHTML],{type:'text/html'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='linux_command_bible_SAVED.html';a.click();
+}
+</script>
+</body>
+</html>

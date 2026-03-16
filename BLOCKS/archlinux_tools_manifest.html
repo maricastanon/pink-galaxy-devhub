@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arch Linux — Pink Galaxy — Complete Software Manifest</title>
+<style>
+:root {
+  --pink: #e91e63; --pink-light: #f8bbd0; --pink-dark: #880e4f;
+  --green: #2e7d32; --green-light: #c8e6c9;
+  --bg: #0a0a12; --bg-card: rgba(15,15,30,0.85);
+  --text: #e8e6f0; --text2: #a8a6b8; --text-muted: #6c6a7e;
+  --border: rgba(233,30,99,0.2);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: Calibri, "Segoe UI", sans-serif;
+  font-size: 10.5pt;
+  color: var(--text);
+  background: var(--bg);
+  padding: 30px;
+  line-height: 1.6;
+}
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse at 20% 50%, rgba(233,30,99,0.06) 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 20%, rgba(103,58,183,0.04) 0%, transparent 50%);
+}
+.container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+h1 { color: var(--pink); font-size: 24pt; margin: 30px 0 10px; border-bottom: 2px solid var(--pink); padding-bottom: 8px; }
+h2 { color: var(--green); font-size: 16pt; margin: 28px 0 12px; border-left: 4px solid var(--green); padding-left: 12px; }
+h3 { color: var(--pink); font-size: 12pt; margin: 20px 0 8px; }
+p { margin: 8px 0; color: var(--text); }
+a { color: var(--pink); text-decoration: none; }
+a:hover { color: var(--pink-light); }
+.ic { font-family: "Courier New", monospace; font-size: 9.5pt; background: rgba(233,30,99,0.1); padding: 1px 5px; border-radius: 3px; color: #f48fb1; }
+table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 9.5pt; }
+th { background: rgba(233,30,99,0.12); color: var(--pink-light); padding: 8px 10px; text-align: left; border-bottom: 2px solid var(--pink); }
+td { padding: 6px 10px; border-bottom: 1px solid var(--border); color: var(--text2); vertical-align: top; }
+tr:hover td { background: rgba(233,30,99,0.03); }
+.cat-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 8pt; font-weight: bold; margin-right: 4px; }
+.cat-core { background: var(--pink); color: #fff; }
+.cat-dev { background: var(--green); color: #fff; }
+.cat-sec { background: #ff5252; color: #fff; }
+.cat-rice { background: #7c4dff; color: #fff; }
+.cat-prod { background: #ff9800; color: #fff; }
+.cat-hw { background: #00bcd4; color: #fff; }
+.check-cell { text-align: center; }
+.check-cell input { accent-color: var(--pink); width: 16px; height: 16px; }
+.progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; margin: 8px 0; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--pink), var(--green)); transition: width 0.3s; }
+.progress-text { font-size: 8pt; color: var(--text-muted); }
+.section-progress { display: flex; align-items: center; gap: 10px; margin: 6px 0 16px; }
+.cover {
+  text-align: center; padding: 40px; margin-bottom: 30px;
+  background: linear-gradient(135deg, #1a0533, #0d1b2a);
+  border: 2px solid var(--pink); border-radius: 14px;
+  box-shadow: 0 0 40px rgba(233,30,99,0.2);
+}
+.cover h1 { border: none; font-size: 28pt; }
+.save-bar {
+  position: sticky; top: 0; z-index: 100; background: var(--bg);
+  padding: 8px 0; border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.save-btn {
+  padding: 6px 16px; border: none; border-radius: 6px;
+  font-weight: bold; font-size: 9pt; cursor: pointer; letter-spacing: 1px;
+}
+.save-btn.green { background: var(--green); color: #fff; }
+.save-btn.pink { background: var(--pink); color: #fff; }
+.note-inline {
+  display: block; width: 100%; margin: 4px 0;
+  background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 4px;
+  color: var(--text); font-family: Calibri, sans-serif; font-size: 9pt; padding: 4px 6px;
+  resize: none; overflow: hidden; min-height: 20px;
+}
+@media print {
+  body { background: #fff; color: #333; }
+  h1 { color: #e91e63 !important; }
+  h2 { color: #2e7d32 !important; }
+  td, p { color: #333 !important; }
+  .save-bar { display: none; }
+  @page { size: A4; margin: 1.5cm 1cm; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="cover">
+  <h1>🌸 Complete Software Manifest</h1>
+  <p style="color:var(--text2);">Everything you need for the Pink Galaxy Arch Linux Developer & Security Environment</p>
+  <p style="color:var(--text-muted); font-size:9pt;">Dell Inspiron 14 7420 2-in-1 • Arch Linux • No Desktop Environment • Component-by-Component</p>
+</div>
+
+<div class="save-bar" id="saveBar">
+  <div>
+    <span class="progress-text">Overall: </span>
+    <span class="progress-text" id="overallPct">0%</span>
+    <div class="progress-bar" style="width:200px;display:inline-block;vertical-align:middle;"><div class="progress-fill" id="overallBar" style="width:0%"></div></div>
+  </div>
+  <div>
+    <button class="save-btn pink" onclick="saveManifestSnapshot()">💾 Save Snapshot</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<h1>1. Core System (pacstrap + immediate post-install)</h1>
+<div class="section-progress"><span class="progress-text" id="pct-core">0/0</span><div class="progress-bar" style="flex:1"><div class="progress-fill" id="bar-core" style="width:0%"></div></div></div>
+
+<table data-category="core">
+<tr><th style="width:40px">✓</th><th>Package</th><th>Install Command</th><th>Purpose</th><th>GitHub / Docs</th><th>Notes</th></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">base</span></td><td><span class="ic">pacstrap -K /mnt base</span></td><td>Minimal Arch (systemd, bash, coreutils, pacman)</td><td><a href="https://archlinux.org/packages/core/any/base/">arch/base</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">linux</span></td><td><span class="ic">pacstrap</span></td><td>The Linux kernel</td><td><a href="https://github.com/torvalds/linux">torvalds/linux</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">linux-firmware</span></td><td><span class="ic">pacstrap</span></td><td>Firmware blobs (Wi-Fi, GPU, NVMe controllers)</td><td><a href="https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git">linux-firmware</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">linux-headers</span></td><td><span class="ic">pacman -S linux-headers</span></td><td>Kernel headers (needed for DKMS, building modules)</td><td>—</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">base-devel</span></td><td><span class="ic">pacstrap</span></td><td>Compilers, make, autotools (needed for AUR)</td><td>—</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">intel-ucode</span></td><td><span class="ic">pacstrap</span></td><td>Intel CPU microcode patches (Spectre/Meltdown fixes)</td><td>—</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">sof-firmware</span></td><td><span class="ic">pacstrap</span></td><td>Intel Sound Open Firmware — Dell 7420 REQUIRES this for audio</td><td><a href="https://github.com/thesofproject/sof">thesofproject/sof</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">networkmanager</span></td><td><span class="ic">pacstrap</span></td><td>Network management daemon (Wi-Fi, Ethernet)</td><td><a href="https://gitlab.freedesktop.org/NetworkManager/NetworkManager">NM Gitlab</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">git</span></td><td><span class="ic">pacstrap</span></td><td>Version control — you need this for everything</td><td><a href="https://github.com/git/git">git/git</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">vim nano</span></td><td><span class="ic">pacstrap</span></td><td>Text editors for system configuration</td><td>—</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">openssh</span></td><td><span class="ic">pacman -S openssh</span></td><td>SSH server & client</td><td><a href="https://www.openssh.com/">openssh.com</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">ufw</span></td><td><span class="ic">pacman -S ufw</span></td><td>Uncomplicated Firewall</td><td>—</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">paru</span> (AUR)</td><td><span class="ic">git clone + makepkg -si</span></td><td>AUR helper (install community packages)</td><td><a href="https://github.com/Morganamilo/paru">Morganamilo/paru</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+</table>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<h1>2. Modern CLI Essentials</h1>
+<div class="section-progress"><span class="progress-text" id="pct-cli">0/0</span><div class="progress-bar" style="flex:1"><div class="progress-fill" id="bar-cli" style="width:0%"></div></div></div>
+
+<table data-category="cli">
+<tr><th style="width:40px">✓</th><th>Package</th><th>Install</th><th>Replaces</th><th>Why It's Amazing</th><th>Notes</th></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">zsh</span></td><td><span class="ic">pacman -S zsh</span></td><td>bash</td><td>Better completion, plugins, themes, syntax highlighting</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">starship</span></td><td><span class="ic">pacman -S starship</span></td><td>oh-my-zsh themes</td><td>Blazing fast Rust-based prompt with Git status, Python venv, etc.</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">eza</span></td><td><span class="ic">pacman -S eza</span></td><td>ls</td><td>Colorized, Git-aware, tree view, icons</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">bat</span></td><td><span class="ic">pacman -S bat</span></td><td>cat</td><td>Syntax highlighting, line numbers, Git integration</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">ripgrep</span></td><td><span class="ic">pacman -S ripgrep</span></td><td>grep</td><td>10-100x faster, respects .gitignore, better regex</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">fd</span></td><td><span class="ic">pacman -S fd</span></td><td>find</td><td>Simple syntax, fast, colorized, respects .gitignore</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">fzf</span></td><td><span class="ic">pacman -S fzf</span></td><td>—</td><td>Fuzzy finder for everything (files, history, processes)</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">zoxide</span></td><td><span class="ic">pacman -S zoxide</span></td><td>cd</td><td>Learns your most-used directories, jump with z command</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">tmux</span></td><td><span class="ic">pacman -S tmux</span></td><td>—</td><td>Terminal multiplexer — multiple panes/windows, detach sessions</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">htop btop</span></td><td><span class="ic">pacman -S htop btop</span></td><td>top</td><td>Beautiful process monitors (btop has GPU monitoring)</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">dust</span></td><td><span class="ic">pacman -S dust</span></td><td>du</td><td>Disk usage analyzer with visual bars</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">procs</span></td><td><span class="ic">pacman -S procs</span></td><td>ps</td><td>Colorized, human-readable process viewer</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">jq yq</span></td><td><span class="ic">pacman -S jq</span></td><td>—</td><td>JSON/YAML processor for CLI pipelines</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">tree</span></td><td><span class="ic">pacman -S tree</span></td><td>—</td><td>Directory structure viewer</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">wget curl</span></td><td><span class="ic">pacman -S wget curl</span></td><td>—</td><td>HTTP clients (curl for APIs, wget for downloads)</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">rsync</span></td><td><span class="ic">pacman -S rsync</span></td><td>—</td><td>File sync, delta transfers, backup tool</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">unzip p7zip</span></td><td><span class="ic">pacman -S unzip p7zip</span></td><td>—</td><td>Archive extraction</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">fastfetch</span></td><td><span class="ic">pacman -S fastfetch</span></td><td>neofetch</td><td>System info display — fast, customizable</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+</table>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<h1>3. Display Server, Compositor & Desktop Components</h1>
+<div class="section-progress"><span class="progress-text" id="pct-display">0/0</span><div class="progress-bar" style="flex:1"><div class="progress-fill" id="bar-display" style="width:0%"></div></div></div>
+
+<table data-category="display">
+<tr><th style="width:40px">✓</th><th>Package</th><th>Install</th><th>Purpose</th><th>GitHub</th><th>Notes</th></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">hyprland</span></td><td><span class="ic">pacman -S hyprland</span></td><td>Wayland tiling compositor — the WM for your rice</td><td><a href="https://github.com/hyprwm/Hyprland">hyprwm/Hyprland</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">xdg-desktop-portal-hyprland</span></td><td><span class="ic">pacman -S</span></td><td>Screen sharing, file dialogs for Hyprland</td><td>—</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">kitty</span></td><td><span class="ic">pacman -S kitty</span></td><td>GPU-accelerated terminal emulator</td><td><a href="https://github.com/kovidgoyal/kitty">kovidgoyal/kitty</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">waybar</span></td><td><span class="ic">pacman -S waybar</span></td><td>Highly customizable status bar for Wayland</td><td><a href="https://github.com/Alexays/Waybar">Alexays/Waybar</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">wofi</span> or <span class="ic">rofi-wayland</span></td><td><span class="ic">pacman -S wofi</span></td><td>Application launcher (Wayland-native)</td><td><a href="https://github.com/lbonn/rofi">lbonn/rofi (wayland fork)</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">dunst</span> or <span class="ic">mako</span></td><td><span class="ic">pacman -S dunst</span></td><td>Notification daemon</td><td><a href="https://github.com/dunst-project/dunst">dunst-project/dunst</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">swww</span></td><td><span class="ic">paru -S swww</span></td><td>Animated wallpaper daemon for Wayland</td><td><a href="https://github.com/LGFae/swww">LGFae/swww</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">grim slurp</span></td><td><span class="ic">pacman -S grim slurp</span></td><td>Screenshots (grim captures, slurp selects region)</td><td><a href="https://github.com/emersion/grim">emersion/grim</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">wl-clipboard</span></td><td><span class="ic">pacman -S wl-clipboard</span></td><td>Clipboard manager for Wayland (wl-copy/wl-paste)</td><td>—</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">brightnessctl</span></td><td><span class="ic">pacman -S brightnessctl</span></td><td>Screen brightness control</td><td>—</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">swaylock</span></td><td><span class="ic">pacman -S swaylock</span></td><td>Screen locker for Wayland</td><td>—</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">polkit-gnome</span></td><td><span class="ic">pacman -S polkit-gnome</span></td><td>Authentication agent (sudo dialogs in GUI apps)</td><td>—</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">thunar</span></td><td><span class="ic">pacman -S thunar</span></td><td>Lightweight file manager</td><td>—</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+</table>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<h1>4. Audio, Bluetooth & Hardware</h1>
+<div class="section-progress"><span class="progress-text" id="pct-hw">0/0</span><div class="progress-bar" style="flex:1"><div class="progress-fill" id="bar-hw" style="width:0%"></div></div></div>
+
+<table data-category="hw">
+<tr><th style="width:40px">✓</th><th>Package</th><th>Install</th><th>Purpose</th><th>Notes</th></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">pipewire pipewire-pulse pipewire-alsa</span></td><td><span class="ic">pacman -S pipewire pipewire-pulse pipewire-alsa wireplumber</span></td><td>Modern audio server (replaces PulseAudio)</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">bluez bluez-utils</span></td><td><span class="ic">pacman -S bluez bluez-utils</span></td><td>Bluetooth stack — for BT keyboard, mouse, headset</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">pavucontrol</span></td><td><span class="ic">pacman -S pavucontrol</span></td><td>GUI volume control / audio device manager</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">lm_sensors</span></td><td><span class="ic">pacman -S lm_sensors</span></td><td>CPU/GPU temperature monitoring</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">smartmontools</span></td><td><span class="ic">pacman -S smartmontools</span></td><td>SSD health monitoring (SMART data)</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">power-profiles-daemon</span></td><td><span class="ic">pacman -S power-profiles-daemon</span></td><td>Power management for laptops</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">iio-sensor-proxy</span></td><td><span class="ic">pacman -S iio-sensor-proxy</span></td><td>Auto-rotate for 2-in-1 tablet mode</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+</table>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<h1>4b. Peripherals — Stream Deck, Logitech, HDMI & USB</h1>
+<div class="section-progress"><span class="progress-text" id="pct-periph">0/0</span><div class="progress-bar" style="flex:1"><div class="progress-fill" id="bar-periph" style="width:0%"></div></div></div>
+
+<table data-category="periph">
+<tr><th style="width:40px">✓</th><th>Package</th><th>Install</th><th>Purpose</th><th>GitHub / Docs</th><th>Notes</th></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td colspan="5" style="color:var(--pink-light);font-weight:bold">🎛️ Elgato Stream Deck (all models incl. Stream Deck+)</td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">streamdeck-ui</span></td><td><span class="ic">paru -S streamdeck-ui</span></td><td>Full GUI — icons, actions, multi-actions, folders, pages, dials (SD+)</td><td><a href="https://github.com/timothycrosley/streamdeck-ui">timothycrosley/streamdeck-ui</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">python-streamdeck</span></td><td><span class="ic">pip install streamdeck</span></td><td>Python API — build custom scripts, dynamic buttons, OBS integration</td><td><a href="https://github.com/abcminiuser/python-elgato-streamdeck">abcminiuser/python-elgato-streamdeck</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">hidapi</span></td><td><span class="ic">pacman -S hidapi</span></td><td>HID API lib — required for USB comm with Stream Deck</td><td>—</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">udev rule (Stream Deck)</span></td><td><span class="ic">see Part 2 guide §8.4</span></td><td>Allow non-root access to Stream Deck USB. See Part 2 for the exact rule.</td><td><a href="https://github.com/timothycrosley/streamdeck-ui#linux">docs</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td colspan="5" style="color:var(--pink-light);font-weight:bold">🖱️ Logitech Mouse & Keyboard</td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">solaar</span></td><td><span class="ic">pacman -S solaar</span></td><td>Logitech Unifying/Bolt receiver — pair devices, battery, DPI, button remap</td><td><a href="https://github.com/pwr-Solaar/Solaar">pwr-Solaar/Solaar</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">libratbag + piper</span></td><td><span class="ic">pacman -S libratbag piper</span></td><td>Advanced mouse GUI — DPI profiles, button mapping, LED, scroll speed (MX Master, G-series)</td><td><a href="https://github.com/libratbag/piper">libratbag/piper</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">keyd</span></td><td><span class="ic">paru -S keyd</span></td><td>System-level key remapping — layers, macros, Caps→Ctrl. Works for ANY keyboard.</td><td><a href="https://github.com/rvaiya/keyd">rvaiya/keyd</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">input-remapper</span></td><td><span class="ic">paru -S input-remapper-git</span></td><td>GUI for remapping any input device — mouse buttons, keyboard keys, macros</td><td><a href="https://github.com/sezanzeb/input-remapper">sezanzeb/input-remapper</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td colspan="5" style="color:var(--pink-light);font-weight:bold">🖥️ Display / HDMI / Multi-Monitor</td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">wlr-randr</span></td><td><span class="ic">pacman -S wlr-randr</span></td><td>CLI monitor config — resolution, refresh rate, position for HDMI/USB-C</td><td><a href="https://sr.ht/~emersion/wlr-randr/">wlr-randr</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">kanshi</span></td><td><span class="ic">pacman -S kanshi</span></td><td>Auto display profiles — detects HDMI plug/unplug and applies layout</td><td><a href="https://sr.ht/~emersion/kanshi/">kanshi</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">nwg-displays</span></td><td><span class="ic">paru -S nwg-displays</span></td><td>Visual GUI display configurator for Hyprland — drag to position monitors</td><td><a href="https://github.com/nwg-piotr/nwg-displays">nwg-piotr/nwg-displays</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+</table>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<h1>5. Development Environment</h1>
+<div class="section-progress"><span class="progress-text" id="pct-dev">0/0</span><div class="progress-bar" style="flex:1"><div class="progress-fill" id="bar-dev" style="width:0%"></div></div></div>
+
+<table data-category="dev">
+<tr><th style="width:40px">✓</th><th>Package</th><th>Install</th><th>Purpose</th><th>GitHub / Docs</th><th>Notes</th></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">python python-pip</span></td><td><span class="ic">pacman -S python python-pip</span></td><td>Python 3 runtime and pip</td><td><a href="https://docs.python.org/3/">docs.python.org</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">pyenv</span></td><td><span class="ic">paru -S pyenv</span></td><td>Python version manager (multiple Python versions)</td><td><a href="https://github.com/pyenv/pyenv">pyenv/pyenv</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">poetry</span></td><td><span class="ic">pacman -S python-poetry</span></td><td>Python dependency management and packaging</td><td><a href="https://github.com/python-poetry/poetry">python-poetry</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">nodejs npm</span></td><td><span class="ic">pacman -S nodejs npm</span></td><td>Node.js runtime</td><td><a href="https://nodejs.org">nodejs.org</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">nvm</span></td><td><span class="ic">paru -S nvm</span></td><td>Node version manager</td><td><a href="https://github.com/nvm-sh/nvm">nvm-sh/nvm</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">rustup</span></td><td><span class="ic">pacman -S rustup</span></td><td>Rust toolchain installer (Claude Code needs this!)</td><td><a href="https://rustup.rs">rustup.rs</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">docker docker-compose</span></td><td><span class="ic">pacman -S docker docker-compose</span></td><td>Containerization platform</td><td><a href="https://github.com/docker">github.com/docker</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">github-cli</span></td><td><span class="ic">pacman -S github-cli</span></td><td>Official GitHub CLI (gh auth login, gh pr, etc.)</td><td><a href="https://github.com/cli/cli">cli/cli</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">visual-studio-code-bin</span></td><td><span class="ic">paru -S visual-studio-code-bin</span></td><td>VS Code editor (official Microsoft build)</td><td><a href="https://github.com/microsoft/vscode">microsoft/vscode</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">neovim</span></td><td><span class="ic">pacman -S neovim</span></td><td>Modern Vim — with LazyVim for IDE-like features</td><td><a href="https://github.com/neovim/neovim">neovim/neovim</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">claude-code</span></td><td><span class="ic">npm install -g @anthropic-ai/claude-code</span></td><td>Claude Code — AI coding from terminal</td><td><a href="https://docs.anthropic.com/en/docs/claude-code">Claude Code docs</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">postgresql</span></td><td><span class="ic">pacman -S postgresql</span></td><td>Database server</td><td><a href="https://www.postgresql.org/">postgresql.org</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">redis</span></td><td><span class="ic">pacman -S redis</span></td><td>In-memory cache/message broker</td><td><a href="https://redis.io">redis.io</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">dbeaver</span></td><td><span class="ic">paru -S dbeaver</span></td><td>Universal database GUI client</td><td><a href="https://github.com/dbeaver/dbeaver">dbeaver/dbeaver</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+</table>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<h1>6. Productivity & Knowledge Tools</h1>
+<div class="section-progress"><span class="progress-text" id="pct-prod">0/0</span><div class="progress-bar" style="flex:1"><div class="progress-fill" id="bar-prod" style="width:0%"></div></div></div>
+
+<table data-category="prod">
+<tr><th style="width:40px">✓</th><th>Package</th><th>Install</th><th>Purpose</th><th>GitHub</th><th>Notes</th></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">obsidian</span></td><td><span class="ic">paru -S obsidian</span></td><td>Knowledge base / notes — Markdown, plugins, graph view</td><td><a href="https://obsidian.md">obsidian.md</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">firefox</span></td><td><span class="ic">pacman -S firefox</span></td><td>Web browser</td><td>—</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">chromium</span></td><td><span class="ic">pacman -S chromium</span></td><td>Secondary browser (DevTools, web testing)</td><td>—</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">drawio-desktop</span></td><td><span class="ic">paru -S drawio-desktop</span></td><td>Diagramming tool (flowcharts, architecture, UML)</td><td><a href="https://github.com/jgraph/drawio-desktop">jgraph/drawio-desktop</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">xmind</span> or <span class="ic">freeplane</span></td><td><span class="ic">paru -S freeplane</span></td><td>Mind mapping tool (free, Java-based)</td><td><a href="https://github.com/freeplane/freeplane">freeplane/freeplane</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">libreoffice-fresh</span></td><td><span class="ic">pacman -S libreoffice-fresh</span></td><td>Office suite (docs, spreadsheets, presentations)</td><td>—</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">zathura zathura-pdf-mupdf</span></td><td><span class="ic">pacman -S zathura zathura-pdf-mupdf</span></td><td>Lightweight PDF viewer with vim keybindings</td><td>—</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">mpv</span></td><td><span class="ic">pacman -S mpv</span></td><td>Media player (videos, audio, streams)</td><td>—</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">imv</span></td><td><span class="ic">pacman -S imv</span></td><td>Image viewer for Wayland</td><td>—</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+</table>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<h1>7. Security & White Hat Arsenal</h1>
+<div class="section-progress"><span class="progress-text" id="pct-sec">0/0</span><div class="progress-bar" style="flex:1"><div class="progress-fill" id="bar-sec" style="width:0%"></div></div></div>
+
+<table data-category="sec">
+<tr><th style="width:40px">✓</th><th>Package</th><th>Install</th><th>Purpose</th><th>GitHub</th><th>Notes</th></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">nmap</span></td><td><span class="ic">pacman -S nmap</span></td><td>Network scanner & port discovery</td><td><a href="https://github.com/nmap/nmap">nmap/nmap</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">wireshark-qt</span></td><td><span class="ic">pacman -S wireshark-qt</span></td><td>Network packet analyzer</td><td><a href="https://github.com/wireshark/wireshark">wireshark/wireshark</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">burpsuite</span></td><td><span class="ic">paru -S burpsuite</span></td><td>Web vulnerability scanner / proxy</td><td><a href="https://portswigger.net/burp">portswigger.net</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">metasploit</span></td><td><span class="ic">paru -S metasploit</span></td><td>Penetration testing framework</td><td><a href="https://github.com/rapid7/metasploit-framework">rapid7/metasploit</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">john</span></td><td><span class="ic">pacman -S john</span></td><td>Password hash cracker</td><td><a href="https://github.com/openwall/john">openwall/john</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">hashcat</span></td><td><span class="ic">pacman -S hashcat</span></td><td>GPU-accelerated password recovery</td><td><a href="https://github.com/hashcat/hashcat">hashcat/hashcat</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">aircrack-ng</span></td><td><span class="ic">pacman -S aircrack-ng</span></td><td>Wi-Fi security auditing suite</td><td><a href="https://github.com/aircrack-ng/aircrack-ng">aircrack-ng</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">sqlmap</span></td><td><span class="ic">pacman -S sqlmap</span></td><td>SQL injection detection & exploitation</td><td><a href="https://github.com/sqlmapproject/sqlmap">sqlmapproject</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">gobuster</span></td><td><span class="ic">pacman -S gobuster</span></td><td>Directory/DNS brute-forcer</td><td><a href="https://github.com/OJ/gobuster">OJ/gobuster</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">ghidra</span></td><td><span class="ic">paru -S ghidra</span></td><td>NSA's reverse engineering tool (disassembler/decompiler)</td><td><a href="https://github.com/NationalSecurityAgency/ghidra">NSA/ghidra</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">radare2</span></td><td><span class="ic">pacman -S radare2</span></td><td>Binary analysis framework</td><td><a href="https://github.com/radareorg/radare2">radareorg/radare2</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">lynis</span></td><td><span class="ic">pacman -S lynis</span></td><td>Security auditing tool for your own system</td><td><a href="https://github.com/CISOfy/lynis">CISOfy/lynis</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+</table>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<h1>8. Cloud & Data Engineering (AWS, Azure, Databricks)</h1>
+<div class="section-progress"><span class="progress-text" id="pct-cloud">0/0</span><div class="progress-bar" style="flex:1"><div class="progress-fill" id="bar-cloud" style="width:0%"></div></div></div>
+
+<table data-category="cloud">
+<tr><th style="width:40px">✓</th><th>Package</th><th>Install</th><th>Purpose</th><th>Docs / GitHub</th><th>Notes</th></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">aws-cli-v2</span></td><td><span class="ic">paru -S aws-cli-v2</span></td><td>Official AWS CLI — S3, Lambda, DynamoDB, EC2, Amplify, everything</td><td><a href="https://github.com/aws/aws-cli">aws/aws-cli</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">aws-sam-cli</span></td><td><span class="ic">paru -S aws-sam-cli</span></td><td>Serverless Application Model — local Lambda testing, deployment</td><td><a href="https://github.com/aws/aws-sam-cli">aws/aws-sam-cli</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">aws-cdk</span></td><td><span class="ic">npm install -g aws-cdk</span></td><td>Cloud Development Kit — infrastructure as code (TypeScript/Python)</td><td><a href="https://github.com/aws/aws-cdk">aws/aws-cdk</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">amplify-cli</span></td><td><span class="ic">npm install -g @aws-amplify/cli</span></td><td>AWS Amplify — deploy frontend + backend (S3, Lambda, DynamoDB, API Gateway)</td><td><a href="https://github.com/aws-amplify/amplify-cli">aws-amplify/amplify-cli</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">terraform</span></td><td><span class="ic">pacman -S terraform</span></td><td>Multi-cloud infrastructure as code (AWS + Azure + GCP)</td><td><a href="https://github.com/hashicorp/terraform">hashicorp/terraform</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">azure-cli</span></td><td><span class="ic">paru -S azure-cli</span></td><td>Official Azure CLI — manage all Azure resources</td><td><a href="https://github.com/Azure/azure-cli">Azure/azure-cli</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">azure-functions-core-tools</span></td><td><span class="ic">paru -S azure-functions-core-tools-bin</span></td><td>Local Azure Functions development & testing</td><td><a href="https://github.com/Azure/azure-functions-core-tools">Azure/azure-functions</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">databricks-cli</span></td><td><span class="ic">pip install databricks-cli</span></td><td>Databricks CLI — manage clusters, jobs, notebooks, DBFS</td><td><a href="https://github.com/databricks/databricks-cli">databricks/databricks-cli</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">databricks-sdk</span></td><td><span class="ic">pip install databricks-sdk</span></td><td>Databricks Python SDK — programmatic access to workspace, Unity Catalog</td><td><a href="https://github.com/databricks/databricks-sdk-py">databricks/databricks-sdk-py</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">databricks-connect</span></td><td><span class="ic">pip install databricks-connect</span></td><td>Run Spark code locally against a remote Databricks cluster</td><td><a href="https://docs.databricks.com/dev-tools/databricks-connect.html">Databricks docs</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">python-pyspark</span></td><td><span class="ic">pip install pyspark</span></td><td>Apache Spark Python API — distributed data processing</td><td><a href="https://github.com/apache/spark">apache/spark</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">delta-spark</span></td><td><span class="ic">pip install delta-spark</span></td><td>Delta Lake — ACID transactions on data lakes</td><td><a href="https://github.com/delta-io/delta">delta-io/delta</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">python-polars</span></td><td><span class="ic">pip install polars</span></td><td>Lightning-fast DataFrame library (Rust core, your specialty!)</td><td><a href="https://github.com/pola-rs/polars">pola-rs/polars</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">python-pandas</span></td><td><span class="ic">pip install pandas</span></td><td>Classic DataFrame library — still needed for legacy code and some APIs</td><td><a href="https://github.com/pandas-dev/pandas">pandas-dev/pandas</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">python-boto3</span></td><td><span class="ic">pip install boto3</span></td><td>AWS SDK for Python — programmatic S3, Lambda, DynamoDB, SQS, etc.</td><td><a href="https://github.com/boto/boto3">boto/boto3</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">azure-identity + azure-storage-blob</span></td><td><span class="ic">pip install azure-identity azure-storage-blob</span></td><td>Azure Python SDK — auth + Blob storage access</td><td><a href="https://github.com/Azure/azure-sdk-for-python">Azure/azure-sdk-for-python</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">kubectl</span></td><td><span class="ic">pacman -S kubectl</span></td><td>Kubernetes CLI — manage AKS/EKS clusters</td><td><a href="https://github.com/kubernetes/kubectl">kubernetes/kubectl</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">helm</span></td><td><span class="ic">pacman -S helm</span></td><td>Kubernetes package manager</td><td><a href="https://github.com/helm/helm">helm/helm</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">jdk-openjdk</span></td><td><span class="ic">pacman -S jdk-openjdk</span></td><td>Java JDK — required by PySpark, Databricks Connect, Ghidra</td><td>—</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+</table>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<h1>9. BlackArch Repository (2800+ Security Tools)</h1>
+<div class="section-progress"><span class="progress-text" id="pct-blackarch">0/0</span><div class="progress-bar" style="flex:1"><div class="progress-fill" id="bar-blackarch" style="width:0%"></div></div></div>
+
+<p style="margin:12px 0;">BlackArch is not a separate distro — it's an additional pacman repository that layers on top of your existing Arch install. Once enabled, you get access to 2800+ penetration testing and security tools installable via <span class="ic">pacman -S</span>. Think of it as Kali Linux's toolset without leaving Arch.</p>
+
+<table data-category="blackarch">
+<tr><th style="width:40px">✓</th><th>Step / Package</th><th>Command</th><th>Purpose</th><th>Notes</th></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><strong>Step 1: Add BlackArch repo</strong></td><td><span class="ic">curl -O https://blackarch.org/strap.sh<br>chmod +x strap.sh<br>sudo ./strap.sh</span></td><td>Downloads and runs the BlackArch bootstrap script — adds the repo + signing keys to pacman</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><strong>Step 2: Sync repos</strong></td><td><span class="ic">sudo pacman -Sy</span></td><td>Refresh package databases including new BlackArch repo</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">blackarch-webapp</span> (group)</td><td><span class="ic">sudo pacman -S blackarch-webapp</span></td><td>All web application testing tools (~120 tools: nikto, wpscan, sqlmap, etc.)</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">blackarch-scanner</span> (group)</td><td><span class="ic">sudo pacman -S blackarch-scanner</span></td><td>All scanning tools (~100 tools: nmap, masscan, zmap, etc.)</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">blackarch-exploitation</span> (group)</td><td><span class="ic">sudo pacman -S blackarch-exploitation</span></td><td>Exploitation frameworks (~80 tools: metasploit, exploitdb, etc.)</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">blackarch-networking</span> (group)</td><td><span class="ic">sudo pacman -S blackarch-networking</span></td><td>Network attack/defense tools (~150 tools)</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">blackarch-forensic</span> (group)</td><td><span class="ic">sudo pacman -S blackarch-forensic</span></td><td>Digital forensics tools (~70 tools: volatility, autopsy, binwalk, etc.)</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">blackarch-crypto</span> (group)</td><td><span class="ic">sudo pacman -S blackarch-crypto</span></td><td>Cryptography tools (hashcat, john, etc.)</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">blackarch-wireless</span> (group)</td><td><span class="ic">sudo pacman -S blackarch-wireless</span></td><td>Wireless attack tools (aircrack-ng, wifite, reaver, etc.)</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">blackarch-reversing</span> (group)</td><td><span class="ic">sudo pacman -S blackarch-reversing</span></td><td>Reverse engineering tools (ghidra, radare2, binary ninja, etc.)</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td>Individual favorites</td><td><span class="ic">pacman -S seclists wordlistctl responder evil-winrm crackmapexec</span></td><td>Curated must-have tools not in the groups above</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+</table>
+
+<div style="background:rgba(233,30,99,0.06);border:1px solid var(--pink);border-radius:8px;padding:14px;margin:14px 0;">
+  <p style="color:var(--pink-light);font-weight:bold;margin-bottom:6px;">💡 PRO TIP — Don't install everything at once</p>
+  <p>The full BlackArch repo is ~70 GB. Install tool groups as you need them. You can search for specific tools with <span class="ic">pacman -Ss blackarch | grep toolname</span>. For CTF competitions, <span class="ic">blackarch-webapp</span> + <span class="ic">blackarch-exploitation</span> + <span class="ic">blackarch-crypto</span> covers 90% of challenges.</p>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<h1>9.5 Peripherals: Elgato Stream Deck, Logitech, HDMI Monitors</h1>
+<div class="section-progress"><span class="progress-text" id="pct-periph">0/0</span><div class="progress-bar" style="flex:1"><div class="progress-fill" id="bar-periph" style="width:0%"></div></div></div>
+
+<table data-category="periph">
+<tr><th style="width:40px">✓</th><th>Package</th><th>Install</th><th>Purpose</th><th>GitHub / Docs</th><th>Notes</th></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">streamdeck-ui</span></td><td><span class="ic">paru -S streamdeck-ui</span></td><td>Open-source Linux GUI for Elgato Stream Deck — button config, icons, multi-actions, pages</td><td><a href="https://github.com/timothycrosley/streamdeck-ui">timothycrosley/streamdeck-ui</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">python-streamdeck</span></td><td><span class="ic">pip install streamdeck</span></td><td>Python library to program Stream Deck buttons programmatically (custom scripts)</td><td><a href="https://github.com/abcminiuser/python-elgato-streamdeck">abcminiuser/python-elgato-streamdeck</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">libusb hidapi</span></td><td><span class="ic">pacman -S libusb hidapi</span></td><td>USB/HID libraries — required by Stream Deck tools to communicate with the device</td><td>—</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">udev rule for Stream Deck</span></td><td><span class="ic">sudo tee /etc/udev/rules.d/70-streamdeck.rules</span></td><td>Allows non-root access to Stream Deck USB device. Content: <span class="ic">SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", TAG+="uaccess"</span></td><td><a href="https://github.com/timothycrosley/streamdeck-ui#udev">streamdeck-ui docs</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">boatswain</span></td><td><span class="ic">paru -S boatswain</span></td><td>GNOME-native Stream Deck controller (alternative to streamdeck-ui, GTK4)</td><td><a href="https://gitlab.gnome.org/World/boatswain">GNOME/boatswain</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">solaar</span></td><td><span class="ic">pacman -S solaar</span></td><td>Logitech device manager — configure Unifying/Bolt receivers, button mapping, DPI, battery status</td><td><a href="https://github.com/pwr-Solaar/Solaar">pwr-Solaar/Solaar</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">libratbag + piper</span></td><td><span class="ic">pacman -S libratbag piper</span></td><td>Advanced Logitech mouse config: per-button actions, DPI profiles, LED, macros. Piper = GUI frontend.</td><td><a href="https://github.com/libratbag/piper">libratbag/piper</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">keyd</span></td><td><span class="ic">paru -S keyd</span></td><td>Key remapping daemon — remap any key on any keyboard, create layers, tap-hold combos. Works at kernel level, Wayland-compatible.</td><td><a href="https://github.com/rvaiya/keyd">rvaiya/keyd</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">xdg-utils</span></td><td><span class="ic">pacman -S xdg-utils</span></td><td>Desktop integration utilities (xdg-open, mime type handling) — needed by many GUI tools</td><td>—</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">wdisplays</span></td><td><span class="ic">pacman -S wdisplays</span></td><td>GUI for Wayland display configuration — arrange monitors, set resolution, scaling (like Windows Display Settings)</td><td><a href="https://github.com/artizirk/wdisplays">artizirk/wdisplays</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">kanshi</span></td><td><span class="ic">pacman -S kanshi</span></td><td>Auto display profile switcher — automatically applies layout when HDMI monitor is plugged/unplugged</td><td><a href="https://sr.ht/~emersion/kanshi/">emersion/kanshi</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+</table>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<h1>10. Rice & Theming (Pink Galaxy)</h1>
+<div class="section-progress"><span class="progress-text" id="pct-rice">0/0</span><div class="progress-bar" style="flex:1"><div class="progress-fill" id="bar-rice" style="width:0%"></div></div></div>
+
+<table data-category="rice">
+<tr><th style="width:40px">✓</th><th>Package</th><th>Install</th><th>Purpose</th><th>GitHub</th><th>Notes</th></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">ttf-jetbrains-mono-nerd</span></td><td><span class="ic">pacman -S ttf-jetbrains-mono-nerd</span></td><td>Nerd Font for terminal icons</td><td>—</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">noto-fonts noto-fonts-cjk noto-fonts-emoji</span></td><td><span class="ic">pacman -S</span></td><td>Complete Unicode font coverage</td><td>—</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">gtk3 gtk4</span></td><td><span class="ic">pacman -S gtk3 gtk4</span></td><td>GTK toolkit (for theming GUI apps)</td><td>—</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">catppuccin-gtk-theme-mocha</span></td><td><span class="ic">paru -S catppuccin-gtk-theme-mocha</span></td><td>Pastel dark GTK theme (customize to pink)</td><td><a href="https://github.com/catppuccin/gtk">catppuccin/gtk</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">papirus-icon-theme</span></td><td><span class="ic">pacman -S papirus-icon-theme</span></td><td>Modern flat icon theme</td><td><a href="https://github.com/PapirusDevelopmentTeam/papirus-icon-theme">papirus</a></td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">qt5ct qt6ct</span></td><td><span class="ic">pacman -S qt5ct qt6ct</span></td><td>Qt theme configuration (for VS Code, etc.)</td><td>—</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+<tr><td class="check-cell"><input type="checkbox" onchange="recalc()"></td><td><span class="ic">kvantum</span></td><td><span class="ic">pacman -S kvantum</span></td><td>SVG-based Qt theme engine</td><td>—</td><td><input class="note-inline" placeholder="notes…" oninput="autoGrow(this)"></td></tr>
+</table>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<h1>11. GitHub Repos to Explore (Dotfiles & Configs)</h1>
+
+<p>These are community repositories with pre-built Hyprland configs, rice inspirations, and dotfiles you can borrow from:</p>
+
+<table>
+<tr><th>Repo</th><th>What It Has</th><th>Link</th></tr>
+<tr><td>end-4/dots-hyprland</td><td>Beautiful Hyprland rice with animations, Waybar, AGS widgets</td><td><a href="https://github.com/end-4/dots-hyprland">github.com/end-4/dots-hyprland</a></td></tr>
+<tr><td>JaKooLit/Hyprland-Dots</td><td>Complete Hyprland setup with install script, themes, Waybar</td><td><a href="https://github.com/JaKooLit/Hyprland-Dots">github.com/JaKooLit/Hyprland-Dots</a></td></tr>
+<tr><td>prasanthrangan/hyprdots</td><td>Aesthetic Hyprland dots with theme switcher</td><td><a href="https://github.com/prasanthrangan/hyprdots">github.com/prasanthrangan/hyprdots</a></td></tr>
+<tr><td>catppuccin/catppuccin</td><td>Pastel theme for 200+ apps (terminal, vim, gtk, vscode, etc.)</td><td><a href="https://github.com/catppuccin/catppuccin">github.com/catppuccin/catppuccin</a></td></tr>
+<tr><td>romkatv/powerlevel10k</td><td>Zsh theme with instant prompt and Git status</td><td><a href="https://github.com/romkatv/powerlevel10k">github.com/romkatv/powerlevel10k</a></td></tr>
+<tr><td>zsh-users/zsh-autosuggestions</td><td>Fish-like autosuggestions for Zsh</td><td><a href="https://github.com/zsh-users/zsh-autosuggestions">github.com/zsh-users</a></td></tr>
+<tr><td>zsh-users/zsh-syntax-highlighting</td><td>Syntax highlighting in the shell as you type</td><td><a href="https://github.com/zsh-users/zsh-syntax-highlighting">github.com/zsh-users</a></td></tr>
+<tr><td>LazyVim/LazyVim</td><td>Neovim IDE setup — batteries included</td><td><a href="https://github.com/LazyVim/LazyVim">github.com/LazyVim</a></td></tr>
+<tr><td>r/unixporn</td><td>Linux desktop customization community (inspiration)</td><td><a href="https://reddit.com/r/unixporn">reddit.com/r/unixporn</a></td></tr>
+</table>
+
+</div><!-- end container -->
+
+<script>
+function recalc() {
+  const categories = ['core','cli','display','hw','periph','dev','prod','sec','cloud','blackarch','rice'];
+  let totalAll = 0, checkedAll = 0;
+  categories.forEach(cat => {
+    const table = document.querySelector(`table[data-category="${cat}"]`);
+    if (!table) return;
+    const checks = table.querySelectorAll('input[type="checkbox"]');
+    let t = checks.length, c = 0;
+    checks.forEach(cb => { if (cb.checked) c++; });
+    totalAll += t; checkedAll += c;
+    const pctEl = document.getElementById('pct-' + cat);
+    const barEl = document.getElementById('bar-' + cat);
+    if (pctEl) pctEl.textContent = c + '/' + t;
+    if (barEl) barEl.style.width = (t > 0 ? Math.round(c/t*100) : 0) + '%';
+  });
+  const pct = totalAll > 0 ? Math.round(checkedAll/totalAll*100) : 0;
+  document.getElementById('overallPct').textContent = pct + '%';
+  document.getElementById('overallBar').style.width = pct + '%';
+  // Save to localStorage
+  const state = {};
+  document.querySelectorAll('input[type="checkbox"]').forEach((cb, i) => { state['cb_'+i] = cb.checked; });
+  document.querySelectorAll('.note-inline').forEach((n, i) => { if (n.value) state['note_'+i] = n.value; });
+  localStorage.setItem('archtools_state', JSON.stringify(state));
+}
+function autoGrow(el) { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; }
+// Restore state
+try {
+  const saved = JSON.parse(localStorage.getItem('archtools_state') || '{}');
+  document.querySelectorAll('input[type="checkbox"]').forEach((cb, i) => { if (saved['cb_'+i]) cb.checked = true; });
+  document.querySelectorAll('.note-inline').forEach((n, i) => { if (saved['note_'+i]) { n.value = saved['note_'+i]; autoGrow(n); } });
+  recalc();
+} catch {}
+// Save snapshot
+function saveManifestSnapshot() {
+  recalc();
+  const blob = new Blob([document.documentElement.outerHTML], {type:'text/html'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'archlinux_tools_manifest_SAVED.html'; a.click();
+}
+</script>
+</body>
+</html>

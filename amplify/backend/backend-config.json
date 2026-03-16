@@ -1,0 +1,68 @@
+{
+  "auth": {
+    "pinkgalaxyauth": {
+      "service": "Cognito",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [],
+      "customAuth": false,
+      "frontendAuthConfig": {
+        "socialProviders": [],
+        "usernameAttributes": ["email"],
+        "signupAttributes": ["email"],
+        "passwordProtectionSettings": {
+          "passwordPolicyMinLength": 8,
+          "passwordPolicyCharacters": []
+        },
+        "mfaConfiguration": "OFF",
+        "mfaTypes": ["SMS"],
+        "verificationMechanisms": ["email"]
+      }
+    }
+  },
+  "storage": {
+    "pinkgalaxystorage": {
+      "service": "DynamoDB",
+      "providerPlugin": "awscloudformation"
+    }
+  },
+  "function": {
+    "saveUserProgress": {
+      "service": "Lambda",
+      "providerPlugin": "awscloudformation",
+      "build": true
+    },
+    "getUserProgress": {
+      "service": "Lambda",
+      "providerPlugin": "awscloudformation",
+      "build": true
+    },
+    "syncUserData": {
+      "service": "Lambda",
+      "providerPlugin": "awscloudformation",
+      "build": true
+    }
+  },
+  "api": {
+    "pinkgalaxyapi": {
+      "service": "API Gateway",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [
+        {
+          "category": "function",
+          "resourceName": "saveUserProgress",
+          "attributes": ["Name", "Arn"]
+        },
+        {
+          "category": "function", 
+          "resourceName": "getUserProgress",
+          "attributes": ["Name", "Arn"]
+        },
+        {
+          "category": "function",
+          "resourceName": "syncUserData", 
+          "attributes": ["Name", "Arn"]
+        }
+      ]
+    }
+  }
+}

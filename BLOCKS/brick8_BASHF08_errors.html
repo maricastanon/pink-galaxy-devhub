@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧱 Brick 8 — BASH-F08: Error Handling (Production-Ready Scripts)</title>
+<style>
+:root{--p:#e91e63;--pl:#f8bbd0;--g:#2e7d32;--gl:#a5d6a7;--bg:#0a0a12;--s2:#1a1a2e;--tx:#e8e6f0;--t2:#a8a6b8;--mt:#6c6a7e;--bd:rgba(233,30,99,.18);--bdg:rgba(46,125,50,.2);--purple:#9c27b0;--mono:"Courier New",monospace;--dn:#ff5252;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Calibri,"Segoe UI",sans-serif;background:var(--bg);color:var(--tx);font-size:11pt;line-height:1.65;padding:20px;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 20% 50%,rgba(233,30,99,.05),transparent 50%);}
+.w{max-width:900px;margin:0 auto;position:relative;z-index:1;}
+h1{color:var(--p);font-size:20pt;margin:30px 0 12px;border-bottom:2px solid var(--p);padding-bottom:8px;}
+h2{color:var(--g);font-size:15pt;margin:28px 0 10px;border-left:4px solid var(--g);padding-left:12px;}
+h3{color:var(--p);font-size:12pt;margin:20px 0 8px;}
+p{margin:8px 0;text-align:justify;}
+.ic{font-family:var(--mono);font-size:9pt;background:rgba(233,30,99,.08);padding:1px 5px;border-radius:3px;color:var(--pl);}
+.note{background:var(--s2);border-left:3px solid var(--p);padding:12px;border-radius:0 8px 8px 0;margin:14px 0;font-size:9.5pt;}.note b{color:var(--p);}.note.gn{border-left-color:var(--g);}.note.gn b{color:var(--gl);}
+.tabs{display:flex;gap:2px;margin:14px 0 6px;}
+.tab{padding:5px 12px;border-radius:6px 6px 0 0;border:1px solid transparent;background:none;color:var(--mt);cursor:pointer;font-size:8.5pt;font-family:inherit;}.tab.on{background:var(--s2);color:var(--p);border-color:var(--bd);border-bottom-color:var(--s2);}
+.pan{display:none;background:var(--s2);border:1px solid var(--bd);border-radius:0 8px 8px 8px;padding:14px;font-size:10pt;}.pan.on{display:block;}.pan.si{border-left:3px solid var(--gl);}.pan.te{border-left:3px solid var(--p);}.pan.de{border-left:3px solid var(--purple);}
+.cw{margin:10px 0;border:1px solid var(--bdg);border-radius:8px;overflow:hidden;background:#10101c;}
+.cwt{display:flex;justify-content:space-between;align-items:center;padding:3px 10px;background:rgba(46,125,50,.1);border-bottom:1px solid var(--bdg);font-size:7pt;}
+.cwl{color:var(--g);font-family:var(--mono);font-weight:bold;text-transform:uppercase;letter-spacing:1px;}
+.cwb{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--t2);padding:2px 7px;border-radius:4px;cursor:pointer;font-size:7pt;font-family:var(--mono);}.cwb:hover{background:var(--p);color:#fff;}
+pre{font-family:var(--mono);font-size:9.5pt;padding:10px;overflow-x:auto;white-space:pre;line-height:1.5;margin:0;color:var(--tx);background:#10101c;}
+pre .c{color:#555;font-style:italic;}pre .g{color:#a5d6a7;}pre .y{color:#fff59d;}pre .b{color:#90caf9;}pre .o{color:#ffcc80;}pre .p{color:#f48fb1;}pre .v{color:#ce93d8;}pre .k{color:#80cbc4;}
+.out{background:rgba(46,125,50,.05);border-top:2px solid var(--g);padding:6px 10px;font-family:var(--mono);font-size:8.5pt;color:#a5d6a7;}
+.outl{color:var(--g);font-weight:bold;font-size:7pt;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;}
+.cm{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;}.cm>div{border-radius:8px;padding:10px;font-size:9pt;}
+.cm-do{background:rgba(46,125,50,.05);border:1px solid var(--bdg);}.cm-do b{color:var(--gl);}
+.cm-x{background:rgba(233,30,99,.04);border:1px solid var(--bd);}.cm-x b{color:var(--pl);}
+.cm p{margin:3px 0;color:var(--t2);}
+.qz{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:12px;margin:12px 0;}.qz-q{color:var(--tx);font-size:10pt;margin-bottom:8px;}
+.qo{padding:7px 12px;border:1px solid var(--bd);border-radius:8px;cursor:pointer;font-size:9pt;color:var(--t2);background:none;font-family:inherit;width:100%;text-align:left;transition:all .15s;display:block;margin-bottom:5px;}.qo:hover:not(:disabled){border-color:var(--p);color:var(--pl);}.qo.y{border-color:var(--g);background:rgba(46,125,50,.1);color:var(--gl);}.qo.n{border-color:var(--dn);background:rgba(255,82,82,.06);color:var(--dn);}
+.qfb{margin-top:6px;font-size:9pt;padding:8px;border-radius:6px;display:none;}.qfb.s{display:block;}.qfb.w{background:rgba(46,125,50,.08);color:var(--gl);border:1px solid var(--bdg);}.qfb.l{background:rgba(255,82,82,.05);color:var(--dn);border:1px solid rgba(255,82,82,.15);}
+.sd{margin:40px 0 0;padding:16px 0 8px;border-top:1px solid rgba(233,30,99,.1);}.sd small{color:var(--mt);font-size:8pt;text-transform:uppercase;letter-spacing:2px;}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:9.5pt;}
+th{background:rgba(233,30,99,.1);color:var(--pl);padding:8px 10px;text-align:left;border-bottom:2px solid var(--p);}
+td{padding:6px 10px;border-bottom:1px solid var(--bd);color:var(--t2);}
+td code{font-family:var(--mono);font-size:9pt;color:var(--pl);background:rgba(233,30,99,.06);padding:1px 4px;border-radius:2px;}
+.sf{position:fixed;bottom:14px;right:14px;z-index:9999;}.sf button{padding:8px 16px;background:var(--g);color:#fff;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(0,0,0,.3);}
+.cover{text-align:center;padding:30px;margin-bottom:20px;background:linear-gradient(135deg,#1a0533,#0d1b2a);border:2px solid var(--g);border-radius:14px;position:relative;overflow:hidden;}.cover h1{border:none;color:var(--gl);font-size:16pt;margin:0;}.cover p{color:var(--t2);font-size:10pt;}.cover::after{content:'🛡️';position:absolute;font-size:80pt;opacity:0.04;right:10px;top:-10px;}
+@media print{body{background:#fff;color:#333;}h1{color:#e91e63!important;}h2{color:#2e7d32!important;}pre{background:#f5f5f5!important;color:#333;}.sf{display:none;}@page{size:A4;margin:1.5cm 1cm;}}
+</style>
+</head>
+<body>
+<div class="w">
+
+<div class="cover">
+<h1>🧱 Brick 8 — BASH-F08: Error Handling</h1>
+<p>Making your scripts bulletproof: exit codes, strict mode, traps, and defensive patterns</p>
+<p style="font-size:8pt;color:var(--mt);margin-top:6px;">6 sections · 3 explanation levels · The capstone of Bash Fundamentals 🎓</p>
+</div>
+
+<div class="note">
+<b>🎯 Why this is the most important module:</b> A script without error handling is a loaded gun. It will silently continue executing after failures, potentially deleting wrong files, corrupting data, deploying broken code, or running commands in the wrong directory. The techniques in this module — <span class="ic">set -euo pipefail</span>, <span class="ic">trap</span>, and defensive patterns — are what separate "a script I wrote" from "a script I can trust in production." Every professional bash script starts with these safeguards. This module is not optional — it is the foundation of everything you build from here.
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 1: Exit Codes                          -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s0"><small>BASH-F08.1 of 6 · ⏱ ~8 min</small></div>
+<h2>BASH-F08.1 — Exit Codes: The Language of Success and Failure</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+<button class="tab" onclick="sw(this,'de')">⚙️ Deep</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>Every command in Linux, when it finishes running, leaves behind a number called its exit code. This number is like a traffic light for the next command. Exit code 0 means green — "everything went fine, proceed." Any other number (1 through 255) means red — "something went wrong." The specific number gives a hint about what went wrong, though conventions vary by program. You check the exit code of the last command with the special variable <span class="ic">$?</span>.</p>
+<p>This system is the backbone of how <span class="ic">if</span> statements, <span class="ic">&&</span>, <span class="ic">||</span>, and <span class="ic">set -e</span> all work — they all inspect exit codes to decide what to do next. Understanding exit codes means understanding how bash decides whether your script is succeeding or failing at every single step.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Exit codes are integers 0-255. By POSIX convention, 0 means success and non-zero means failure. Common conventions for non-zero codes include 1 for general errors, 2 for misuse of shell builtins (e.g., wrong arguments), 126 for permission denied (command found but not executable), 127 for command not found, and 128+N for termination by signal N (e.g., 130 = SIGINT/Ctrl+C, 137 = SIGKILL, 143 = SIGTERM). Your own scripts should <span class="ic">exit 0</span> on success and <span class="ic">exit 1</span> (or another meaningful code) on failure. Functions use <span class="ic">return</span> instead of <span class="ic">exit</span> — <span class="ic">exit</span> terminates the entire script, <span class="ic">return</span> only exits the function.</p>
+</div>
+<div class="pan de" data-l="de">
+<p>When a process calls <span class="ic">exit(n)</span> (the C library call), it triggers the <span class="ic">_exit()</span> syscall which sets the process's exit status in its <span class="ic">task_struct</span> and transitions the process to the zombie state (Z). The parent process (bash) calls <span class="ic">waitpid()</span> which reads the 16-bit status word. The low 8 bits contain the signal number if the child was killed by a signal, and bits 8-15 contain the exit code if the child exited normally. Bash extracts this with the <span class="ic">WEXITSTATUS()</span> macro and stores it in <span class="ic">last_command_exit_value</span>, accessible as <span class="ic">$?</span>. Because only 8 bits are used for the exit code, the range is 0-255. If your script does <span class="ic">exit 256</span>, bash actually stores 0 (256 mod 256). If you do <span class="ic">exit -1</span>, bash stores 255 (unsigned interpretation of -1 in 8 bits).</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="c"># ═══ Exit Codes in Action ═══</span>
+
+<span class="c"># Every command sets $?</span>
+<span class="g">ls</span> <span class="b">/etc/pacman.conf</span>
+<span class="g">echo</span> <span class="y">"ls exit code: $?"</span>           <span class="c"># 0 (file exists)</span>
+
+<span class="g">ls</span> <span class="b">/nonexistent</span> 2>/dev/null
+<span class="g">echo</span> <span class="y">"ls exit code: $?"</span>           <span class="c"># 2 (file not found)</span>
+
+<span class="g">grep</span> <span class="o">-q</span> <span class="y">"root"</span> <span class="b">/etc/passwd</span>
+<span class="g">echo</span> <span class="y">"grep found: $?"</span>             <span class="c"># 0 (pattern found)</span>
+
+<span class="g">grep</span> <span class="o">-q</span> <span class="y">"zzzzz"</span> <span class="b">/etc/passwd</span>
+<span class="g">echo</span> <span class="y">"grep not found: $?"</span>         <span class="c"># 1 (pattern not found)</span>
+
+<span class="c"># Using exit codes in your own scripts</span>
+<span class="g">check_root</span>() {
+    <span class="k">if</span> [[ <span class="y">"$(id -u)"</span> <span class="o">-ne</span> <span class="y">0</span> ]]; <span class="k">then</span>
+        <span class="g">echo</span> <span class="y">"Error: must be run as root"</span> >&2
+        <span class="k">return</span> <span class="y">1</span>    <span class="c"># function: use return, not exit</span>
+    <span class="k">fi</span>
+    <span class="k">return</span> <span class="y">0</span>
+}
+
+<span class="c"># Common exit code conventions:</span>
+<span class="c"># 0   = success</span>
+<span class="c"># 1   = general error</span>
+<span class="c"># 2   = misuse (bad arguments)</span>
+<span class="c"># 126 = command not executable</span>
+<span class="c"># 127 = command not found</span>
+<span class="c"># 130 = killed by Ctrl+C (128 + SIGINT=2)</span>
+<span class="c"># 137 = killed by SIGKILL (128 + 9)</span></pre>
+<div class="out"><div class="outl">Expected Output</div><pre>/etc/pacman.conf
+ls exit code: 0
+ls exit code: 2
+grep found: 0
+grep not found: 1</pre></div></div>
+
+<div class="qz"><div class="qz-q">🧪 A script exits with code 130. What happened?</div>
+<div class="qo" onclick="ck(this,false)">The script had 130 errors</div>
+<div class="qo" onclick="ck(this,true)">The script was interrupted by Ctrl+C (128 + SIGINT signal number 2 = 130)</div>
+<div class="qo" onclick="ck(this,false)">The script ran out of memory</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 2: set -euo pipefail                   -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s1"><small>BASH-F08.2 of 6 · ⏱ ~12 min</small></div>
+<h2>BASH-F08.2 — The Holy Trinity: set -euo pipefail</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+<button class="tab" onclick="sw(this,'de')">⚙️ Deep</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>By default, bash scripts are dangerously permissive. If a command fails, bash shrugs and continues to the next line. If you use a variable you never set, bash silently uses an empty string. If a command in the middle of a pipeline fails, bash only checks the last command's exit code. This means your script can be failing catastrophically and you would never know until the damage is done.</p>
+<p>The line <span class="ic">set -euo pipefail</span> enables three safety nets that fix all of these problems. Think of it as putting on your seatbelt, turning on the headlights, and locking the doors before driving. It should be the SECOND line of every script you ever write (after the shebang). Let me break down what each letter does.</p>
+<p><strong>-e</strong> (errexit): "Stop immediately if any command fails." Like a circuit breaker that trips when something shorts out, preventing the damage from spreading.</p>
+<p><strong>-u</strong> (nounset): "Treat undefined variables as errors." Like a spell-checker that catches typos in variable names before they cause silent data loss.</p>
+<p><strong>-o pipefail</strong>: "A pipeline fails if ANY stage fails, not just the last one." Like a quality inspector at every station on the assembly line, not just at the end.</p>
+</div>
+<div class="pan te" data-l="te">
+<p><span class="ic">set -e</span> (errexit) causes bash to exit immediately when any simple command returns a non-zero exit status. Exceptions: commands in <span class="ic">if</span> conditions, commands before <span class="ic">&&</span> or <span class="ic">||</span>, commands in <span class="ic">while</span>/<span class="ic">until</span> conditions, and negated commands (<span class="ic">! cmd</span>). <span class="ic">set -u</span> (nounset) causes bash to treat unset variables as errors, printing a message and exiting. This catches typos like <span class="ic">$HOEM</span> instead of <span class="ic">$HOME</span>. Exceptions: <span class="ic">${var:-default}</span> and <span class="ic">${var:+alternate}</span> still work because they explicitly handle the unset case. <span class="ic">set -o pipefail</span> changes pipeline exit status from "status of the last command" to "status of the rightmost command that failed." Without it, <span class="ic">bad_cmd | good_cmd</span> exits 0 (good_cmd's status). With it, it exits non-zero (bad_cmd's status). Combined, these three options make bash behave more like a strict programming language where errors are caught immediately rather than silently propagated.</p>
+</div>
+<div class="pan de" data-l="de">
+<p>The <span class="ic">-e</span> flag sets the <span class="ic">errexit_flag</span> in bash's internal state. After each simple command execution in <span class="ic">execute_command_internal()</span>, bash checks <span class="ic">last_command_exit_value</span>; if it is non-zero and <span class="ic">errexit_flag</span> is set, bash calls <span class="ic">exit_shell()</span> with that status. The exceptions are implemented as context flags: <span class="ic">ERR_TRAP_HANDLED</span> suppresses errexit in conditional contexts. The <span class="ic">-u</span> flag sets <span class="ic">unbound_vars_is_error</span>; when the expansion engine (<span class="ic">parameter_brace_expand()</span> in <span class="ic">subst.c</span>) encounters an unset variable, it checks this flag and calls <span class="ic">err_unboundvar()</span> instead of returning an empty string. The <span class="ic">pipefail</span> option changes <span class="ic">execute_pipeline()</span>: instead of returning only the last process's exit status, it iterates through all <span class="ic">PIPESTATUS</span> entries and returns the highest non-zero value (rightmost failure). The common <span class="ic">set -euo pipefail</span> incantation is processed as three separate <span class="ic">set</span> operations: <span class="ic">-e</span>, <span class="ic">-u</span>, and <span class="ic">-o pipefail</span>.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="c"># ═══ THE STANDARD HEADER FOR EVERY PRODUCTION SCRIPT ═══</span>
+<span class="g">set</span> <span class="o">-euo</span> <span class="y">pipefail</span>
+
+<span class="c"># ─── What -e does (errexit) ───</span>
+<span class="c"># WITHOUT -e: script continues after failure (DANGEROUS)</span>
+<span class="c"># cd /nonexistent_directory    ← fails silently</span>
+<span class="c"># rm -rf *                     ← now deletes files in WRONG directory!</span>
+<span class="c"># WITH -e: script stops at the cd failure. rm never runs. Disaster averted.</span>
+
+<span class="c"># ─── What -u does (nounset) ───</span>
+<span class="c"># WITHOUT -u:</span>
+<span class="c"># echo "Home is: $HOEM"        ← typo! silently prints "Home is: "</span>
+<span class="c"># WITH -u:</span>
+<span class="c"># echo "Home is: $HOEM"        ← ERROR: HOEM: unbound variable (script stops)</span>
+
+<span class="c"># ─── What pipefail does ───</span>
+<span class="c"># WITHOUT pipefail:</span>
+<span class="c"># bad_command | sort | head     ← exit code is 0 (from head)</span>
+<span class="c"># WITH pipefail:</span>
+<span class="c"># bad_command | sort | head     ← exit code is non-zero (from bad_command)</span>
+
+<span class="c"># ═══ Safe Patterns That Work WITH set -e ═══</span>
+
+<span class="c"># Pattern: Allow a command to fail (check it yourself)</span>
+<span class="v">result</span>=<span class="p">$(</span><span class="g">grep</span> <span class="y">"needle"</span> <span class="b">haystack.txt</span> 2>/dev/null<span class="p">)</span> || <span class="k">true</span>
+<span class="c"># The || true prevents set -e from killing the script when grep finds nothing</span>
+
+<span class="c"># Pattern: Check if a command exists before using it</span>
+<span class="k">if</span> <span class="g">command</span> <span class="o">-v</span> <span class="y">docker</span> &>/dev/null; <span class="k">then</span>
+    <span class="g">docker</span> <span class="o">ps</span>     <span class="c"># safe — we know it exists</span>
+<span class="k">else</span>
+    <span class="g">echo</span> <span class="y">"Docker not installed, skipping"</span>
+<span class="k">fi</span>
+
+<span class="c"># Pattern: Safe default for potentially unset variables</span>
+<span class="v">target</span>=<span class="y">"${1:-production}"</span>      <span class="c"># default value prevents -u error</span>
+<span class="v">verbose</span>=<span class="y">"${VERBOSE:-false}"</span>    <span class="c"># safe env var access</span>
+
+<span class="g">echo</span> <span class="y">"Deploying to: $target (verbose: $verbose)"</span></pre>
+<div class="out"><div class="outl">Expected Output</div><pre>Deploying to: production (verbose: false)</pre></div></div>
+
+<div class="cm">
+<div class="cm-do"><b>✅ The line that saves your career:</b><p><span class="ic">set -euo pipefail</span> on line 2 of every script. It catches failed commands, typos in variable names, and hidden pipeline failures. The 5 seconds it takes to type this line can prevent hours of debugging or worse — silent data corruption in production.</p></div>
+<div class="cm-x"><b>❌ Without strict mode, this happens:</b><p><span class="ic">cd "$DEPLOY_DIR"</span> fails because the variable is misspelled. Script continues. <span class="ic">rm -rf ./*</span> runs in the HOME directory instead of the deploy directory. Everything is deleted. This is not hypothetical — this exact scenario has caused real production outages at major companies. <span class="ic">set -euo pipefail</span> prevents it entirely.</p></div>
+</div>
+
+<div class="qz"><div class="qz-q">🧪 Your script has <span class="ic">set -u</span> and you write <span class="ic">echo "$ENVVAR"</span> where ENVVAR was never set. What happens?</div>
+<div class="qo" onclick="ck(this,false)">It prints an empty line and continues</div>
+<div class="qo" onclick="ck(this,true)">Bash prints "ENVVAR: unbound variable" and the script exits immediately — protecting you from using empty values that could cause damage</div>
+<div class="qo" onclick="ck(this,false)">It prompts the user to enter a value</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 3: trap — Cleanup Guaranteed           -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s2"><small>BASH-F08.3 of 6 · ⏱ ~10 min</small></div>
+<h2>BASH-F08.3 — trap: Guaranteed Cleanup</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+<button class="tab" onclick="sw(this,'de')">⚙️ Deep</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>The <span class="ic">trap</span> command registers a function (or command) that runs automatically when your script exits — no matter HOW it exits. Whether the script completes normally, crashes due to an error, or gets killed by Ctrl+C, the trap fires. This is your "finally" block, your safety net, your guarantee that temporary files get cleaned up, locks get released, and resources get freed.</p>
+<p>Think of it like hiring a cleaning crew that activates when you leave a room, regardless of whether you walk out calmly, run out in a panic, or are carried out by emergency services. The room always gets cleaned.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>The <span class="ic">trap 'commands' SIGNAL_LIST</span> builtin registers a handler for the specified signals. The most important pseudo-signal is <span class="ic">EXIT</span> — it fires when the shell exits for any reason (normal completion, <span class="ic">exit</span> call, errexit trigger, or fatal signal). Other useful signals include <span class="ic">ERR</span> (fires after any command returns non-zero, if errexit is not set), <span class="ic">INT</span> (Ctrl+C), and <span class="ic">TERM</span> (termination request). Traps execute in the current shell, not a subshell, so they can access all script variables. Multiple traps can be set on different signals. Setting a trap on <span class="ic">EXIT</span> combined with <span class="ic">set -e</span> is the canonical pattern for resource cleanup in bash scripts.</p>
+</div>
+<div class="pan de" data-l="de">
+<p>Bash maintains an internal array of trap handlers (<span class="ic">trap_list[]</span> in <span class="ic">trap.c</span>), indexed by signal number. When a signal is received (via the kernel's signal delivery mechanism), bash's signal handler (<span class="ic">sighandler()</span>) sets a flag in <span class="ic">pending_traps[]</span>. Between command executions, bash checks <span class="ic">pending_traps[]</span> and executes any registered handlers by calling <span class="ic">parse_and_execute(trap_command)</span>. The <span class="ic">EXIT</span> pseudo-signal (index 0) is special: its handler is called from <span class="ic">exit_shell()</span> just before the process terminates. The <span class="ic">ERR</span> trap fires when <span class="ic">last_command_exit_value != 0</span> and the command is not in a conditional context. Traps are inherited by subshells (but reset to SIG_DFL for non-interactive subshells spawned by command substitution, unless the shell is in POSIX mode).</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="g">set</span> <span class="o">-euo</span> <span class="y">pipefail</span>
+
+<span class="c"># ═══ Pattern 1: Basic Temp File Cleanup ═══</span>
+
+<span class="v">TMPDIR</span>=<span class="p">$(</span><span class="g">mktemp</span> <span class="o">-d</span><span class="p">)</span>
+
+<span class="g">cleanup</span>() {
+    <span class="k">local</span> <span class="v">exit_code</span>=<span class="y">$?</span>    <span class="c"># capture BEFORE any cleanup commands change it</span>
+    <span class="g">echo</span> <span class="y">"🧹 Cleaning up temp dir: $TMPDIR"</span> >&2
+    <span class="g">rm</span> <span class="o">-rf</span> <span class="y">"$TMPDIR"</span>
+    <span class="g">echo</span> <span class="y">"🧹 Exiting with code: $exit_code"</span> >&2
+    <span class="g">exit</span> <span class="y">"$exit_code"</span>    <span class="c"># preserve the original exit code</span>
+}
+<span class="g">trap</span> <span class="y">cleanup</span> <span class="y">EXIT</span>
+
+<span class="c"># Now use $TMPDIR freely — it WILL be cleaned up no matter what</span>
+<span class="g">echo</span> <span class="y">"important data"</span> > <span class="y">"$TMPDIR/data.txt"</span>
+<span class="g">echo</span> <span class="y">"Working in: $TMPDIR"</span>
+
+<span class="c"># ═══ Pattern 2: Lock File (Prevent Concurrent Runs) ═══</span>
+
+<span class="v">LOCKFILE</span>=<span class="y">"/tmp/myscript.lock"</span>
+
+<span class="g">acquire_lock</span>() {
+    <span class="k">if</span> [[ <span class="o">-f</span> <span class="y">"$LOCKFILE"</span> ]]; <span class="k">then</span>
+        <span class="g">echo</span> <span class="y">"ERROR: Script already running (lockfile exists)"</span> >&2
+        <span class="g">exit</span> <span class="y">1</span>
+    <span class="k">fi</span>
+    <span class="g">echo</span> <span class="y">$$</span> > <span class="y">"$LOCKFILE"</span>    <span class="c"># write our PID</span>
+}
+
+<span class="g">release_lock</span>() {
+    <span class="g">rm</span> <span class="o">-f</span> <span class="y">"$LOCKFILE"</span>
+}
+<span class="g">trap</span> <span class="y">release_lock</span> <span class="y">EXIT</span>
+<span class="g">acquire_lock</span>
+
+<span class="c"># ═══ Pattern 3: Ctrl+C Handler ═══</span>
+
+<span class="g">on_interrupt</span>() {
+    <span class="g">echo</span> <span class="y">""</span>    <span class="c"># newline after ^C</span>
+    <span class="g">echo</span> <span class="y">"⚠️ Interrupted! Cleaning up gracefully..."</span> >&2
+    <span class="c"># do cleanup specific to interruption</span>
+    <span class="g">exit</span> <span class="y">130</span>   <span class="c"># convention: 128 + signal number (SIGINT=2)</span>
+}
+<span class="g">trap</span> <span class="y">on_interrupt</span> <span class="y">INT</span></pre>
+<div class="out"><div class="outl">Expected Output (normal run)</div><pre>Working in: /tmp/tmp.xK3j2mN
+🧹 Cleaning up temp dir: /tmp/tmp.xK3j2mN
+🧹 Exiting with code: 0</pre></div></div>
+
+<div class="cm">
+<div class="cm-do"><b>✅ The cleanup pattern to memorize:</b><p>1. Create temp resources. 2. Register <span class="ic">trap cleanup EXIT</span>. 3. Work. The trap fires automatically whether the script succeeds, fails, or is interrupted. Capture <span class="ic">$?</span> as the first line inside the cleanup function to preserve the original exit code.</p></div>
+<div class="cm-x"><b>❌ Without trap:</b><p>If your script creates a temp file and then crashes halfway through, the temp file stays forever. If it creates a lock file and crashes, no future run of the script can ever start (permanent deadlock). If it opens a network connection and crashes, the connection leaks. Traps prevent all of these.</p></div>
+</div>
+
+<div class="qz"><div class="qz-q">🧪 Why must you capture <span class="ic">$?</span> on the first line of your trap function?</div>
+<div class="qo" onclick="ck(this,true)">Because every command you run inside the trap function changes $? — if you don't capture it immediately, you lose the original exit code that caused the trap to fire</div>
+<div class="qo" onclick="ck(this,false)">Because $? is automatically cleared when the trap starts</div>
+<div class="qo" onclick="ck(this,false)">Because trap functions cannot read $?</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 4: Defensive Patterns                  -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s3"><small>BASH-F08.4 of 6 · ⏱ ~10 min</small></div>
+<h2>BASH-F08.4 — Defensive Scripting Patterns</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>Defensive scripting means assuming everything that CAN go wrong WILL go wrong, and coding accordingly. Files might not exist. Directories might not be writable. Network connections might time out. Variables might be empty. Users might pass garbage arguments. Disks might be full. Commands might not be installed. A defensive script checks every assumption before acting on it, and fails loudly with a helpful error message rather than silently proceeding into disaster.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Key defensive patterns: (1) Validate all inputs before use. (2) Check prerequisites (required commands, files, permissions) early. (3) Use <span class="ic">cd dir || exit 1</span> instead of bare <span class="ic">cd dir</span>. (4) Use <span class="ic">${var:?error message}</span> to enforce required variables. (5) Quote all variable expansions. (6) Use <span class="ic">mktemp</span> for temporary files (never hardcoded names — race condition vulnerability). (7) Use lock files for scripts that should not run concurrently. (8) Always specify full paths for critical operations (<span class="ic">rm</span>, <span class="ic">mv</span>) to avoid PATH hijacking. (9) Redirect errors to stderr, data to stdout. (10) Test with empty inputs, missing files, and permission denied scenarios.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="g">set</span> <span class="o">-euo</span> <span class="y">pipefail</span>
+
+<span class="c"># ═══ Pattern: Required Variable with Helpful Error ═══</span>
+<span class="v">DEPLOY_DIR</span>=<span class="y">"${DEPLOY_DIR:?ERROR: DEPLOY_DIR environment variable is not set}"</span>
+<span class="c"># If DEPLOY_DIR is unset, this prints the error message and exits immediately</span>
+
+<span class="c"># ═══ Pattern: Safe cd (never rm in wrong directory) ═══</span>
+<span class="g">cd</span> <span class="y">"$DEPLOY_DIR"</span> || {
+    <span class="g">echo</span> <span class="y">"FATAL: Cannot cd to $DEPLOY_DIR"</span> >&2
+    <span class="g">exit</span> <span class="y">1</span>
+}
+
+<span class="c"># ═══ Pattern: Require commands to exist before use ═══</span>
+<span class="g">require_cmd</span>() {
+    <span class="k">local</span> <span class="v">cmd</span>=<span class="y">"$1"</span>
+    <span class="k">if</span> ! <span class="g">command</span> <span class="o">-v</span> <span class="y">"$cmd"</span> &>/dev/null; <span class="k">then</span>
+        <span class="g">echo</span> <span class="y">"FATAL: Required command '$cmd' not found. Install it first."</span> >&2
+        <span class="g">exit</span> <span class="y">1</span>
+    <span class="k">fi</span>
+}
+<span class="g">require_cmd</span> <span class="y">"git"</span>
+<span class="g">require_cmd</span> <span class="y">"docker"</span>
+<span class="g">require_cmd</span> <span class="y">"jq"</span>
+
+<span class="c"># ═══ Pattern: Validate Arguments ═══</span>
+<span class="k">if</span> [[ <span class="v">$#</span> <span class="o">-lt</span> <span class="y">1</span> ]]; <span class="k">then</span>
+    <span class="g">cat</span> >&2 << <span class="y">USAGE</span>
+Usage: $(basename "$0") <environment>
+
+Environments:
+  staging     Deploy to staging
+  production  Deploy to production (requires confirmation)
+
+Example:
+  $(basename "$0") staging
+<span class="y">USAGE</span>
+    <span class="g">exit</span> <span class="y">2</span>
+<span class="k">fi</span>
+
+<span class="c"># ═══ Pattern: Confirm Destructive Operations ═══</span>
+<span class="v">env</span>=<span class="y">"$1"</span>
+<span class="k">if</span> [[ <span class="y">"$env"</span> == <span class="y">"production"</span> ]]; <span class="k">then</span>
+    <span class="g">read</span> <span class="o">-rp</span> <span class="y">"⚠️ Deploy to PRODUCTION? Type 'yes' to confirm: "</span> <span class="v">confirm</span>
+    <span class="k">if</span> [[ <span class="y">"$confirm"</span> != <span class="y">"yes"</span> ]]; <span class="k">then</span>
+        <span class="g">echo</span> <span class="y">"Cancelled."</span>
+        <span class="g">exit</span> <span class="y">0</span>
+    <span class="k">fi</span>
+<span class="k">fi</span>
+
+<span class="c"># ═══ Pattern: Safe Temporary Files ═══</span>
+<span class="v">tmpfile</span>=<span class="p">$(</span><span class="g">mktemp</span><span class="p">)</span>          <span class="c"># random name (e.g., /tmp/tmp.xK3j2mN)</span>
+<span class="v">tmpdir</span>=<span class="p">$(</span><span class="g">mktemp</span> <span class="o">-d</span><span class="p">)</span>       <span class="c"># random directory</span>
+<span class="g">trap</span> <span class="y">'rm -rf "$tmpfile" "$tmpdir"'</span> <span class="y">EXIT</span>
+<span class="c"># NEVER use /tmp/myfile.txt — multiple runs create race conditions</span></pre></div>
+
+<div class="qz"><div class="qz-q">🧪 Why should you never use <span class="ic">/tmp/myscript_temp.txt</span> as a temp file name?</div>
+<div class="qo" onclick="ck(this,false)">Because /tmp is too slow</div>
+<div class="qo" onclick="ck(this,true)">Because if two copies of the script run simultaneously, they overwrite each other's temp file (race condition). Also, an attacker could pre-create that file as a symlink to a sensitive file. mktemp generates random, unique names that prevent both problems.</div>
+<div class="qo" onclick="ck(this,false)">Because Linux does not allow writing to /tmp</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 5: Error Functions & Logging           -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s4"><small>BASH-F08.5 of 6 · ⏱ ~8 min</small></div>
+<h2>BASH-F08.5 — Error Functions &amp; Structured Logging</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>Rather than scattering <span class="ic">echo "error" >&2; exit 1</span> throughout your script, create a reusable library of error and logging functions. This gives you consistent formatting, timestamps, color coding, and the ability to write to both the terminal AND a log file simultaneously. When something goes wrong at 3 AM and you are reading the logs the next morning, you will be grateful for structured, timestamped, color-coded messages that tell you exactly what happened, when, and where in the script.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>A production logging library typically provides functions at multiple severity levels (DEBUG, INFO, WARN, ERROR, FATAL), each writing to stderr (not stdout, so they do not interfere with data pipelines). Each message includes a timestamp (ISO 8601), the log level, and optionally the function name and line number (via <span class="ic">${FUNCNAME[1]}</span> and <span class="ic">${BASH_LINENO[0]}</span>). The FATAL function should call <span class="ic">exit 1</span> after logging. A <span class="ic">die</span> function (common convention) combines error message + exit into one call. Using <span class="ic">tee</span> or file descriptor duplication, you can mirror logs to a file while still showing them on the terminal.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="g">set</span> <span class="o">-euo</span> <span class="y">pipefail</span>
+
+<span class="c"># ═══ Production Logging Library ═══</span>
+
+<span class="v">LOG_FILE</span>=<span class="y">"/tmp/$(basename "$0" .sh).log"</span>
+
+<span class="g">_log</span>() {
+    <span class="k">local</span> <span class="v">level</span>=<span class="y">"$1"</span>; <span class="g">shift</span>
+    <span class="k">local</span> <span class="v">color</span>=<span class="y">"$1"</span>; <span class="g">shift</span>
+    <span class="k">local</span> <span class="v">ts</span>=<span class="p">$(</span><span class="g">date</span> <span class="o">+%Y-%m-%dT%H:%M:%S</span><span class="p">)</span>
+    <span class="k">local</span> <span class="v">caller</span>=<span class="y">"${FUNCNAME[2]:-main}:${BASH_LINENO[1]:-0}"</span>
+    <span class="k">local</span> <span class="v">msg</span>=<span class="y">"[$ts] [$level] [$caller] $*"</span>
+    <span class="g">echo</span> <span class="o">-e</span> <span class="y">"${color}${msg}\033[0m"</span> >&2
+    <span class="g">echo</span> <span class="y">"$msg"</span> >> <span class="y">"$LOG_FILE"</span>
+}
+
+<span class="g">log_debug</span>() { <span class="g">_log</span> <span class="y">"DEBUG"</span> <span class="y">"\033[37m"</span>  <span class="y">"$@"</span>; }
+<span class="g">log_info</span>()  { <span class="g">_log</span> <span class="y">"INFO"</span>  <span class="y">"\033[32m"</span>  <span class="y">"$@"</span>; }
+<span class="g">log_warn</span>()  { <span class="g">_log</span> <span class="y">"WARN"</span>  <span class="y">"\033[33m"</span>  <span class="y">"$@"</span>; }
+<span class="g">log_error</span>() { <span class="g">_log</span> <span class="y">"ERROR"</span> <span class="y">"\033[31m"</span>  <span class="y">"$@"</span>; }
+<span class="g">die</span>()       { <span class="g">_log</span> <span class="y">"FATAL"</span> <span class="y">"\033[1;31m"</span> <span class="y">"$@"</span>; <span class="g">exit</span> <span class="y">1</span>; }
+
+<span class="c"># ═══ Usage ═══</span>
+
+<span class="g">log_info</span> <span class="y">"Script started"</span>
+<span class="g">log_info</span> <span class="y">"Checking prerequisites..."</span>
+
+<span class="k">if</span> ! <span class="g">command</span> <span class="o">-v</span> <span class="y">git</span> &>/dev/null; <span class="k">then</span>
+    <span class="g">die</span> <span class="y">"git is required but not installed"</span>
+<span class="k">fi</span>
+
+<span class="g">log_info</span> <span class="y">"All checks passed"</span>
+<span class="g">log_warn</span> <span class="y">"Disk usage is above 75%"</span>
+<span class="g">log_info</span> <span class="y">"Deploying..."</span>
+<span class="g">log_info</span> <span class="y">"Script completed successfully"</span>
+
+<span class="g">echo</span> <span class="y">""</span>
+<span class="g">echo</span> <span class="y">"Log file: $LOG_FILE"</span></pre>
+<div class="out"><div class="outl">Expected Output (terminal — colored)</div><pre>[2026-03-15T15:42:01] [INFO] [main:0] Script started
+[2026-03-15T15:42:01] [INFO] [main:0] Checking prerequisites...
+[2026-03-15T15:42:01] [INFO] [main:0] All checks passed
+[2026-03-15T15:42:01] [WARN] [main:0] Disk usage is above 75%
+[2026-03-15T15:42:01] [INFO] [main:0] Deploying...
+[2026-03-15T15:42:01] [INFO] [main:0] Script completed successfully
+
+Log file: /tmp/myscript.log</pre></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 6: Practice                            -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s5"><small>BASH-F08.6 of 6 · ⏱ ~15 min</small></div>
+<h2>BASH-F08.6 — Practice: The Complete Production Script Template</h2>
+
+<p>This final exercise brings together EVERYTHING from the entire Bash Fundamentals track — all 8 modules — into a single, complete, production-ready script template. This is the template you copy every time you start a new script. Study it carefully — every line exists for a reason.</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash — the complete template</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="c"># ═══════════════════════════════════════════════════════════════</span>
+<span class="c"># 🌸 Pink Galaxy Script Template — Production Ready</span>
+<span class="c"># Description: [What this script does]</span>
+<span class="c"># Usage:       ./script.sh <arg1> [arg2]</span>
+<span class="c"># Author:      Mari</span>
+<span class="c"># Created:     2026-03-15</span>
+<span class="c"># ═══════════════════════════════════════════════════════════════</span>
+
+<span class="c"># ─── STRICT MODE (Brick 8: non-negotiable) ───</span>
+<span class="g">set</span> <span class="o">-euo</span> <span class="y">pipefail</span>
+
+<span class="c"># ─── CONSTANTS (Brick 2: variables) ───</span>
+<span class="k">readonly</span> <span class="v">SCRIPT_NAME</span>=<span class="y">"$(basename "$0")"</span>
+<span class="k">readonly</span> <span class="v">SCRIPT_DIR</span>=<span class="y">"$(cd "$(dirname "$0")" && pwd)"</span>
+<span class="k">readonly</span> <span class="v">LOG_FILE</span>=<span class="y">"/tmp/${SCRIPT_NAME%.sh}.log"</span>
+<span class="k">readonly</span> <span class="v">VERSION</span>=<span class="y">"1.0.0"</span>
+
+<span class="c"># ─── COLORS (Brick 2: variables; Brick 7: output) ───</span>
+<span class="k">readonly</span> <span class="v">RED</span>=<span class="y">'\033[31m'</span> <span class="v">GREEN</span>=<span class="y">'\033[32m'</span> <span class="v">YELLOW</span>=<span class="y">'\033[33m'</span> <span class="v">NC</span>=<span class="y">'\033[0m'</span>
+
+<span class="c"># ─── LOGGING (Brick 8: error handling; Brick 6: functions) ───</span>
+<span class="g">log_info</span>()  { <span class="g">echo</span> <span class="o">-e</span> <span class="y">"${GREEN}[INFO]${NC} $*"</span> >&2; <span class="g">echo</span> <span class="y">"[$(date +%T)] [INFO] $*"</span> >> <span class="y">"$LOG_FILE"</span>; }
+<span class="g">log_warn</span>()  { <span class="g">echo</span> <span class="o">-e</span> <span class="y">"${YELLOW}[WARN]${NC} $*"</span> >&2; <span class="g">echo</span> <span class="y">"[$(date +%T)] [WARN] $*"</span> >> <span class="y">"$LOG_FILE"</span>; }
+<span class="g">log_error</span>() { <span class="g">echo</span> <span class="o">-e</span> <span class="y">"${RED}[ERROR]${NC} $*"</span> >&2; <span class="g">echo</span> <span class="y">"[$(date +%T)] [ERROR] $*"</span> >> <span class="y">"$LOG_FILE"</span>; }
+<span class="g">die</span>()       { <span class="g">log_error</span> <span class="y">"$@"</span>; <span class="g">exit</span> <span class="y">1</span>; }
+
+<span class="c"># ─── CLEANUP (Brick 8: trap) ───</span>
+<span class="v">TMPDIR</span>=<span class="y">""</span>
+<span class="g">cleanup</span>() {
+    <span class="k">local</span> <span class="v">exit_code</span>=<span class="y">$?</span>
+    <span class="k">if</span> [[ <span class="o">-n</span> <span class="y">"$TMPDIR"</span> && <span class="o">-d</span> <span class="y">"$TMPDIR"</span> ]]; <span class="k">then</span>
+        <span class="g">rm</span> <span class="o">-rf</span> <span class="y">"$TMPDIR"</span>
+        <span class="g">log_info</span> <span class="y">"Cleaned up temp dir"</span>
+    <span class="k">fi</span>
+    <span class="k">if</span> [[ <span class="v">$exit_code</span> <span class="o">-ne</span> <span class="y">0</span> ]]; <span class="k">then</span>
+        <span class="g">log_error</span> <span class="y">"Script failed with exit code $exit_code"</span>
+    <span class="k">else</span>
+        <span class="g">log_info</span> <span class="y">"Script completed successfully"</span>
+    <span class="k">fi</span>
+    <span class="g">exit</span> <span class="y">"$exit_code"</span>
+}
+<span class="g">trap</span> <span class="y">cleanup</span> <span class="y">EXIT</span>
+<span class="g">trap</span> <span class="y">'echo ""; log_warn "Interrupted by user"; exit 130'</span> <span class="y">INT</span>
+
+<span class="c"># ─── PREREQUISITES (Brick 8: defensive patterns; Brick 4: conditionals) ───</span>
+<span class="g">require_cmd</span>() {
+    <span class="g">command</span> <span class="o">-v</span> <span class="y">"$1"</span> &>/dev/null || <span class="g">die</span> <span class="y">"Required command not found: $1"</span>
+}
+
+<span class="c"># ─── USAGE (Brick 7: heredoc + Brick 4: conditionals) ───</span>
+<span class="g">usage</span>() {
+    <span class="g">cat</span> << <span class="y">HELP</span>
+${SCRIPT_NAME} v${VERSION} — [Description]
+
+Usage: ${SCRIPT_NAME} <environment> [options]
+
+Arguments:
+  environment    Target: staging | production
+
+Options:
+  -v, --verbose  Enable verbose output
+  -d, --dry-run  Show what would be done without doing it
+  -h, --help     Show this help message
+
+Examples:
+  ${SCRIPT_NAME} staging
+  ${SCRIPT_NAME} production --dry-run
+<span class="y">HELP</span>
+}
+
+<span class="c"># ─── ARGUMENT PARSING (Brick 4: case; Brick 5: loops) ───</span>
+<span class="v">VERBOSE</span>=<span class="y">false</span>
+<span class="v">DRY_RUN</span>=<span class="y">false</span>
+<span class="v">ENVIRONMENT</span>=<span class="y">""</span>
+
+<span class="g">parse_args</span>() {
+    <span class="k">while</span> [[ <span class="v">$#</span> <span class="o">-gt</span> <span class="y">0</span> ]]; <span class="k">do</span>
+        <span class="k">case</span> <span class="y">"$1"</span> <span class="k">in</span>
+            -v|--verbose)  <span class="v">VERBOSE</span>=<span class="y">true</span> ;;
+            -d|--dry-run)  <span class="v">DRY_RUN</span>=<span class="y">true</span> ;;
+            -h|--help)     <span class="g">usage</span>; <span class="g">exit</span> <span class="y">0</span> ;;
+            -*)            <span class="g">die</span> <span class="y">"Unknown option: $1 (use --help)"</span> ;;
+            *)
+                <span class="k">if</span> [[ <span class="o">-z</span> <span class="y">"$ENVIRONMENT"</span> ]]; <span class="k">then</span>
+                    <span class="v">ENVIRONMENT</span>=<span class="y">"$1"</span>
+                <span class="k">else</span>
+                    <span class="g">die</span> <span class="y">"Unexpected argument: $1"</span>
+                <span class="k">fi</span>
+                ;;
+        <span class="k">esac</span>
+        <span class="g">shift</span>
+    <span class="k">done</span>
+    [[ <span class="o">-z</span> <span class="y">"$ENVIRONMENT"</span> ]] && { <span class="g">usage</span>; <span class="g">die</span> <span class="y">"Missing required argument: environment"</span>; }
+    [[ <span class="y">"$ENVIRONMENT"</span> =~ ^(staging|production)$ ]] || <span class="g">die</span> <span class="y">"Invalid environment: $ENVIRONMENT"</span>
+}
+
+<span class="c"># ─── BUSINESS LOGIC (Brick 6: functions) ───</span>
+<span class="g">deploy</span>() {
+    <span class="k">local</span> <span class="v">env</span>=<span class="y">"$1"</span>
+    
+    <span class="g">log_info</span> <span class="y">"Starting deployment to $env"</span>
+    
+    <span class="k">if</span> [[ <span class="y">"$env"</span> == <span class="y">"production"</span> ]]; <span class="k">then</span>
+        <span class="g">read</span> <span class="o">-rp</span> <span class="y">"⚠️ Deploy to PRODUCTION? Type 'yes': "</span> <span class="v">confirm</span>
+        [[ <span class="y">"$confirm"</span> == <span class="y">"yes"</span> ]] || <span class="g">die</span> <span class="y">"Deployment cancelled by user"</span>
+    <span class="k">fi</span>
+    
+    <span class="k">if</span> <span class="y">"$DRY_RUN"</span>; <span class="k">then</span>
+        <span class="g">log_info</span> <span class="y">"[DRY RUN] Would deploy to $env"</span>
+        <span class="k">return</span> <span class="y">0</span>
+    <span class="k">fi</span>
+    
+    <span class="c"># ... actual deployment logic here ...</span>
+    <span class="g">log_info</span> <span class="y">"Deployment to $env completed"</span>
+}
+
+<span class="c"># ─── MAIN (Brick 6: main pattern) ───</span>
+<span class="g">main</span>() {
+    <span class="g">parse_args</span> <span class="y">"$@"</span>
+    
+    <span class="g">log_info</span> <span class="y">"$SCRIPT_NAME v$VERSION starting"</span>
+    <span class="g">log_info</span> <span class="y">"Environment: $ENVIRONMENT, Verbose: $VERBOSE, Dry-run: $DRY_RUN"</span>
+    
+    <span class="c"># Check prerequisites</span>
+    <span class="g">require_cmd</span> <span class="y">"git"</span>
+    <span class="g">require_cmd</span> <span class="y">"docker"</span>
+    
+    <span class="c"># Create temp workspace</span>
+    <span class="v">TMPDIR</span>=<span class="p">$(</span><span class="g">mktemp</span> <span class="o">-d</span><span class="p">)</span>
+    <span class="g">log_info</span> <span class="y">"Temp dir: $TMPDIR"</span>
+    
+    <span class="c"># Do the work</span>
+    <span class="g">deploy</span> <span class="y">"$ENVIRONMENT"</span>
+}
+
+<span class="c"># ─── ENTRY POINT (Brick 6: source-safe) ───</span>
+<span class="k">if</span> [[ <span class="y">"${BASH_SOURCE[0]}"</span> == <span class="y">"${0}"</span> ]]; <span class="k">then</span>
+    <span class="g">main</span> <span class="y">"$@"</span>
+<span class="k">fi</span></pre>
+<div class="out"><div class="outl">Expected Output (./deploy.sh staging --dry-run)</div><pre>[INFO] deploy.sh v1.0.0 starting
+[INFO] Environment: staging, Verbose: false, Dry-run: true
+[INFO] Temp dir: /tmp/tmp.xK3j2mN
+[INFO] Starting deployment to staging
+[INFO] [DRY RUN] Would deploy to staging
+[INFO] Cleaned up temp dir
+[INFO] Script completed successfully</pre></div></div>
+
+<div class="note gn" style="border-width:3px;padding:16px;">
+<b>🌸🎓 BASH FUNDAMENTALS TRACK COMPLETE!</b>
+
+<p style="margin-top:10px;">You have completed all 8 modules of the Bash Fundamentals track. Here is what you now know, module by module.</p>
+
+<p><strong>F01 — Your First Script:</strong> shebang, chmod +x, script execution, the fork/exec lifecycle.</p>
+<p><strong>F02 — Variables &amp; Data Types:</strong> assignment rules, strings (length, substring, replace, case), integers, arrays (indexed and associative), environment variables, scope and the local keyword.</p>
+<p><strong>F03 — Quoting &amp; Expansion:</strong> single quotes (literal), double quotes (safe expansion), the expansion pipeline, brace and tilde expansion, command substitution with $().</p>
+<p><strong>F04 — Conditionals:</strong> if/elif/else, test and [ ], [[ ]] vs [ ], case statements, logical operators &&, ||, !.</p>
+<p><strong>F05 — Loops:</strong> for (list and C-style), while (counter and file-reading), until, select menus, break and continue.</p>
+<p><strong>F06 — Functions:</strong> definition, arguments ($1 $@ $#), return values (exit codes vs stdout capture), local variables, the main() pattern, guard/cleanup/retry patterns.</p>
+<p><strong>F07 — Input/Output:</strong> read (prompt, silent, timeout), echo vs printf, heredocs, file redirection (>, >>, <, 2>, &>), pipes, pipefail, PIPESTATUS.</p>
+<p><strong>F08 — Error Handling:</strong> exit codes, set -euo pipefail, trap for cleanup, defensive patterns, production logging, the complete script template.</p>
+
+<p style="margin-top:10px;">You are now equipped to write any bash script. The next tracks in the platform cover Advanced Bash (F07-level patterns, parallel execution, complex architectures), Arch Linux Commands (applying your scripting knowledge to system administration), and Python (where you will find that many concepts — variables, functions, error handling, I/O — transfer directly from bash). Every single concept in this track will be used daily in your work. 🌸</p>
+</div>
+
+</div>
+<div class="sf"><button onclick="svB()">💾 Save Brick 8</button></div>
+<script>
+function sw(btn,lv){let el=btn.parentElement.nextElementSibling;while(el&&!el.classList.contains('sd')&&!el.classList.contains('qz')&&!el.classList.contains('cm')&&!el.classList.contains('cw')&&el.tagName!=='H3'&&el.tagName!=='TABLE'){if(el.classList.contains('pan'))el.classList.toggle('on',el.dataset.l===lv);el=el.nextElementSibling;}btn.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');}
+function ck(btn,ok){const box=btn.closest('.qz');box.querySelectorAll('.qo').forEach(o=>o.disabled=true);btn.classList.add(ok?'y':'n');const fb=box.querySelector('.qfb');fb.classList.add('s');fb.className=ok?'qfb s w':'qfb s l';fb.textContent=ok?'✓ Correct! +10 XP':'✗ Review the section above.';}
+function cpC(b){const pre=b.closest('.cw').querySelector('pre');navigator.clipboard.writeText(pre.textContent).then(()=>{b.textContent='✓';setTimeout(()=>b.textContent='Copy',1500);});}
+function svB(){const blob=new Blob(['<!DOCTYPE html>\n'+document.documentElement.outerHTML],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='brick8_BASHF08_errors_'+new Date().toISOString().slice(0,10)+'.html';a.click();}
+</script>
+</body>
+</html>

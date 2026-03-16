@@ -1,0 +1,19 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - echo "Installing dependencies and setting up Pink Galaxy DevHub"
+    build:
+      commands:
+        - echo "Building Pink Galaxy Platform"
+        - echo "Platform is client-side, no build needed"
+    postBuild:
+      commands:
+        - echo "Post-build optimizations"
+  artifacts:
+    baseDirectory: .
+    files:
+      - '**/*'
+  cache:
+    paths: []

@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧱 Brick 5 — BASH-F05: Loops (for, while, until, select)</title>
+<style>
+:root{--p:#e91e63;--pl:#f8bbd0;--g:#2e7d32;--gl:#a5d6a7;--bg:#0a0a12;--s2:#1a1a2e;--tx:#e8e6f0;--t2:#a8a6b8;--mt:#6c6a7e;--bd:rgba(233,30,99,.18);--bdg:rgba(46,125,50,.2);--purple:#9c27b0;--mono:"Courier New",monospace;--dn:#ff5252;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Calibri,"Segoe UI",sans-serif;background:var(--bg);color:var(--tx);font-size:11pt;line-height:1.65;padding:20px;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 20% 50%,rgba(233,30,99,.05),transparent 50%);}
+.w{max-width:900px;margin:0 auto;position:relative;z-index:1;}
+h1{color:var(--p);font-size:20pt;margin:30px 0 12px;border-bottom:2px solid var(--p);padding-bottom:8px;}
+h2{color:var(--g);font-size:15pt;margin:28px 0 10px;border-left:4px solid var(--g);padding-left:12px;}
+h3{color:var(--p);font-size:12pt;margin:20px 0 8px;}
+p{margin:8px 0;text-align:justify;}
+.ic{font-family:var(--mono);font-size:9pt;background:rgba(233,30,99,.08);padding:1px 5px;border-radius:3px;color:var(--pl);}
+.note{background:var(--s2);border-left:3px solid var(--p);padding:12px;border-radius:0 8px 8px 0;margin:14px 0;font-size:9.5pt;}.note b{color:var(--p);}.note.gn{border-left-color:var(--g);}.note.gn b{color:var(--gl);}
+.tabs{display:flex;gap:2px;margin:14px 0 6px;}
+.tab{padding:5px 12px;border-radius:6px 6px 0 0;border:1px solid transparent;background:none;color:var(--mt);cursor:pointer;font-size:8.5pt;font-family:inherit;}.tab.on{background:var(--s2);color:var(--p);border-color:var(--bd);border-bottom-color:var(--s2);}
+.pan{display:none;background:var(--s2);border:1px solid var(--bd);border-radius:0 8px 8px 8px;padding:14px;font-size:10pt;}.pan.on{display:block;}.pan.si{border-left:3px solid var(--gl);}.pan.te{border-left:3px solid var(--p);}.pan.de{border-left:3px solid var(--purple);}
+.cw{margin:10px 0;border:1px solid var(--bdg);border-radius:8px;overflow:hidden;background:#10101c;}
+.cwt{display:flex;justify-content:space-between;align-items:center;padding:3px 10px;background:rgba(46,125,50,.1);border-bottom:1px solid var(--bdg);font-size:7pt;}
+.cwl{color:var(--g);font-family:var(--mono);font-weight:bold;text-transform:uppercase;letter-spacing:1px;}
+.cwb{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--t2);padding:2px 7px;border-radius:4px;cursor:pointer;font-size:7pt;font-family:var(--mono);}.cwb:hover{background:var(--p);color:#fff;}
+pre{font-family:var(--mono);font-size:9.5pt;padding:10px;overflow-x:auto;white-space:pre;line-height:1.5;margin:0;color:var(--tx);background:#10101c;}
+pre .c{color:#555;font-style:italic;}pre .g{color:#a5d6a7;}pre .y{color:#fff59d;}pre .b{color:#90caf9;}pre .o{color:#ffcc80;}pre .p{color:#f48fb1;}pre .v{color:#ce93d8;}pre .k{color:#80cbc4;}
+.out{background:rgba(46,125,50,.05);border-top:2px solid var(--g);padding:6px 10px;font-family:var(--mono);font-size:8.5pt;color:#a5d6a7;}
+.outl{color:var(--g);font-weight:bold;font-size:7pt;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;}
+.cm{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;}.cm>div{border-radius:8px;padding:10px;font-size:9pt;}
+.cm-do{background:rgba(46,125,50,.05);border:1px solid var(--bdg);}.cm-do b{color:var(--gl);}
+.cm-x{background:rgba(233,30,99,.04);border:1px solid var(--bd);}.cm-x b{color:var(--pl);}
+.cm p{margin:3px 0;color:var(--t2);}
+.qz{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:12px;margin:12px 0;}.qz-q{color:var(--tx);font-size:10pt;margin-bottom:8px;}
+.qo{padding:7px 12px;border:1px solid var(--bd);border-radius:8px;cursor:pointer;font-size:9pt;color:var(--t2);background:none;font-family:inherit;width:100%;text-align:left;transition:all .15s;display:block;margin-bottom:5px;}.qo:hover:not(:disabled){border-color:var(--p);color:var(--pl);}.qo.y{border-color:var(--g);background:rgba(46,125,50,.1);color:var(--gl);}.qo.n{border-color:var(--dn);background:rgba(255,82,82,.06);color:var(--dn);}
+.qfb{margin-top:6px;font-size:9pt;padding:8px;border-radius:6px;display:none;}.qfb.s{display:block;}.qfb.w{background:rgba(46,125,50,.08);color:var(--gl);border:1px solid var(--bdg);}.qfb.l{background:rgba(255,82,82,.05);color:var(--dn);border:1px solid rgba(255,82,82,.15);}
+.sd{margin:40px 0 0;padding:16px 0 8px;border-top:1px solid rgba(233,30,99,.1);}.sd small{color:var(--mt);font-size:8pt;text-transform:uppercase;letter-spacing:2px;}
+.sf{position:fixed;bottom:14px;right:14px;z-index:9999;}.sf button{padding:8px 16px;background:var(--g);color:#fff;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(0,0,0,.3);}
+.cover{text-align:center;padding:30px;margin-bottom:20px;background:linear-gradient(135deg,#1a0533,#0d1b2a);border:2px solid var(--g);border-radius:14px;}.cover h1{border:none;color:var(--gl);font-size:16pt;margin:0;}.cover p{color:var(--t2);font-size:10pt;}
+@media print{body{background:#fff;color:#333;}h1{color:#e91e63!important;}h2{color:#2e7d32!important;}pre{background:#f5f5f5!important;color:#333;}.sf{display:none;}@page{size:A4;margin:1.5cm 1cm;}}
+</style>
+</head>
+<body>
+<div class="w">
+
+<div class="cover">
+<h1>🧱 Brick 5 — BASH-F05: Loops</h1>
+<p>Making your scripts repeat things intelligently: for, while, until, select, break, continue</p>
+<p style="font-size:8pt;color:var(--mt);margin-top:6px;">6 sections · 3 explanation levels · Complete with quizzes and exercises</p>
+</div>
+
+<div class="note">
+<b>🎯 Why this matters:</b> Loops are the engine of automation. Without them, you can only do things once. With them, you process 10,000 files, monitor a service forever, retry failed operations, parse every line of a log, and scan every port on a network. Loops plus conditionals (Brick 4) give you the full power of programming in bash.
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 1: for Loops                           -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s0"><small>BASH-F05.1 of 6 · ⏱ ~12 min</small></div>
+<h2>BASH-F05.1 — for Loops</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+<button class="tab" onclick="sw(this,'de')">⚙️ Deep</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>A <span class="ic">for</span> loop is like going through a checklist. You have a list of items, and for each item, you do something. "For each file in this directory, check if it is a Python file. For each server in my list, ping it. For each package in my install list, install it." The structure is: <span class="ic">for item in list; do something; done</span>. The variable <span class="ic">item</span> takes on each value from the list, one at a time, and the body runs once for each value.</p>
+<p>Bash has two styles of for loop. The "for-in" loop iterates over a list of words (the most common style). The "C-style" loop uses <span class="ic">for ((i=0; i<10; i++))</span> syntax, which feels familiar if you know C, Python's range(), or JavaScript. Both are useful in different situations.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>The <span class="ic">for name in word-list; do commands; done</span> form expands the word-list (applying all normal expansion rules: brace, tilde, parameter, command substitution, word splitting, and pathname expansion), then iterates over the resulting words, binding each to <span class="ic">name</span> and executing the command list. If <span class="ic">in word-list</span> is omitted, the loop iterates over <span class="ic">$@</span> (the script's positional parameters). The C-style <span class="ic">for ((expr1; expr2; expr3)); do commands; done</span> evaluates <span class="ic">expr1</span> once, then loops: evaluate <span class="ic">expr2</span> (continue if non-zero), execute body, evaluate <span class="ic">expr3</span>. All three expressions are arithmetic contexts — no <span class="ic">$</span> needed for variables.</p>
+</div>
+<div class="pan de" data-l="de">
+<p>Internally, the for-in loop is represented as a <span class="ic">FOR_COM</span> structure containing the variable name, the word list (a <span class="ic">WORD_LIST</span> linked list), and the body command. Execution (<span class="ic">execute_for_command()</span> in <span class="ic">execute_cmd.c</span>) first expands the word list, producing an array of strings. Then it iterates: for each string, it calls <span class="ic">bind_variable(name, string)</span> to update the loop variable in the shell's variable hash table, then calls <span class="ic">execute_command(body)</span>. The C-style for loop is parsed into an <span class="ic">ARITH_FOR_COM</span> structure with three arithmetic expression strings. Each expression is evaluated by the arithmetic evaluator (converting strings to <span class="ic">intmax_t</span>, performing the operation, converting back). The loop variable lives in the normal variable namespace — there is no special loop scope.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="c"># ═══ for-in Loop: Iterate Over a List ═══</span>
+
+<span class="c"># Simple word list</span>
+<span class="k">for</span> <span class="v">color</span> <span class="k">in</span> pink green purple blue; <span class="k">do</span>
+    <span class="g">echo</span> <span class="y">"🎨 $color"</span>
+<span class="k">done</span>
+
+<span class="c"># Loop over files (glob expansion)</span>
+<span class="g">echo</span> <span class="y">"--- Python files ---"</span>
+<span class="k">for</span> <span class="v">f</span> <span class="k">in</span> <span class="b">*.py</span> 2>/dev/null; <span class="k">do</span>
+    <span class="g">echo</span> <span class="y">"  📄 $f ($(wc -l < "$f") lines)"</span>
+<span class="k">done</span>
+
+<span class="c"># Loop over command output</span>
+<span class="g">echo</span> <span class="y">"--- Running services (first 5) ---"</span>
+<span class="k">for</span> <span class="v">svc</span> <span class="k">in</span> <span class="p">$(</span><span class="g">systemctl</span> <span class="o">list-units</span> <span class="o">--type=service</span> <span class="o">--state=running</span> <span class="o">--no-legend</span> | <span class="g">head</span> <span class="o">-5</span> | <span class="g">awk</span> <span class="y">'{print $1}'</span><span class="p">)</span>; <span class="k">do</span>
+    <span class="g">echo</span> <span class="y">"  ✓ $svc"</span>
+<span class="k">done</span>
+
+<span class="c"># Loop over array elements</span>
+<span class="v">tools</span>=(<span class="y">"nmap"</span> <span class="y">"gobuster"</span> <span class="y">"sqlmap"</span> <span class="y">"nikto"</span>)
+<span class="k">for</span> <span class="v">tool</span> <span class="k">in</span> <span class="y">"${tools[@]}"</span>; <span class="k">do</span>
+    <span class="k">if</span> <span class="g">command</span> <span class="o">-v</span> <span class="y">"$tool"</span> &>/dev/null; <span class="k">then</span>
+        <span class="g">echo</span> <span class="y">"  ✅ $tool installed"</span>
+    <span class="k">else</span>
+        <span class="g">echo</span> <span class="y">"  ❌ $tool NOT installed"</span>
+    <span class="k">fi</span>
+<span class="k">done</span>
+
+<span class="c"># ═══ Brace expansion + for (create numbered files) ═══</span>
+<span class="k">for</span> <span class="v">i</span> <span class="k">in</span> <span class="y">{01..05}</span>; <span class="k">do</span>
+    <span class="g">echo</span> <span class="y">"Creating chapter_${i}.md"</span>
+<span class="k">done</span>
+
+<span class="c"># ═══ C-style for loop (counter-based) ═══</span>
+<span class="g">echo</span> <span class="y">"--- Countdown ---"</span>
+<span class="k">for</span> ((<span class="v">i</span>=5; <span class="v">i</span>>=1; <span class="v">i</span>--)); <span class="k">do</span>
+    <span class="g">echo</span> <span class="y">"  $i..."</span>
+<span class="k">done</span>
+<span class="g">echo</span> <span class="y">"  🚀 Launch!"</span></pre>
+<div class="out"><div class="outl">Expected Output</div><pre>🎨 pink
+🎨 green
+🎨 purple
+🎨 blue
+--- Python files ---
+  📄 main.py (42 lines)
+  📄 utils.py (18 lines)
+--- Running services (first 5) ---
+  ✓ NetworkManager.service
+  ✓ dbus.service
+  ✓ docker.service
+  ✓ sshd.service
+  ✓ systemd-journald.service
+  ✅ nmap installed
+  ❌ gobuster NOT installed
+  ✅ sqlmap installed
+  ❌ nikto NOT installed
+Creating chapter_01.md
+Creating chapter_02.md
+Creating chapter_03.md
+Creating chapter_04.md
+Creating chapter_05.md
+--- Countdown ---
+  5...
+  4...
+  3...
+  2...
+  1...
+  🚀 Launch!</pre></div></div>
+
+<div class="cm">
+<div class="cm-do"><b>✅ The golden rule for for-in loops:</b><p>Always double-quote <span class="ic">"${array[@]}"</span> when looping over arrays, so elements with spaces stay as single items. Without quotes, an element like "my file.txt" gets split into "my" and "file.txt" — two separate iterations instead of one.</p></div>
+<div class="cm-x"><b>❌ The classic trap — looping over command output:</b><p><span class="ic">for f in $(ls)</span> breaks on filenames with spaces. Instead use <span class="ic">for f in *</span> (glob expansion handles spaces correctly) or <span class="ic">find ... -print0 | while read -r -d '' f</span> for recursive searches.</p></div>
+</div>
+
+<div class="qz"><div class="qz-q">🧪 Why is <span class="ic">for f in $(ls *.txt)</span> dangerous?</div>
+<div class="qo" onclick="ck(this,true)">Because filenames with spaces get word-split into separate tokens — "my report.txt" becomes two iterations: "my" and "report.txt"</div>
+<div class="qo" onclick="ck(this,false)">Because ls is slow</div>
+<div class="qo" onclick="ck(this,false)">Because it only works in bash, not zsh</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 2: while Loops                         -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s1"><small>BASH-F05.2 of 6 · ⏱ ~10 min</small></div>
+<h2>BASH-F05.2 — while Loops</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+<button class="tab" onclick="sw(this,'de')">⚙️ Deep</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>A <span class="ic">while</span> loop keeps running as long as a condition is true. Think of it as a guard standing at a door: "While the door is locked, keep trying to open it. Once it opens, stop." This is perfect for situations where you do not know in advance how many iterations you need — reading lines from a file (you do not know how many lines there are), waiting for a process to finish, retrying a failed network request, or monitoring something until a condition changes.</p>
+<p>The most important use of <span class="ic">while</span> in bash is reading files line by line with <span class="ic">while read</span>. This is the correct and safe way to process text files, because it handles spaces, tabs, and special characters properly (unlike <span class="ic">for line in $(cat file)</span> which breaks on all of those).</p>
+</div>
+<div class="pan te" data-l="te">
+<p>The <span class="ic">while command-list; do body-list; done</span> construct repeatedly executes the body as long as the last command in <span class="ic">command-list</span> exits with status 0. The command-list is re-evaluated before each iteration. The <span class="ic">while read -r line</span> idiom reads from stdin one line at a time: <span class="ic">read</span> returns 0 on successful read and non-zero at EOF. The <span class="ic">-r</span> flag prevents backslash interpretation (so <span class="ic">\n</span> in the file is read as literal backslash-n, not a newline). Using <span class="ic">IFS=</span> before <span class="ic">read</span> preserves leading/trailing whitespace. Piping into a while loop creates a subshell, so variable changes inside the loop do not propagate to the parent — use process substitution or <span class="ic">done < file</span> redirection instead.</p>
+</div>
+<div class="pan de" data-l="de">
+<p>The while loop is compiled into a <span class="ic">WHILE_COM</span> structure containing the test command list and the body command list. Execution calls <span class="ic">execute_command(test)</span>, checks <span class="ic">last_command_exit_value</span>, and if 0, calls <span class="ic">execute_command(body)</span>, then repeats. The <span class="ic">read</span> builtin calls the kernel's <span class="ic">read()</span> syscall on stdin's file descriptor, reading one byte at a time until it encounters a newline (0x0A) or EOF. The bytes are accumulated in a buffer, trailing newline is stripped, and the result is assigned to the specified variable(s). If multiple variable names are given, the line is split on <span class="ic">IFS</span> characters and assigned left-to-right, with the last variable getting all remaining text. The subshell problem with pipes exists because the pipe operator causes both sides to run in forked subprocesses — the while loop's fork cannot modify the parent shell's variable space because they have separate copies of memory (copy-on-write page tables).</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="c"># ═══ while loop: Read a File Line by Line ═══</span>
+
+<span class="c"># THE CORRECT way to read files (handles spaces, special chars)</span>
+<span class="v">count</span>=<span class="y">0</span>
+<span class="k">while</span> IFS= <span class="g">read</span> <span class="o">-r</span> <span class="v">line</span>; <span class="k">do</span>
+    <span class="p">((</span>count++<span class="p">))</span>
+    <span class="g">echo</span> <span class="y">"  Line $count: $line"</span>
+<span class="k">done</span> < <span class="b">/etc/hostname</span>
+<span class="g">echo</span> <span class="y">"Total: $count lines"</span>
+
+<span class="c"># ═══ Process command output (without subshell problem) ═══</span>
+<span class="v">total</span>=<span class="y">0</span>
+<span class="k">while</span> IFS= <span class="g">read</span> <span class="o">-r</span> <span class="v">line</span>; <span class="k">do</span>
+    <span class="v">size</span>=<span class="p">$(</span><span class="g">echo</span> <span class="y">"$line"</span> | <span class="g">awk</span> <span class="y">'{print $1}'</span><span class="p">)</span>
+    <span class="v">dir</span>=<span class="p">$(</span><span class="g">echo</span> <span class="y">"$line"</span> | <span class="g">awk</span> <span class="y">'{print $2}'</span><span class="p">)</span>
+    <span class="g">echo</span> <span class="y">"  📁 $dir → $size"</span>
+<span class="k">done</span> < <span class="p"><(</span><span class="g">du</span> <span class="o">-sh</span> <span class="b">~/.config/*/</span> 2>/dev/null | <span class="g">head</span> <span class="o">-5</span><span class="p">)</span>
+
+<span class="c"># ═══ Counter-based while loop ═══</span>
+<span class="v">i</span>=<span class="y">1</span>
+<span class="k">while</span> [[ <span class="v">$i</span> <span class="o">-le</span> <span class="y">5</span> ]]; <span class="k">do</span>
+    <span class="g">echo</span> <span class="y">"  Attempt $i of 5"</span>
+    <span class="p">((</span>i++<span class="p">))</span>
+<span class="k">done</span>
+
+<span class="c"># ═══ Retry pattern (wait for something) ═══</span>
+<span class="v">max_retries</span>=<span class="y">5</span>
+<span class="v">attempt</span>=<span class="y">0</span>
+<span class="k">while</span> [[ <span class="v">$attempt</span> <span class="o">-lt</span> <span class="v">$max_retries</span> ]]; <span class="k">do</span>
+    <span class="k">if</span> <span class="g">ping</span> <span class="o">-c1</span> <span class="o">-W1</span> <span class="y">google.com</span> &>/dev/null; <span class="k">then</span>
+        <span class="g">echo</span> <span class="y">"✓ Online (attempt $((attempt+1)))"</span>
+        <span class="k">break</span>
+    <span class="k">fi</span>
+    <span class="p">((</span>attempt++<span class="p">))</span>
+    <span class="g">echo</span> <span class="y">"  ⏳ Retry $attempt/$max_retries..."</span>
+    <span class="g">sleep</span> <span class="y">2</span>
+<span class="k">done</span>
+[[ <span class="v">$attempt</span> <span class="o">-eq</span> <span class="v">$max_retries</span> ]] && <span class="g">echo</span> <span class="y">"✗ Failed after $max_retries attempts"</span></pre>
+<div class="out"><div class="outl">Expected Output</div><pre>  Line 1: pinkgalaxy
+Total: 1 lines
+  📁 /home/mari/.config/hypr/ → 12K
+  📁 /home/mari/.config/kitty/ → 8.0K
+  📁 /home/mari/.config/waybar/ → 4.0K
+  📁 /home/mari/.config/wofi/ → 4.0K
+  📁 /home/mari/.config/nvim/ → 48K
+  Attempt 1 of 5
+  Attempt 2 of 5
+  Attempt 3 of 5
+  Attempt 4 of 5
+  Attempt 5 of 5
+✓ Online (attempt 1)</pre></div></div>
+
+<div class="cm">
+<div class="cm-do"><b>✅ The safe pattern:</b><p><span class="ic">while IFS= read -r line; do ...; done < file</span> is the canonical way to read files. The <span class="ic">IFS=</span> preserves whitespace, <span class="ic">-r</span> preserves backslashes, and <span class="ic">< file</span> avoids the subshell problem that piping creates.</p></div>
+<div class="cm-x"><b>❌ The subshell trap:</b><p><span class="ic">cat file | while read line; do count=$((count+1)); done; echo $count</span> — the count is always 0! Because the pipe runs the while loop in a subshell, and the subshell's variable changes disappear when the pipe ends. Use <span class="ic">done < file</span> instead.</p></div>
+</div>
+
+<div class="qz"><div class="qz-q">🧪 Why does <span class="ic">cat file | while read line; do ((n++)); done; echo $n</span> print nothing (or 0)?</div>
+<div class="qo" onclick="ck(this,true)">Because the pipe runs the while loop in a subshell — changes to $n inside the subshell are lost when the pipe ends</div>
+<div class="qo" onclick="ck(this,false)">Because read cannot handle the output from cat</div>
+<div class="qo" onclick="ck(this,false)">Because ((n++)) has a syntax error</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 3: until Loops                         -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s2"><small>BASH-F05.3 of 6 · ⏱ ~5 min</small></div>
+<h2>BASH-F05.3 — until Loops</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>An <span class="ic">until</span> loop is the exact mirror image of a <span class="ic">while</span> loop. While says "keep going while this is true." Until says "keep going until this becomes true." In practice, <span class="ic">until</span> is used less often than <span class="ic">while</span>, but it reads more naturally in certain situations — especially waiting for something to happen: "Until the server responds, keep retrying." You can always rewrite an <span class="ic">until</span> as a <span class="ic">while</span> with a negated condition (using <span class="ic">!</span>), so choose whichever reads more clearly.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>The <span class="ic">until command-list; do body-list; done</span> construct executes the body as long as the last command in <span class="ic">command-list</span> exits with a non-zero status. It is logically equivalent to <span class="ic">while ! command-list; do body-list; done</span>. The internal representation is the same <span class="ic">WHILE_COM</span> structure with an inverted test flag. Typical use case: polling loops where you wait for a resource to become available.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="c"># ═══ until: Wait for a Service to Start ═══</span>
+
+<span class="g">echo</span> <span class="y">"Waiting for PostgreSQL..."</span>
+<span class="k">until</span> <span class="g">pg_isready</span> <span class="o">-q</span> 2>/dev/null; <span class="k">do</span>
+    <span class="g">echo</span> <span class="y">"  ⏳ Not ready yet, waiting 1s..."</span>
+    <span class="g">sleep</span> <span class="y">1</span>
+<span class="k">done</span>
+<span class="g">echo</span> <span class="y">"✓ PostgreSQL is ready!"</span>
+
+<span class="c"># ═══ until: Wait for a File to Appear ═══</span>
+<span class="g">echo</span> <span class="y">"Waiting for /tmp/signal.lock..."</span>
+<span class="k">until</span> [[ <span class="o">-f</span> <span class="b">/tmp/signal.lock</span> ]]; <span class="k">do</span>
+    <span class="g">sleep</span> <span class="y">0.5</span>
+<span class="k">done</span>
+<span class="g">echo</span> <span class="y">"✓ Signal file detected!"</span></pre>
+<div class="out"><div class="outl">Expected Output</div><pre>Waiting for PostgreSQL...
+  ⏳ Not ready yet, waiting 1s...
+  ⏳ Not ready yet, waiting 1s...
+✓ PostgreSQL is ready!</pre></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 4: select Menus                        -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s3"><small>BASH-F05.4 of 6 · ⏱ ~6 min</small></div>
+<h2>BASH-F05.4 — select Menus (Interactive User Choice)</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>The <span class="ic">select</span> loop creates a numbered menu that asks the user to pick an option. It is a quick way to build interactive scripts without manually coding the menu display and input handling. Bash automatically prints the numbered list, shows a prompt (<span class="ic">PS3</span>), reads the user's number, and sets the variable to the corresponding choice. The loop repeats until you <span class="ic">break</span> out of it, which makes it perfect for "pick an action" menu interfaces.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>The <span class="ic">select name in word-list; do commands; done</span> construct expands the word-list, displays the items as a numbered menu to stderr, prints the <span class="ic">PS3</span> prompt (default: "#? "), and reads a line from stdin. If the input is a valid number, the corresponding word is assigned to <span class="ic">name</span> and <span class="ic">REPLY</span> holds the raw input. If the input is empty (just Enter), the menu is re-displayed. If the input is invalid, <span class="ic">name</span> is set to empty string. The loop continues until a <span class="ic">break</span> statement is encountered or EOF is received on stdin.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="c"># ═══ select: Interactive Tool Launcher ═══</span>
+
+<span class="v">PS3</span>=<span class="y">"🌸 Pick a tool (number): "</span>     <span class="c"># custom prompt</span>
+
+<span class="k">select</span> <span class="v">tool</span> <span class="k">in</span> <span class="y">"nmap scan"</span> <span class="y">"wireshark"</span> <span class="y">"burp suite"</span> <span class="y">"system info"</span> <span class="y">"quit"</span>; <span class="k">do</span>
+    <span class="k">case</span> <span class="y">"$tool"</span> <span class="k">in</span>
+        <span class="y">"nmap scan"</span>)
+            <span class="g">echo</span> <span class="y">"🔍 Running: nmap -sC -sV localhost"</span>
+            ;;
+        <span class="y">"wireshark"</span>)
+            <span class="g">echo</span> <span class="y">"🦈 Launching Wireshark..."</span>
+            ;;
+        <span class="y">"burp suite"</span>)
+            <span class="g">echo</span> <span class="y">"🔥 Launching Burp Suite..."</span>
+            ;;
+        <span class="y">"system info"</span>)
+            <span class="g">echo</span> <span class="y">"ℹ️ Kernel: $(uname -r), Uptime: $(uptime -p)"</span>
+            ;;
+        <span class="y">"quit"</span>)
+            <span class="g">echo</span> <span class="y">"👋 Bye!"</span>
+            <span class="k">break</span>
+            ;;
+        *)
+            <span class="g">echo</span> <span class="y">"❌ Invalid choice: $REPLY"</span>
+            ;;
+    <span class="k">esac</span>
+<span class="k">done</span></pre>
+<div class="out"><div class="outl">Expected Output</div><pre>1) nmap scan
+2) wireshark
+3) burp suite
+4) system info
+5) quit
+🌸 Pick a tool (number): 4
+ℹ️ Kernel: 6.12.8-arch1-1, Uptime: up 3 hours, 42 minutes
+🌸 Pick a tool (number): 5
+👋 Bye!</pre></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 5: break & continue                    -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s4"><small>BASH-F05.5 of 6 · ⏱ ~7 min</small></div>
+<h2>BASH-F05.5 — break &amp; continue (Loop Control)</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p><span class="ic">break</span> is the emergency exit — it immediately stops the loop entirely and jumps to the code after <span class="ic">done</span>. Use it when you have found what you are looking for or when an error means continuing would be pointless. <span class="ic">continue</span> is the skip button — it stops the current iteration and jumps back to the top of the loop for the next one. Use it when the current item does not match your criteria and you want to skip it without stopping the entire loop.</p>
+<p>Think of a for loop as walking through a grocery store aisle. <span class="ic">continue</span> means "this item is not what I need, move to the next shelf." <span class="ic">break</span> means "I found what I need, leave the aisle entirely."</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Both <span class="ic">break</span> and <span class="ic">continue</span> accept an optional numeric argument specifying how many enclosing loops to break/continue from. <span class="ic">break 2</span> exits two levels of nested loops. Without an argument, they affect the innermost loop only. The <span class="ic">break</span> builtin sets an internal flag (<span class="ic">breaking</span>) and the loop execution code checks this flag after each iteration. <span class="ic">continue</span> sets <span class="ic">continuing</span> flag, causing the loop to skip the remaining body and re-evaluate the condition. Both return exit status 0 when used within a loop and non-zero when used outside a loop (which is a common error).</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="c"># ═══ break: Stop Early ═══</span>
+
+<span class="c"># Find the first .conf file in /etc</span>
+<span class="g">echo</span> <span class="y">"Searching for first .conf file..."</span>
+<span class="k">for</span> <span class="v">f</span> <span class="k">in</span> <span class="b">/etc/*</span>; <span class="k">do</span>
+    <span class="k">if</span> [[ <span class="y">"$f"</span> == <span class="y">*.conf</span> ]]; <span class="k">then</span>
+        <span class="g">echo</span> <span class="y">"  Found: $f"</span>
+        <span class="k">break</span>      <span class="c"># stop searching, we found one</span>
+    <span class="k">fi</span>
+<span class="k">done</span>
+
+<span class="c"># ═══ continue: Skip Items ═══</span>
+
+<span class="c"># Process only .py files, skip everything else</span>
+<span class="g">echo</span> <span class="y">"--- Python files only ---"</span>
+<span class="k">for</span> <span class="v">f</span> <span class="k">in</span> <span class="b">*</span>; <span class="k">do</span>
+    <span class="k">if</span> [[ <span class="y">"$f"</span> != <span class="y">*.py</span> ]]; <span class="k">then</span>
+        <span class="k">continue</span>   <span class="c"># skip non-Python files</span>
+    <span class="k">fi</span>
+    <span class="g">echo</span> <span class="y">"  Processing: $f"</span>
+<span class="k">done</span>
+
+<span class="c"># ═══ Practical: Process CSV, skip header and empty lines ═══</span>
+<span class="v">line_num</span>=<span class="y">0</span>
+<span class="k">while</span> IFS=<span class="y">','</span> <span class="g">read</span> <span class="o">-r</span> <span class="v">name</span> <span class="v">email</span> <span class="v">role</span>; <span class="k">do</span>
+    <span class="p">((</span>line_num++<span class="p">))</span>
+    <span class="c"># Skip header</span>
+    [[ <span class="v">$line_num</span> <span class="o">-eq</span> <span class="y">1</span> ]] && <span class="k">continue</span>
+    <span class="c"># Skip empty lines</span>
+    [[ <span class="o">-z</span> <span class="y">"$name"</span> ]] && <span class="k">continue</span>
+    <span class="g">echo</span> <span class="y">"  User: $name ($email) — $role"</span>
+<span class="k">done</span> << <span class="y">'CSV'</span>
+name,email,role
+Mari,mari@galaxy.dev,admin
+Luna,luna@galaxy.dev,developer
+
+Kai,kai@galaxy.dev,analyst
+CSV</pre>
+<div class="out"><div class="outl">Expected Output</div><pre>Searching for first .conf file...
+  Found: /etc/fstab.conf
+--- Python files only ---
+  Processing: main.py
+  Processing: utils.py
+  User: Mari (mari@galaxy.dev) — admin
+  User: Luna (luna@galaxy.dev) — developer
+  User: Kai (kai@galaxy.dev) — analyst</pre></div></div>
+
+<div class="qz"><div class="qz-q">🧪 In a nested loop (loop inside a loop), what does <span class="ic">break 2</span> do?</div>
+<div class="qo" onclick="ck(this,false)">Breaks out of the inner loop only</div>
+<div class="qo" onclick="ck(this,true)">Breaks out of BOTH the inner and outer loop (2 levels)</div>
+<div class="qo" onclick="ck(this,false)">Runs the loop body 2 more times then stops</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 6: Practice                            -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s5"><small>BASH-F05.6 of 6 · ⏱ ~15 min</small></div>
+<h2>BASH-F05.6 — Practice Exercises</h2>
+
+<h3>Exercise 1 (Easy) — Bulk File Creator</h3>
+<p>Write a script that creates 10 numbered Markdown files in a directory called <span class="ic">notes/</span>: <span class="ic">note_01.md</span> through <span class="ic">note_10.md</span>. Each file should contain a header with its number (e.g., <span class="ic"># Note 01</span>).</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">solution</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="g">mkdir</span> <span class="o">-p</span> <span class="b">notes</span>
+<span class="k">for</span> <span class="v">i</span> <span class="k">in</span> <span class="y">{01..10}</span>; <span class="k">do</span>
+    <span class="g">echo</span> <span class="y">"# Note $i"</span> > <span class="b">"notes/note_${i}.md"</span>
+    <span class="g">echo</span> <span class="y">"Created notes/note_${i}.md"</span>
+<span class="k">done</span>
+<span class="g">echo</span> <span class="y">"✓ Created $(ls notes/ | wc -l) files"</span></pre></div>
+
+<h3>Exercise 2 (Medium) — Port Scanner</h3>
+<p>Write a simple port scanner that checks ports 20-25, 80, 443, and 8080 on localhost. For each port, use <span class="ic">/dev/tcp/</span> (bash's built-in TCP feature) to test if it is open. Print ✓ for open and ✗ for closed.</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">solution</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="c"># ═══ Simple Port Scanner ═══</span>
+
+<span class="v">host</span>=<span class="y">"localhost"</span>
+<span class="v">ports</span>=(<span class="y">20</span> <span class="y">21</span> <span class="y">22</span> <span class="y">23</span> <span class="y">24</span> <span class="y">25</span> <span class="y">80</span> <span class="y">443</span> <span class="y">8080</span>)
+
+<span class="g">echo</span> <span class="y">"Scanning $host..."</span>
+<span class="k">for</span> <span class="v">port</span> <span class="k">in</span> <span class="y">"${ports[@]}"</span>; <span class="k">do</span>
+    <span class="c"># Bash's /dev/tcp is a virtual device for TCP connections</span>
+    <span class="c"># timeout after 1 second to avoid hanging on closed ports</span>
+    <span class="k">if</span> (echo >/dev/tcp/<span class="v">$host</span>/<span class="v">$port</span>) 2>/dev/null; <span class="k">then</span>
+        <span class="g">echo</span> <span class="y">"  ✅ Port $port — OPEN"</span>
+    <span class="k">else</span>
+        <span class="g">echo</span> <span class="y">"  ✗  Port $port — closed"</span>
+    <span class="k">fi</span>
+<span class="k">done</span>
+<span class="g">echo</span> <span class="y">"Scan complete."</span></pre>
+<div class="out"><div class="outl">Expected Output</div><pre>Scanning localhost...
+  ✗  Port 20 — closed
+  ✗  Port 21 — closed
+  ✅ Port 22 — OPEN
+  ✗  Port 23 — closed
+  ✗  Port 24 — closed
+  ✗  Port 25 — closed
+  ✗  Port 80 — closed
+  ✗  Port 443 — closed
+  ✗  Port 8080 — closed
+Scan complete.</pre></div></div>
+
+<h3>Exercise 3 (Hard) — Log Analyzer</h3>
+<p>Write a script that reads <span class="ic">/var/log/pacman.log</span> (Arch Linux's package manager log), counts how many packages were installed, upgraded, and removed in the last 7 days, and prints a summary. Use <span class="ic">while read</span>, <span class="ic">case</span>, and date comparison.</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">solution</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="c"># ═══ Pacman Log Analyzer — Last 7 Days ═══</span>
+
+<span class="v">logfile</span>=<span class="y">"/var/log/pacman.log"</span>
+<span class="v">cutoff</span>=<span class="p">$(</span><span class="g">date</span> <span class="o">-d</span> <span class="y">"7 days ago"</span> <span class="o">+%Y-%m-%d</span><span class="p">)</span>
+
+<span class="v">installed</span>=<span class="y">0</span>
+<span class="v">upgraded</span>=<span class="y">0</span>
+<span class="v">removed</span>=<span class="y">0</span>
+
+<span class="k">if</span> [[ ! -r <span class="y">"$logfile"</span> ]]; <span class="k">then</span>
+    <span class="g">echo</span> <span class="y">"Cannot read $logfile"</span> >&2
+    <span class="g">exit</span> <span class="y">1</span>
+<span class="k">fi</span>
+
+<span class="k">while</span> IFS= <span class="g">read</span> <span class="o">-r</span> <span class="v">line</span>; <span class="k">do</span>
+    <span class="c"># Extract date from log format: [2026-03-10T14:22:01+0100]</span>
+    <span class="v">log_date</span>=<span class="y">"${line:1:10}"</span>
+    
+    <span class="c"># Skip lines older than cutoff</span>
+    [[ <span class="y">"$log_date"</span> < <span class="y">"$cutoff"</span> ]] && <span class="k">continue</span>
+    
+    <span class="k">case</span> <span class="y">"$line"</span> <span class="k">in</span>
+        *<span class="y">"[ALPM] installed"</span>*)   <span class="p">((</span>installed++<span class="p">))</span> ;;
+        *<span class="y">"[ALPM] upgraded"</span>*)    <span class="p">((</span>upgraded++<span class="p">))</span> ;;
+        *<span class="y">"[ALPM] removed"</span>*)     <span class="p">((</span>removed++<span class="p">))</span> ;;
+    <span class="k">esac</span>
+<span class="k">done</span> < <span class="y">"$logfile"</span>
+
+<span class="g">echo</span> <span class="y">"═══ Pacman Activity (last 7 days) ═══"</span>
+<span class="g">echo</span> <span class="y">"  📦 Installed: $installed packages"</span>
+<span class="g">echo</span> <span class="y">"  ⬆️  Upgraded:  $upgraded packages"</span>
+<span class="g">echo</span> <span class="y">"  🗑️  Removed:   $removed packages"</span>
+<span class="g">echo</span> <span class="y">"  📊 Total:     $((installed + upgraded + removed)) operations"</span></pre>
+<div class="out"><div class="outl">Expected Output</div><pre>═══ Pacman Activity (last 7 days) ═══
+  📦 Installed: 23 packages
+  ⬆️  Upgraded:  47 packages
+  🗑️  Removed:   3 packages
+  📊 Total:     73 operations</pre></div></div>
+
+<div class="note gn">
+<b>🌸 Module Complete!</b> You now have the full loop toolkit: <span class="ic">for</span> loops for iterating over known lists (files, arrays, ranges), <span class="ic">while</span> loops for reading files line-by-line and retrying operations, <span class="ic">until</span> loops for waiting until conditions become true, <span class="ic">select</span> for interactive menus, and <span class="ic">break</span>/<span class="ic">continue</span> for fine-grained loop control. Combined with conditionals (Brick 4), you can now write scripts that make decisions AND repeat actions — the two pillars of every useful automation script. Next module: BASH-F06 (Functions) — organizing your code into reusable, testable building blocks.
+</div>
+
+</div>
+<div class="sf"><button onclick="svB()">💾 Save Brick 5</button></div>
+<script>
+function sw(btn,lv){let el=btn.parentElement.nextElementSibling;while(el&&!el.classList.contains('sd')&&!el.classList.contains('qz')&&!el.classList.contains('cm')&&!el.classList.contains('cw')&&el.tagName!=='H3'){if(el.classList.contains('pan'))el.classList.toggle('on',el.dataset.l===lv);el=el.nextElementSibling;}btn.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');}
+function ck(btn,ok){const box=btn.closest('.qz');box.querySelectorAll('.qo').forEach(o=>o.disabled=true);btn.classList.add(ok?'y':'n');const fb=box.querySelector('.qfb');fb.classList.add('s');fb.className=ok?'qfb s w':'qfb s l';fb.textContent=ok?'✓ Correct! +10 XP':'✗ Review the section above.';}
+function cpC(b){const pre=b.closest('.cw').querySelector('pre');navigator.clipboard.writeText(pre.textContent).then(()=>{b.textContent='✓';setTimeout(()=>b.textContent='Copy',1500);});}
+function svB(){const blob=new Blob(['<!DOCTYPE html>\n'+document.documentElement.outerHTML],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='brick5_BASHF05_loops_'+new Date().toISOString().slice(0,10)+'.html';a.click();}
+</script>
+</body>
+</html>

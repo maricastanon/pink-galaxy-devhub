@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧱 Brick 14 — ARCH-CMD06: Package Management (pacman & paru)</title>
+<style>
+:root{--p:#e91e63;--pl:#f8bbd0;--g:#2e7d32;--gl:#a5d6a7;--bg:#0a0a12;--s2:#1a1a2e;--tx:#e8e6f0;--t2:#a8a6b8;--mt:#6c6a7e;--bd:rgba(233,30,99,.18);--bdg:rgba(46,125,50,.2);--purple:#9c27b0;--mono:"Courier New",monospace;--dn:#ff5252;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Calibri,"Segoe UI",sans-serif;background:var(--bg);color:var(--tx);font-size:11pt;line-height:1.65;padding:20px;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 20% 50%,rgba(233,30,99,.05),transparent 50%);}
+.w{max-width:900px;margin:0 auto;position:relative;z-index:1;}
+h1{color:var(--p);font-size:20pt;margin:30px 0 12px;border-bottom:2px solid var(--p);padding-bottom:8px;}
+h2{color:var(--g);font-size:15pt;margin:28px 0 10px;border-left:4px solid var(--g);padding-left:12px;}
+h3{color:var(--p);font-size:12pt;margin:20px 0 8px;}
+p{margin:8px 0;text-align:justify;}
+.ic{font-family:var(--mono);font-size:9pt;background:rgba(233,30,99,.08);padding:1px 5px;border-radius:3px;color:var(--pl);}
+.note{background:var(--s2);border-left:3px solid var(--p);padding:12px;border-radius:0 8px 8px 0;margin:14px 0;font-size:9.5pt;}.note b{color:var(--p);}.note.gn{border-left-color:var(--g);}.note.gn b{color:var(--gl);}.note.dn{border-left-color:var(--dn);}.note.dn b{color:var(--dn);}
+.tabs{display:flex;gap:2px;margin:14px 0 6px;}
+.tab{padding:5px 12px;border-radius:6px 6px 0 0;border:1px solid transparent;background:none;color:var(--mt);cursor:pointer;font-size:8.5pt;font-family:inherit;}.tab.on{background:var(--s2);color:var(--p);border-color:var(--bd);border-bottom-color:var(--s2);}
+.pan{display:none;background:var(--s2);border:1px solid var(--bd);border-radius:0 8px 8px 8px;padding:14px;font-size:10pt;}.pan.on{display:block;}.pan.si{border-left:3px solid var(--gl);}.pan.te{border-left:3px solid var(--p);}.pan.de{border-left:3px solid var(--purple);}
+.cw{margin:10px 0;border:1px solid var(--bdg);border-radius:8px;overflow:hidden;background:#10101c;}
+.cwt{display:flex;justify-content:space-between;align-items:center;padding:3px 10px;background:rgba(46,125,50,.1);border-bottom:1px solid var(--bdg);font-size:7pt;}
+.cwl{color:var(--g);font-family:var(--mono);font-weight:bold;text-transform:uppercase;letter-spacing:1px;}
+.cwb{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--t2);padding:2px 7px;border-radius:4px;cursor:pointer;font-size:7pt;font-family:var(--mono);}.cwb:hover{background:var(--p);color:#fff;}
+pre{font-family:var(--mono);font-size:9.5pt;padding:10px;overflow-x:auto;white-space:pre;line-height:1.5;margin:0;color:var(--tx);background:#10101c;}
+pre .c{color:#555;font-style:italic;}pre .g{color:#a5d6a7;}pre .y{color:#fff59d;}pre .b{color:#90caf9;}pre .o{color:#ffcc80;}pre .p{color:#f48fb1;}pre .v{color:#ce93d8;}
+.out{background:rgba(46,125,50,.05);border-top:2px solid var(--g);padding:6px 10px;font-family:var(--mono);font-size:8.5pt;color:#a5d6a7;}
+.outl{color:var(--g);font-weight:bold;font-size:7pt;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;}
+.cm{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;}.cm>div{border-radius:8px;padding:10px;font-size:9pt;}
+.cm-do{background:rgba(46,125,50,.05);border:1px solid var(--bdg);}.cm-do b{color:var(--gl);}
+.cm-x{background:rgba(233,30,99,.04);border:1px solid var(--bd);}.cm-x b{color:var(--pl);}
+.cm p{margin:3px 0;color:var(--t2);}
+.qz{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:12px;margin:12px 0;}.qz-q{color:var(--tx);font-size:10pt;margin-bottom:8px;}
+.qo{padding:7px 12px;border:1px solid var(--bd);border-radius:8px;cursor:pointer;font-size:9pt;color:var(--t2);background:none;font-family:inherit;width:100%;text-align:left;transition:all .15s;display:block;margin-bottom:5px;}.qo:hover:not(:disabled){border-color:var(--p);color:var(--pl);}.qo.y{border-color:var(--g);background:rgba(46,125,50,.1);color:var(--gl);}.qo.n{border-color:var(--dn);background:rgba(255,82,82,.06);color:var(--dn);}
+.qfb{margin-top:6px;font-size:9pt;padding:8px;border-radius:6px;display:none;}.qfb.s{display:block;}.qfb.w{background:rgba(46,125,50,.08);color:var(--gl);border:1px solid var(--bdg);}.qfb.l{background:rgba(255,82,82,.05);color:var(--dn);border:1px solid rgba(255,82,82,.15);}
+.sd{margin:40px 0 0;padding:16px 0 8px;border-top:1px solid rgba(233,30,99,.1);}.sd small{color:var(--mt);font-size:8pt;text-transform:uppercase;letter-spacing:2px;}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:9.5pt;}
+th{background:rgba(233,30,99,.1);color:var(--pl);padding:8px 10px;text-align:left;border-bottom:2px solid var(--p);}
+td{padding:6px 10px;border-bottom:1px solid var(--bd);color:var(--t2);}
+td code{font-family:var(--mono);font-size:9pt;color:var(--pl);background:rgba(233,30,99,.06);padding:1px 4px;border-radius:2px;}
+.sf{position:fixed;bottom:14px;right:14px;z-index:9999;}.sf button{padding:8px 16px;background:var(--g);color:#fff;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(0,0,0,.3);}
+.cover{text-align:center;padding:30px;margin-bottom:20px;background:linear-gradient(135deg,#1a0533,#0d1b2a);border:2px solid #1565c0;border-radius:14px;position:relative;overflow:hidden;}.cover h1{border:none;color:#90caf9;font-size:16pt;margin:0;}.cover p{color:var(--t2);font-size:10pt;}.cover::after{content:'📦';position:absolute;font-size:80pt;opacity:0.04;right:10px;top:-10px;}
+@media print{body{background:#fff;color:#333;}h1{color:#e91e63!important;}h2{color:#2e7d32!important;}pre{background:#f5f5f5!important;color:#333;}.sf{display:none;}@page{size:A4;margin:1.5cm 1cm;}}
+</style>
+</head>
+<body>
+<div class="w">
+
+<div class="cover">
+<h1>🧱 Brick 14 — ARCH-CMD06: Package Management</h1>
+<p>pacman & paru — installing, updating, querying, and maintaining every piece of software on your system</p>
+<p style="font-size:8pt;color:var(--mt);margin-top:6px;">🐧 ARCH Commands Track · 7 sections · The command you will run every single day</p>
+</div>
+
+<div class="note">
+<b>🎯 Why this is central to Arch Linux:</b> Unlike Ubuntu/Debian (apt) or Fedora (dnf), Arch Linux uses <span class="ic">pacman</span> — a fast, elegant package manager that handles everything from system updates to dependency resolution to file ownership tracking. On top of that, the Arch User Repository (AUR) contains tens of thousands of community-built packages that are not in the official repositories, accessible through helpers like <span class="ic">paru</span>. Understanding pacman deeply is not optional on Arch — it is the single most important skill for keeping your system healthy, secure, and up-to-date. You configured all of this in Part 1 of your Arch installation guide, and now you learn to wield it like a professional.
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 1: pacman -S (Sync/Install)            -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s0"><small>ARCH-CMD06.1 of 7 · ⏱ ~14 min</small></div>
+<h2>ARCH-CMD06.1 — Installing &amp; Updating: pacman -S</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+<button class="tab" onclick="sw(this,'de')">⚙️ Deep</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>The <span class="ic">-S</span> flag stands for "Sync" — it synchronizes packages from remote repositories to your local machine. This is what you use to install new software, update your entire system, search for packages, and get information about packages before installing them. The single most important command on Arch Linux is <span class="ic">sudo pacman -Syu</span> — it refreshes the package database from the mirrors and then upgrades every installed package to its latest version. On Arch, you should run this at least once a week (ideally before installing anything new) because Arch is a rolling release where packages are always being updated.</p>
+<p>The pacman flag convention is elegant: capital letters are the <strong>operation</strong> (what you want to do) and lowercase letters are <strong>options</strong> (how you want to do it). So <span class="ic">-S</span> means "sync operation," <span class="ic">-Sy</span> means "sync and refresh the database," <span class="ic">-Syu</span> means "sync, refresh, and upgrade everything," and <span class="ic">-Ss</span> means "sync search" (search for a package in the repos).</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Pacman's sync operations communicate with configured repositories listed in <span class="ic">/etc/pacman.conf</span> (on your system: core, extra, multilib, and optionally blackarch). The database files are downloaded from mirrors listed in <span class="ic">/etc/pacman.d/mirrorlist</span> and stored locally at <span class="ic">/var/lib/pacman/sync/</span>. The <span class="ic">-y</span> flag downloads fresh copies of these database files. The <span class="ic">-u</span> flag compares installed package versions against the database and upgrades any where the remote version is newer. Package files are downloaded to <span class="ic">/var/cache/pacman/pkg/</span> as <span class="ic">.pkg.tar.zst</span> archives (zstd-compressed tarballs containing the package files, metadata, install scripts, and checksums). Pacman uses libalpm (Arch Linux Package Management library) for all operations, performing dependency resolution, conflict detection, and file ownership tracking before extracting packages.</p>
+</div>
+<div class="pan de" data-l="de">
+<p>When you run <span class="ic">pacman -Syu</span>, libalpm performs the following sequence: (1) Download sync databases from mirrors using HTTP(S) — each database is a tar archive of package metadata (desc files containing version, dependencies, file size, checksum). (2) Compare each installed package's version string against the sync database using <span class="ic">alpm_pkg_vercmp()</span> which implements the Arch versioning scheme (epoch:pkgver-pkgrel, compared component by component). (3) Build a transaction: calculate the set of packages to upgrade, resolve all dependencies transitively (using a topological sort of the dependency graph), detect conflicts (two packages providing the same file), and present the summary to the user. (4) Download package files from mirrors, verifying GnuPG signatures against the Arch Linux keyring (<span class="ic">/etc/pacman.d/gnupg/</span>). (5) Remove old package files from the filesystem. (6) Extract new package files to their correct locations. (7) Run post-install scriptlets (<span class="ic">.INSTALL</span> files containing shell functions for post_install, post_upgrade, post_remove). (8) Update the local database at <span class="ic">/var/lib/pacman/local/</span>. The entire operation is transactional — if interrupted, pacman can detect the inconsistency and recover on the next run.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ THE Command: Full System Update ═══</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-Syu</span>
+<span class="c"># S = sync operation</span>
+<span class="c"># y = refresh package database from mirrors</span>
+<span class="c"># u = upgrade all packages to latest versions</span>
+<span class="c"># Run this AT LEAST once a week. Always before installing new packages.</span>
+
+<span class="c"># ═══ Install Packages ═══</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="y">neovim</span>                <span class="c"># install a single package</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="y">nmap wireshark-qt sqlmap</span>  <span class="c"># install multiple at once</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="o">--needed</span> <span class="y">base-devel git</span>   <span class="c"># skip already-installed packages</span>
+
+<span class="c"># ═══ Search for Packages ═══</span>
+<span class="g">pacman</span> <span class="o">-Ss</span> <span class="y">docker</span>                    <span class="c"># search repos by name/description</span>
+<span class="g">pacman</span> <span class="o">-Ss</span> <span class="y">"^python-"</span>                <span class="c"># regex search: all python-* packages</span>
+
+<span class="c"># ═══ Get Package Info (before installing) ═══</span>
+<span class="g">pacman</span> <span class="o">-Si</span> <span class="y">docker</span>                    <span class="c"># detailed info: version, size, deps, URL</span>
+<span class="g">pacman</span> <span class="o">-Si</span> <span class="y">docker</span> | <span class="g">grep</span> <span class="y">"Depends"</span>   <span class="c"># see what it pulls in</span>
+
+<span class="c"># ═══ Install a Specific Version (from cache) ═══</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-U</span> <span class="b">/var/cache/pacman/pkg/package-1.2.3-1-x86_64.pkg.tar.zst</span>
+
+<span class="c"># ═══ Download Only (don't install yet) ═══</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-Sw</span> <span class="y">firefox</span>               <span class="c"># download to cache without installing</span></pre>
+<div class="out"><div class="outl">Expected Output (pacman -Ss docker)</div><pre>extra/docker 1:26.1.4-1
+    Pack, ship and run any application as a lightweight container
+extra/docker-buildx 0.14.1-1
+    Docker CLI plugin for extended build capabilities
+extra/docker-compose 2.27.1-1
+    Fast, isolated development environments using Docker</pre></div></div>
+
+<div class="note dn">
+<b>⚠️ CRITICAL: Never run -Sy without -u</b>
+<p>Running <span class="ic">pacman -Sy</span> (refresh database) without <span class="ic">-u</span> (upgrade) leaves your system in a dangerous state: the package database knows about newer versions, but your installed packages are still old. If you then install a new package with <span class="ic">pacman -S package</span>, it may pull in new library versions that are incompatible with your old installed packages, causing "dependency hell" and potentially breaking your system. The safe rule: always <span class="ic">-Syu</span> (refresh + upgrade together), never <span class="ic">-Sy</span> alone.</p>
+</div>
+
+<div class="qz"><div class="qz-q">🧪 Why is <span class="ic">pacman -Sy package</span> (without -u) dangerous?</div>
+<div class="qo" onclick="ck(this,true)">It refreshes the database to know about newer versions but does not upgrade existing packages — the new package may depend on newer library versions that conflict with your older installed libraries, causing partial upgrade breakage</div>
+<div class="qo" onclick="ck(this,false)">Because -y deletes the local database</div>
+<div class="qo" onclick="ck(this,false)">Because pacman cannot install and refresh at the same time</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 2: pacman -R (Remove)                  -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s1"><small>ARCH-CMD06.2 of 7 · ⏱ ~8 min</small></div>
+<h2>ARCH-CMD06.2 — Removing Packages: pacman -R</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>The <span class="ic">-R</span> operation removes installed packages. The plain <span class="ic">-R</span> removes just the named package, but the real power is in the options. The option <span class="ic">-Rs</span> removes the package AND any of its dependencies that are no longer needed by any other package — this is what you should use 95% of the time, because it keeps your system clean. Without <span class="ic">-s</span>, removing a package leaves behind all its dependency packages, which gradually bloat your system with orphaned packages that nothing uses.</p>
+<p>The option <span class="ic">-Rns</span> goes further — it also removes any configuration files that the package left behind (the <span class="ic">n</span> stands for "nosave"). This gives you a completely clean removal, as if the package was never installed. Use <span class="ic">-Rns</span> when you are sure you will not want the package back.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Pacman's remove operation traces the dependency graph in reverse. The <span class="ic">-s</span> (recursive) flag causes pacman to check each dependency of the removed package: if the dependency is not required by any other installed package and was not explicitly installed (it was pulled in automatically as a dependency), it is also scheduled for removal. The <span class="ic">-n</span> (nosave) flag prevents pacman from saving configuration files with a <span class="ic">.pacsave</span> extension — by default, modified config files are renamed to <span class="ic">file.pacsave</span> during removal so you can recover them. The <span class="ic">-c</span> (cascade) flag is the nuclear option: it removes the package and ALL packages that depend on it. Use this with extreme caution — removing a core library with <span class="ic">-Rc</span> can uninstall hundreds of packages. Orphan packages (installed as dependencies but no longer required) can be listed with <span class="ic">pacman -Qdt</span> and bulk-removed.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ Remove Packages ═══</span>
+
+<span class="c"># Remove package + unused dependencies (standard — use this)</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-Rs</span> <span class="y">firefox</span>
+
+<span class="c"># Clean remove: package + unused deps + config files</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-Rns</span> <span class="y">firefox</span>
+
+<span class="c"># Remove ONLY the package (leave dependencies — rarely what you want)</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-R</span> <span class="y">firefox</span>
+
+<span class="c"># ═══ Orphan Management (cleanup unused dependency packages) ═══</span>
+
+<span class="c"># List orphans: packages installed as deps but no longer needed</span>
+<span class="g">pacman</span> <span class="o">-Qdt</span>
+
+<span class="c"># Remove ALL orphans in one command</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-Rns</span> <span class="p">$(</span><span class="g">pacman</span> <span class="o">-Qdtq</span><span class="p">)</span>
+<span class="c"># -Qdt lists orphans; q = quiet (names only); -Rns removes them cleanly</span>
+<span class="c"># If there are no orphans, this command safely does nothing (empty argument)</span>
+
+<span class="c"># ═══ Check Before Removing (what depends on this package?) ═══</span>
+
+<span class="c"># See what would break if you remove a package</span>
+<span class="g">pacman</span> <span class="o">-Qi</span> <span class="y">python</span> | <span class="g">grep</span> <span class="y">"Required By"</span>
+<span class="c"># If "Required By: None" → safe to remove</span>
+<span class="c"># If it lists other packages → those will break if you remove this</span></pre>
+<div class="out"><div class="outl">Expected Output (pacman -Qdt)</div><pre>lib32-glibc
+lib32-gcc-libs
+libmfx
+perl-xml-parser</pre></div></div>
+
+<div class="cm">
+<div class="cm-do"><b>✅ The removal hierarchy:</b><p>Use <span class="ic">-Rs</span> for normal removal (package + unused deps). Use <span class="ic">-Rns</span> for clean removal (+ config files). Run <span class="ic">pacman -Rns $(pacman -Qdtq)</span> periodically to clean up orphans. Always check <span class="ic">pacman -Qi pkg | grep "Required By"</span> before removing system packages.</p></div>
+<div class="cm-x"><b>❌ Never use -Rc carelessly:</b><p>The <span class="ic">-Rc</span> (cascade) flag removes the package AND everything that depends on it. Running <span class="ic">pacman -Rc glibc</span> would try to remove nearly every package on your system because almost everything depends on glibc. Always check what -Rc would remove before confirming.</p></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 3: pacman -Q (Query)                   -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s2"><small>ARCH-CMD06.3 of 7 · ⏱ ~10 min</small></div>
+<h2>ARCH-CMD06.3 — Querying Installed Packages: pacman -Q</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>The <span class="ic">-Q</span> operation queries the LOCAL database — it tells you about packages that are already installed on your machine. This is how you answer questions like "Is Docker installed?", "What version of Python do I have?", "What files did this package install?", "How many packages do I have?", and "Which packages did I install explicitly versus which came in as dependencies?" This information is invaluable for system maintenance, debugging, and migration (recreating your setup on a new machine).</p>
+</div>
+<div class="pan te" data-l="te">
+<p>The local database lives at <span class="ic">/var/lib/pacman/local/</span> with one directory per installed package containing <span class="ic">desc</span> (metadata), <span class="ic">files</span> (installed file list), and optionally <span class="ic">mtree</span> (file checksums for integrity verification). Key query flags: <span class="ic">-Qi pkg</span> (detailed info: version, install date, size, dependencies, "Required By"), <span class="ic">-Ql pkg</span> (list all files installed by the package), <span class="ic">-Qo /path/to/file</span> (reverse: which package owns this file?), <span class="ic">-Qe</span> (explicitly installed packages — what you chose to install), <span class="ic">-Qd</span> (dependency packages — pulled in automatically), <span class="ic">-Qdt</span> (orphans — dependencies no longer needed), <span class="ic">-Qm</span> (foreign packages — not in any configured repo, usually AUR packages), <span class="ic">-Qn</span> (native packages — from official repos). The <span class="ic">-q</span> suffix makes any query output names-only (no versions), useful for piping into other commands.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ Basic Queries ═══</span>
+
+<span class="c"># Is a package installed? (exit code 0 = yes, 1 = no)</span>
+<span class="g">pacman</span> <span class="o">-Q</span> <span class="y">docker</span>                      <span class="c"># docker 1:26.1.4-1</span>
+<span class="g">pacman</span> <span class="o">-Q</span> <span class="y">docker</span> &>/dev/null && <span class="g">echo</span> <span class="y">"installed"</span> || <span class="g">echo</span> <span class="y">"not installed"</span>
+
+<span class="c"># Detailed info about an installed package</span>
+<span class="g">pacman</span> <span class="o">-Qi</span> <span class="y">docker</span>
+
+<span class="c"># What files did a package install?</span>
+<span class="g">pacman</span> <span class="o">-Ql</span> <span class="y">docker</span>                      <span class="c"># list every file</span>
+<span class="g">pacman</span> <span class="o">-Ql</span> <span class="y">docker</span> | <span class="g">grep</span> <span class="y">"bin/"</span>       <span class="c"># just the executables</span>
+
+<span class="c"># Which package owns a file? (reverse lookup)</span>
+<span class="g">pacman</span> <span class="o">-Qo</span> <span class="b">/usr/bin/git</span>               <span class="c"># /usr/bin/git is owned by git 2.45.2-1</span>
+<span class="g">pacman</span> <span class="o">-Qo</span> <span class="p">$(</span><span class="g">which</span> <span class="y">python</span><span class="p">)</span>             <span class="c"># which package provides the python binary?</span>
+
+<span class="c"># ═══ Listing & Counting ═══</span>
+
+<span class="c"># How many packages are installed?</span>
+<span class="g">pacman</span> <span class="o">-Q</span> | <span class="g">wc</span> <span class="o">-l</span>                     <span class="c"># total count</span>
+
+<span class="c"># Packages YOU explicitly installed (your choices, not auto-deps)</span>
+<span class="g">pacman</span> <span class="o">-Qe</span>                              <span class="c"># explicitly installed</span>
+<span class="g">pacman</span> <span class="o">-Qeq</span>                             <span class="c"># names only (great for backup!)</span>
+
+<span class="c"># AUR packages (not from official repos)</span>
+<span class="g">pacman</span> <span class="o">-Qm</span>                              <span class="c"># foreign/AUR packages</span>
+
+<span class="c"># Recently installed packages (sorted by install date)</span>
+<span class="g">pacman</span> <span class="o">-Qi</span> | <span class="g">awk</span> <span class="y">'/^Name/{n=$3} /^Install Date/{print $0, n}'</span> | <span class="g">sort</span> <span class="o">-t:</span> <span class="o">-k2</span> | <span class="g">tail</span> <span class="o">-10</span>
+
+<span class="c"># ═══ Package Backup & Restore ═══</span>
+
+<span class="c"># Export your package list (for recreating on a new machine)</span>
+<span class="g">pacman</span> <span class="o">-Qeq</span> > <span class="b">~/.config/pkglist-explicit.txt</span>     <span class="c"># explicit packages</span>
+<span class="g">pacman</span> <span class="o">-Qmq</span> > <span class="b">~/.config/pkglist-aur.txt</span>           <span class="c"># AUR packages</span>
+
+<span class="c"># Restore on a new machine:</span>
+<span class="c"># sudo pacman -S --needed - < pkglist-explicit.txt</span>
+<span class="c"># paru -S --needed - < pkglist-aur.txt</span></pre>
+<div class="out"><div class="outl">Expected Output (pacman -Qi docker | head -12)</div><pre>Name            : docker
+Version         : 1:26.1.4-1
+Description     : Pack, ship and run any application as a lightweight container
+Architecture    : x86_64
+URL             : https://www.docker.com/
+Licenses        : Apache-2.0
+Groups          : None
+Provides        : None
+Depends On      : bridge-utils  containerd  iptables  iproute2  ...
+Optional Deps   : btrfs-progs  pigz  docker-buildx  docker-compose
+Required By     : None
+Installed Size  : 123.45 MiB</pre></div></div>
+
+<div class="qz"><div class="qz-q">🧪 You see an unfamiliar binary at <span class="ic">/usr/bin/rg</span>. How do you find out which package installed it?</div>
+<div class="qo" onclick="ck(this,true)">pacman -Qo /usr/bin/rg — the -Qo flag performs a reverse lookup, telling you exactly which package owns any file on your system</div>
+<div class="qo" onclick="ck(this,false)">which rg — this only shows the path, not the package</div>
+<div class="qo" onclick="ck(this,false)">pacman -Ss rg — this searches the remote repo, not your installed packages</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 4: paru & AUR                          -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s3"><small>ARCH-CMD06.4 of 7 · ⏱ ~12 min</small></div>
+<h2>ARCH-CMD06.4 — paru &amp; the AUR: Community Packages</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>The Arch User Repository (AUR) is a massive community-driven collection of package build scripts for software that is not in the official Arch repositories. This includes things like Spotify, Visual Studio Code, Google Chrome, proprietary drivers, niche developer tools, and thousands of other packages. The AUR does not contain prebuilt packages — it contains <span class="ic">PKGBUILD</span> scripts that describe how to download, compile, and package software from source. An AUR helper like <span class="ic">paru</span> (which you installed in Part 1) automates this process: it searches the AUR, downloads the PKGBUILD, shows you the build script for review, compiles the package, and installs it with pacman. Paru is a drop-in replacement for pacman — every pacman command works with paru, plus it adds AUR support.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>The AUR (https://aur.archlinux.org) is a Git-based repository where each package is a Git repo containing a <span class="ic">PKGBUILD</span> file (a bash script defining <span class="ic">pkgname</span>, <span class="ic">pkgver</span>, <span class="ic">source</span> URLs, <span class="ic">sha256sums</span>, <span class="ic">depends</span>, and a <span class="ic">build()</span> function) and optionally a <span class="ic">.SRCINFO</span> metadata file. When you run <span class="ic">paru -S packagename</span> and the package is in the AUR (not official repos), paru clones the Git repo, displays the PKGBUILD for your review (you SHOULD read it — it is arbitrary code that runs on your system), downloads the source files listed in the PKGBUILD, verifies checksums, runs <span class="ic">makepkg</span> to compile and package the software in a sandboxed build environment, and then calls <span class="ic">pacman -U</span> to install the resulting <span class="ic">.pkg.tar.zst</span> file. Paru also handles AUR dependency chains, where AUR packages depend on other AUR packages. Important: AUR packages are user-contributed and not officially vetted — always review the PKGBUILD before building.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ paru — Drop-in pacman Replacement + AUR ═══</span>
+
+<span class="c"># System update (official repos + AUR packages)</span>
+<span class="g">paru</span> <span class="o">-Syu</span>                              <span class="c"># updates EVERYTHING including AUR packages</span>
+
+<span class="c"># Search (searches both official repos AND AUR)</span>
+<span class="g">paru</span> <span class="o">-Ss</span> <span class="y">visual-studio-code</span>
+
+<span class="c"># Install an AUR package</span>
+<span class="g">paru</span> <span class="o">-S</span> <span class="y">visual-studio-code-bin</span>        <span class="c"># paru detects it's AUR, shows PKGBUILD, builds it</span>
+
+<span class="c"># Install from official repos (works exactly like pacman)</span>
+<span class="g">paru</span> <span class="o">-S</span> <span class="y">neovim</span>                         <span class="c"># same as sudo pacman -S neovim</span>
+
+<span class="c"># Interactive search (paru's killer feature)</span>
+<span class="g">paru</span> <span class="y">spotify</span>                            <span class="c"># search + numbered list → type number to install</span>
+
+<span class="c"># ═══ Review & Security ═══</span>
+
+<span class="c"># Always review PKGBUILD before building (paru shows it automatically)</span>
+<span class="c"># Look for suspicious commands: curl | bash, rm -rf, wget to unknown URLs</span>
+<span class="c"># Legitimate PKGBUILDs download from official project sources</span>
+
+<span class="c"># Show the PKGBUILD without installing</span>
+<span class="g">paru</span> <span class="o">-Gp</span> <span class="y">spotify</span>                       <span class="c"># print PKGBUILD to stdout</span>
+
+<span class="c"># List installed AUR packages</span>
+<span class="g">pacman</span> <span class="o">-Qm</span>                              <span class="c"># foreign packages = AUR packages</span>
+
+<span class="c"># ═══ AUR Package Tips ═══</span>
+
+<span class="c"># Prefer "-bin" packages (precompiled — faster install, no build deps)</span>
+<span class="c"># visual-studio-code-bin ← downloads prebuilt binary (fast)</span>
+<span class="c"># visual-studio-code     ← compiles from source (slow, needs build tools)</span>
+
+<span class="c"># "-git" packages track the latest development version</span>
+<span class="c"># neovim-git ← latest Git commit (bleeding edge, may break)</span>
+<span class="c"># neovim     ← official release (stable)</span></pre>
+<div class="out"><div class="outl">Expected Output (paru spotify)</div><pre>1 aur/spotify 1:1.2.31-2 (+3845 14.23) (Installed)
+    An proprietary music streaming service
+2 aur/spotify-adblock 1.0.3-1 (+156 2.10)
+    Spotify ad blocker for Linux
+3 extra/playerctl 2.4.1-3 (3.2 MiB 10.1 MiB)
+    mpris media player controller
+
+:: Packages to install (eg: 1 2 3, 1-3):</pre></div></div>
+
+<div class="cm">
+<div class="cm-do"><b>✅ The paru workflow:</b><p>Use <span class="ic">paru -Syu</span> for full system updates (replaces <span class="ic">sudo pacman -Syu</span> and also updates AUR packages). Use <span class="ic">paru packagename</span> for interactive search+install. Always read the PKGBUILD when prompted — it is code that runs on your machine. Prefer <span class="ic">-bin</span> packages for faster installs when available.</p></div>
+<div class="cm-x"><b>❌ AUR security awareness:</b><p>AUR packages are NOT officially reviewed or vetted. Anyone can upload a PKGBUILD. While malicious packages are rare and usually caught quickly by the community, you should always review the PKGBUILD before confirming the build. Look for suspicious commands, unknown download URLs, and post-install scripts that modify unexpected system files. The Arch Wiki recommends treating AUR packages with the same caution as any code you download from the internet.</p></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 5: Cache & Mirror Management           -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s4"><small>ARCH-CMD06.5 of 7 · ⏱ ~8 min</small></div>
+<h2>ARCH-CMD06.5 — Cache &amp; Mirror Management</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>Every package you install or update is cached at <span class="ic">/var/cache/pacman/pkg/</span>. Over months, this cache grows to many gigabytes because it keeps every version of every package you have ever installed. Cleaning the cache periodically reclaims disk space. The tool <span class="ic">paccache</span> (from the <span class="ic">pacman-contrib</span> package) handles this intelligently — by default it keeps the 3 most recent versions of each package (so you can downgrade if needed) and removes everything older.</p>
+<p>Mirrors are the servers that host Arch's package repository. Your <span class="ic">/etc/pacman.d/mirrorlist</span> controls which mirrors pacman uses and in what order. Choosing geographically close, fast mirrors significantly speeds up downloads. The <span class="ic">reflector</span> tool automatically tests mirror speeds and updates your mirrorlist with the fastest ones.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Cache management: <span class="ic">paccache -r</span> removes all but the 3 most recent versions of each cached package. <span class="ic">paccache -rk 1</span> keeps only 1 version. <span class="ic">pacman -Sc</span> removes cached packages that are no longer installed (keeps only packages still on the system). <span class="ic">pacman -Scc</span> removes ALL cached packages (nuclear option — no downgrading possible). The recommended approach is a weekly systemd timer running <span class="ic">paccache -r</span>. Mirror management: <span class="ic">reflector --country Germany --protocol https --sort rate --save /etc/pacman.d/mirrorlist</span> finds the fastest HTTPS mirrors in Germany, tests their download speed, and writes the sorted list. You can also enable <span class="ic">reflector.timer</span> to automatically update mirrors weekly.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ Cache Management ═══</span>
+
+<span class="c"># Check cache size</span>
+<span class="g">du</span> <span class="o">-sh</span> <span class="b">/var/cache/pacman/pkg/</span>          <span class="c"># might be 5-20 GB!</span>
+
+<span class="c"># Clean: keep 3 most recent versions of each package (recommended)</span>
+<span class="g">sudo</span> <span class="g">paccache</span> <span class="o">-r</span>
+<span class="c"># ==> finished: 147 packages removed (1.2 GiB freed)</span>
+
+<span class="c"># Aggressive: keep only 1 version</span>
+<span class="g">sudo</span> <span class="g">paccache</span> <span class="o">-rk 1</span>
+
+<span class="c"># See what would be removed (dry run)</span>
+<span class="g">paccache</span> <span class="o">-d</span>
+
+<span class="c"># Set up automatic weekly cache cleaning</span>
+<span class="g">sudo</span> <span class="g">systemctl</span> <span class="o">enable</span> <span class="o">--now</span> <span class="y">paccache.timer</span>
+
+<span class="c"># ═══ Mirror Management ═══</span>
+
+<span class="c"># Find fastest mirrors for Germany (where your FRITZ!Box connects)</span>
+<span class="g">sudo</span> <span class="g">reflector</span> \
+  <span class="o">--country</span> <span class="y">Germany</span> \
+  <span class="o">--protocol</span> <span class="y">https</span> \
+  <span class="o">--sort</span> <span class="y">rate</span> \
+  <span class="o">--latest</span> <span class="y">10</span> \
+  <span class="o">--save</span> <span class="b">/etc/pacman.d/mirrorlist</span>
+
+<span class="c"># Automatic weekly mirror updates</span>
+<span class="g">sudo</span> <span class="g">systemctl</span> <span class="o">enable</span> <span class="o">--now</span> <span class="y">reflector.timer</span>
+
+<span class="c"># View current mirrorlist</span>
+<span class="g">head</span> <span class="o">-5</span> <span class="b">/etc/pacman.d/mirrorlist</span></pre></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 6: Troubleshooting & Recovery          -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s5"><small>ARCH-CMD06.6 of 7 · ⏱ ~10 min</small></div>
+<h2>ARCH-CMD06.6 — Troubleshooting &amp; Recovery</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>Things can go wrong with package management: a system update might break something (a library incompatibility, a config file conflict, a service that will not start after upgrading). Knowing how to handle .pacnew files, downgrade a problematic package, and fix a broken pacman database transforms these situations from "my system is broken, time to reinstall" into "I will fix this in 5 minutes." The key principle is: Arch Linux ALWAYS gives you the tools to fix problems from the command line. You never need to reinstall — you just need to know where to look and what commands to run.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Common issues and fixes: (1) <span class="ic">.pacnew</span> files — when a package update includes a new version of a config file that you have modified, pacman saves the new version as <span class="ic">file.pacnew</span> and keeps your modified version. You must manually merge changes. Find them with <span class="ic">find /etc -name "*.pacnew"</span> or <span class="ic">pacdiff</span> (from pacman-contrib). (2) Downgrading — install an older version from the cache with <span class="ic">pacman -U /var/cache/pacman/pkg/package-oldversion.pkg.tar.zst</span>. Add the package to <span class="ic">IgnorePkg</span> in <span class="ic">/etc/pacman.conf</span> to prevent it from being upgraded again until you are ready. (3) Broken keyring — if package signatures fail, refresh with <span class="ic">sudo pacman-key --init && sudo pacman-key --populate archlinux</span>. (4) Corrupted database — <span class="ic">sudo rm /var/lib/pacman/db.lck</span> removes a stale lock file (only if pacman is not actually running). (5) File conflicts — if two packages claim the same file, use <span class="ic">--overwrite</span> as a last resort or check if one package should replace the other.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ .pacnew Files (config merge after update) ═══</span>
+
+<span class="c"># Find all .pacnew files (new configs from updates)</span>
+<span class="g">sudo</span> <span class="g">find</span> <span class="b">/etc</span> <span class="o">-name</span> <span class="y">"*.pacnew"</span> 2>/dev/null
+
+<span class="c"># Interactive merge tool (from pacman-contrib)</span>
+<span class="g">sudo</span> <span class="g">pacdiff</span>
+<span class="c"># Shows diff between your config and the new version, lets you merge</span>
+
+<span class="c"># ═══ Downgrading a Package ═══</span>
+
+<span class="c"># List cached versions of a package</span>
+<span class="g">ls</span> <span class="b">/var/cache/pacman/pkg/python-*</span>
+
+<span class="c"># Install an older version from cache</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-U</span> <span class="b">/var/cache/pacman/pkg/python-3.12.0-1-x86_64.pkg.tar.zst</span>
+
+<span class="c"># Prevent it from upgrading (add to pacman.conf)</span>
+<span class="c"># Edit /etc/pacman.conf and add under [options]:</span>
+<span class="c"># IgnorePkg = python</span>
+
+<span class="c"># ═══ Common Fixes ═══</span>
+
+<span class="c"># Fix: "unable to lock database" (stale lock file)</span>
+<span class="c"># ONLY run this if pacman is NOT currently running:</span>
+<span class="g">sudo</span> <span class="g">rm</span> <span class="b">/var/lib/pacman/db.lck</span>
+
+<span class="c"># Fix: "invalid or corrupted package (PGP signature)"</span>
+<span class="g">sudo</span> <span class="g">pacman-key</span> <span class="o">--init</span>
+<span class="g">sudo</span> <span class="g">pacman-key</span> <span class="o">--populate</span> <span class="y">archlinux</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-Syu</span>                       <span class="c"># retry the update</span>
+
+<span class="c"># Fix: "file exists in filesystem" (file conflict)</span>
+<span class="c"># First check who owns it:</span>
+<span class="g">pacman</span> <span class="o">-Qo</span> <span class="b">/path/to/conflicting/file</span>
+<span class="c"># If it's from a package that should be replaced:</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-Syu</span> <span class="o">--overwrite</span> <span class="y">'/path/to/file'</span>
+
+<span class="c"># ═══ Verify Package Integrity ═══</span>
+
+<span class="c"># Check if any installed files have been modified or are missing</span>
+<span class="g">pacman</span> <span class="o">-Qk</span>                              <span class="c"># quick check (file existence)</span>
+<span class="g">pacman</span> <span class="o">-Qkk</span>                             <span class="c"># thorough check (checksums)</span>
+<span class="g">pacman</span> <span class="o">-Qk</span> <span class="y">docker</span>                      <span class="c"># check specific package</span>
+
+<span class="c"># ═══ View the pacman log ═══</span>
+<span class="g">cat</span> <span class="b">/var/log/pacman.log</span> | <span class="g">tail</span> <span class="o">-50</span>   <span class="c"># recent activity</span>
+<span class="g">grep</span> <span class="y">"upgraded"</span> <span class="b">/var/log/pacman.log</span> | <span class="g">tail</span> <span class="o">-20</span>   <span class="c"># recent upgrades</span></pre></div>
+
+<div class="qz"><div class="qz-q">🧪 After a system update, your web server's config at <span class="ic">/etc/nginx/nginx.conf</span> still works but you notice a file called <span class="ic">/etc/nginx/nginx.conf.pacnew</span>. What should you do?</div>
+<div class="qo" onclick="ck(this,false)">Delete the .pacnew file — your current config works fine</div>
+<div class="qo" onclick="ck(this,true)">Compare the two files (using diff or pacdiff) and merge any important changes from the .pacnew into your config — the .pacnew may contain new directives, security fixes, or changes required by the updated version</div>
+<div class="qo" onclick="ck(this,false)">Replace your config with the .pacnew file</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 7: Practice                            -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s6"><small>ARCH-CMD06.7 of 7 · ⏱ ~15 min</small></div>
+<h2>ARCH-CMD06.7 — Practice Exercises</h2>
+
+<h3>Exercise 1 (Easy) — Package Explorer</h3>
+<p>Answer these questions about your system using only pacman commands: How many total packages are installed? How many were explicitly installed? How many are from the AUR? What package owns <span class="ic">/usr/bin/eza</span>? What files did the <span class="ic">btop</span> package install? When was <span class="ic">linux</span> last updated?</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">solution</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="g">echo</span> <span class="y">"═══ Package Explorer ═══"</span>
+<span class="g">printf</span> <span class="y">"Total packages:    %s\n"</span> <span class="y">"$(pacman -Q | wc -l)"</span>
+<span class="g">printf</span> <span class="y">"Explicit installs: %s\n"</span> <span class="y">"$(pacman -Qe | wc -l)"</span>
+<span class="g">printf</span> <span class="y">"AUR packages:      %s\n"</span> <span class="y">"$(pacman -Qm | wc -l)"</span>
+<span class="g">printf</span> <span class="y">"eza owned by:      %s\n"</span> <span class="y">"$(pacman -Qo /usr/bin/eza 2>/dev/null)"</span>
+<span class="g">echo</span> <span class="y">"btop files (binaries):"</span>
+<span class="g">pacman</span> <span class="o">-Ql</span> <span class="y">btop</span> | <span class="g">grep</span> <span class="y">"bin/"</span>
+<span class="g">echo</span> <span class="y">"Linux kernel last updated:"</span>
+<span class="g">pacman</span> <span class="o">-Qi</span> <span class="y">linux</span> | <span class="g">grep</span> <span class="y">"Install Date"</span></pre></div>
+
+<h3>Exercise 2 (Medium) — System Maintenance Script</h3>
+<p>Write a weekly maintenance script that performs a full system update (<span class="ic">paru -Syu</span>), cleans the package cache (keep 2 versions), removes orphan packages, checks for .pacnew files, reports how many packages were upgraded, and shows any failed services. Use the production script template from BASH-F08.</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">solution</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="g">set</span> <span class="o">-euo</span> <span class="y">pipefail</span>
+<span class="v">G</span>=<span class="y">'\033[32m'</span> <span class="v">Y</span>=<span class="y">'\033[33m'</span> <span class="v">R</span>=<span class="y">'\033[31m'</span> <span class="v">N</span>=<span class="y">'\033[0m'</span>
+<span class="g">log</span>() { <span class="g">echo</span> <span class="o">-e</span> <span class="y">"[$(date +%H:%M:%S)] $*"</span>; }
+
+<span class="g">log</span> <span class="y">"═══ 🌸 Weekly System Maintenance ═══"</span>
+
+<span class="c"># 1. Full system update</span>
+<span class="g">log</span> <span class="y">"${G}📦 Updating system...${N}"</span>
+<span class="v">before</span>=<span class="p">$(</span><span class="g">pacman</span> <span class="o">-Q</span> | <span class="g">md5sum</span><span class="p">)</span>
+<span class="g">paru</span> <span class="o">-Syu</span> <span class="o">--noconfirm</span> || <span class="g">log</span> <span class="y">"${Y}⚠️ Some packages may have failed${N}"</span>
+<span class="v">after</span>=<span class="p">$(</span><span class="g">pacman</span> <span class="o">-Q</span> | <span class="g">md5sum</span><span class="p">)</span>
+[[ <span class="y">"$before"</span> != <span class="y">"$after"</span> ]] && <span class="g">log</span> <span class="y">"   Packages were updated"</span> || <span class="g">log</span> <span class="y">"   Already up to date"</span>
+
+<span class="c"># 2. Clean package cache</span>
+<span class="g">log</span> <span class="y">"${G}🧹 Cleaning cache (keeping 2 versions)...${N}"</span>
+<span class="g">sudo</span> <span class="g">paccache</span> <span class="o">-rk 2</span>
+
+<span class="c"># 3. Remove orphans</span>
+<span class="v">orphans</span>=<span class="p">$(</span><span class="g">pacman</span> <span class="o">-Qdtq</span> 2>/dev/null<span class="p">)</span> || <span class="k">true</span>
+<span class="k">if</span> [[ <span class="o">-n</span> <span class="y">"$orphans"</span> ]]; <span class="k">then</span>
+    <span class="g">log</span> <span class="y">"${Y}🗑️ Removing orphans:${N}"</span>
+    <span class="g">echo</span> <span class="y">"$orphans"</span>
+    <span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-Rns</span> <span class="o">--noconfirm</span> <span class="v">$orphans</span>
+<span class="k">else</span>
+    <span class="g">log</span> <span class="y">"   No orphans found"</span>
+<span class="k">fi</span>
+
+<span class="c"># 4. Check for .pacnew files</span>
+<span class="v">pacnews</span>=<span class="p">$(</span><span class="g">sudo</span> <span class="g">find</span> <span class="b">/etc</span> <span class="o">-name</span> <span class="y">"*.pacnew"</span> 2>/dev/null<span class="p">)</span>
+<span class="k">if</span> [[ <span class="o">-n</span> <span class="y">"$pacnews"</span> ]]; <span class="k">then</span>
+    <span class="g">log</span> <span class="y">"${Y}⚠️ .pacnew files found (merge these!):${N}"</span>
+    <span class="g">echo</span> <span class="y">"$pacnews"</span>
+<span class="k">else</span>
+    <span class="g">log</span> <span class="y">"   No .pacnew files"</span>
+<span class="k">fi</span>
+
+<span class="c"># 5. Check for failed services</span>
+<span class="v">failed</span>=<span class="p">$(</span><span class="g">systemctl</span> <span class="o">--failed</span> <span class="o">--no-legend</span> 2>/dev/null<span class="p">)</span>
+<span class="k">if</span> [[ <span class="o">-n</span> <span class="y">"$failed"</span> ]]; <span class="k">then</span>
+    <span class="g">log</span> <span class="y">"${R}🚨 Failed services:${N}"</span>
+    <span class="g">echo</span> <span class="y">"$failed"</span>
+<span class="k">else</span>
+    <span class="g">log</span> <span class="y">"${G}✅ All services healthy${N}"</span>
+<span class="k">fi</span>
+
+<span class="c"># Summary</span>
+<span class="g">log</span> <span class="y">"${G}═══ Maintenance complete ═══${N}"</span>
+<span class="g">printf</span> <span class="y">"  Packages: %s  Cache: %s  Kernel: %s\n"</span> \
+  <span class="y">"$(pacman -Q | wc -l)"</span> \
+  <span class="y">"$(du -sh /var/cache/pacman/pkg/ | awk '{print $1}')"</span> \
+  <span class="y">"$(uname -r)"</span></pre>
+<div class="out"><div class="outl">Expected Output</div><pre>[16:42:01] ═══ 🌸 Weekly System Maintenance ═══
+[16:42:01] 📦 Updating system...
+[16:42:45]    Packages were updated
+[16:42:45] 🧹 Cleaning cache (keeping 2 versions)...
+==> finished: 89 packages removed (freed 1.8 GiB)
+[16:42:46]    No orphans found
+[16:42:46]    No .pacnew files
+[16:42:46] ✅ All services healthy
+[16:42:46] ═══ Maintenance complete ═══
+  Packages: 847  Cache: 3.2G  Kernel: 6.12.8-arch1-1</pre></div></div>
+
+<h3>Exercise 3 (Hard) — Package Diff Report</h3>
+<p>Write a script that compares your current package list against a saved baseline (from the backup exercise in Section 3). It should report packages that were added since the baseline, packages that were removed, packages that changed versions, and the total size change. Save the current state as the new baseline after reporting.</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">solution</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="g">set</span> <span class="o">-euo</span> <span class="y">pipefail</span>
+
+<span class="v">BASELINE</span>=<span class="y">"$HOME/.config/pkglist-baseline.txt"</span>
+<span class="v">CURRENT</span>=<span class="p">$(</span><span class="g">mktemp</span><span class="p">)</span>
+<span class="g">trap</span> <span class="y">'rm -f "$CURRENT"'</span> <span class="y">EXIT</span>
+
+<span class="g">pacman</span> <span class="o">-Q</span> > <span class="y">"$CURRENT"</span>
+
+<span class="k">if</span> [[ ! -f <span class="y">"$BASELINE"</span> ]]; <span class="k">then</span>
+    <span class="g">echo</span> <span class="y">"No baseline found. Saving current state as baseline."</span>
+    <span class="g">cp</span> <span class="y">"$CURRENT"</span> <span class="y">"$BASELINE"</span>
+    <span class="g">exit</span> <span class="y">0</span>
+<span class="k">fi</span>
+
+<span class="g">echo</span> <span class="y">"═══ Package Diff Report ═══"</span>
+<span class="g">echo</span> <span class="y">"Baseline: $(wc -l < "$BASELINE") packages"</span>
+<span class="g">echo</span> <span class="y">"Current:  $(wc -l < "$CURRENT") packages"</span>
+<span class="g">echo</span> <span class="y">""</span>
+
+<span class="g">echo</span> <span class="y">"--- Added ---"</span>
+<span class="g">comm</span> <span class="o">-13</span> <span class="p"><(</span><span class="g">awk</span> <span class="y">'{print $1}'</span> <span class="y">"$BASELINE"</span> | <span class="g">sort</span><span class="p">)</span> <span class="p"><(</span><span class="g">awk</span> <span class="y">'{print $1}'</span> <span class="y">"$CURRENT"</span> | <span class="g">sort</span><span class="p">)</span> | <span class="g">sed</span> <span class="y">'s/^/  + /'</span>
+
+<span class="g">echo</span> <span class="y">"--- Removed ---"</span>
+<span class="g">comm</span> <span class="o">-23</span> <span class="p"><(</span><span class="g">awk</span> <span class="y">'{print $1}'</span> <span class="y">"$BASELINE"</span> | <span class="g">sort</span><span class="p">)</span> <span class="p"><(</span><span class="g">awk</span> <span class="y">'{print $1}'</span> <span class="y">"$CURRENT"</span> | <span class="g">sort</span><span class="p">)</span> | <span class="g">sed</span> <span class="y">'s/^/  - /'</span>
+
+<span class="g">echo</span> <span class="y">"--- Version Changes ---"</span>
+<span class="g">comm</span> <span class="o">-12</span> <span class="p"><(</span><span class="g">awk</span> <span class="y">'{print $1}'</span> <span class="y">"$BASELINE"</span> | <span class="g">sort</span><span class="p">)</span> <span class="p"><(</span><span class="g">awk</span> <span class="y">'{print $1}'</span> <span class="y">"$CURRENT"</span> | <span class="g">sort</span><span class="p">)</span> | \
+  <span class="k">while</span> <span class="g">read</span> <span class="o">-r</span> <span class="v">pkg</span>; <span class="k">do</span>
+    <span class="v">old</span>=<span class="p">$(</span><span class="g">grep</span> <span class="y">"^$pkg "</span> <span class="y">"$BASELINE"</span> | <span class="g">awk</span> <span class="y">'{print $2}'</span><span class="p">)</span>
+    <span class="v">new</span>=<span class="p">$(</span><span class="g">grep</span> <span class="y">"^$pkg "</span> <span class="y">"$CURRENT"</span> | <span class="g">awk</span> <span class="y">'{print $2}'</span><span class="p">)</span>
+    [[ <span class="y">"$old"</span> != <span class="y">"$new"</span> ]] && <span class="g">printf</span> <span class="y">"  ~ %-30s %s → %s\n"</span> <span class="y">"$pkg"</span> <span class="y">"$old"</span> <span class="y">"$new"</span>
+  <span class="k">done</span> | <span class="g">head</span> <span class="o">-20</span>
+
+<span class="g">echo</span> <span class="y">""</span>
+<span class="g">read</span> <span class="o">-rp</span> <span class="y">"Update baseline? [y/N] "</span> <span class="v">confirm</span>
+[[ <span class="y">"${confirm,,}"</span> == <span class="y">"y"</span> ]] && <span class="g">cp</span> <span class="y">"$CURRENT"</span> <span class="y">"$BASELINE"</span> && <span class="g">echo</span> <span class="y">"✓ Baseline updated"</span></pre></div>
+
+<div class="note gn">
+<b>🌸 Module Complete!</b> You now have complete mastery over Arch Linux package management. You can install and update with <span class="ic">pacman -Syu</span> (and the critical rule of never running <span class="ic">-Sy</span> without <span class="ic">-u</span>), search and inspect with <span class="ic">-Ss</span> and <span class="ic">-Si</span>, remove cleanly with <span class="ic">-Rns</span> and manage orphans with <span class="ic">-Qdt</span>, query your installed packages with <span class="ic">-Q</span> (ownership, file lists, explicit vs dependency installs), use paru for seamless AUR access with PKGBUILD review, manage the cache with <span class="ic">paccache</span> and mirrors with <span class="ic">reflector</span>, and troubleshoot with downgrading, .pacnew merging, and keyring fixes. The weekly maintenance script from the exercises is a real tool you should actually run on your system — consider setting it up as a systemd timer (from ARCH-CMD04). This is one of the most practically important modules in the entire platform. 🌸
+</div>
+
+</div>
+<div class="sf"><button onclick="svB()">💾 Save Brick 14</button></div>
+<script>
+function sw(btn,lv){let el=btn.parentElement.nextElementSibling;while(el&&!el.classList.contains('sd')&&!el.classList.contains('qz')&&!el.classList.contains('cm')&&!el.classList.contains('cw')&&el.tagName!=='H3'&&el.tagName!=='TABLE'){if(el.classList.contains('pan'))el.classList.toggle('on',el.dataset.l===lv);el=el.nextElementSibling;}btn.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');}
+function ck(btn,ok){const box=btn.closest('.qz');box.querySelectorAll('.qo').forEach(o=>o.disabled=true);btn.classList.add(ok?'y':'n');const fb=box.querySelector('.qfb');fb.classList.add('s');fb.className=ok?'qfb s w':'qfb s l';fb.textContent=ok?'✓ Correct! +10 XP':'✗ Review the section above.';}
+function cpC(b){const pre=b.closest('.cw').querySelector('pre');navigator.clipboard.writeText(pre.textContent).then(()=>{b.textContent='✓';setTimeout(()=>b.textContent='Copy',1500);});}
+function svB(){const blob=new Blob(['<!DOCTYPE html>\n'+document.documentElement.outerHTML],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='brick14_ARCHCMD06_pacman_'+new Date().toISOString().slice(0,10)+'.html';a.click();}
+</script>
+</body>
+</html>

@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧱 Brick 2 — BASH-F02: Variables & Data Types (Complete Module)</title>
+<style>
+:root{--p:#e91e63;--pl:#f8bbd0;--g:#2e7d32;--gl:#a5d6a7;--bg:#0a0a12;--s1:#0f0f1e;--s2:#1a1a2e;--tx:#e8e6f0;--t2:#a8a6b8;--mt:#6c6a7e;--bd:rgba(233,30,99,.18);--bdg:rgba(46,125,50,.2);--purple:#9c27b0;--mono:"Courier New",monospace;--danger:#ff5252;--orange:#ff9800;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Calibri,"Segoe UI",sans-serif;background:var(--bg);color:var(--tx);font-size:11pt;line-height:1.65;padding:20px;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 20% 50%,rgba(233,30,99,.05),transparent 50%),radial-gradient(ellipse at 80% 30%,rgba(46,125,50,.04),transparent 50%);}
+.w{max-width:900px;margin:0 auto;position:relative;z-index:1;}
+h1{color:var(--p);font-size:20pt;margin:30px 0 12px;border-bottom:2px solid var(--p);padding-bottom:8px;}
+h2{color:var(--g);font-size:15pt;margin:28px 0 10px;border-left:4px solid var(--g);padding-left:12px;}
+h3{color:var(--p);font-size:12pt;margin:20px 0 8px;}
+p{margin:8px 0;text-align:justify;}
+a{color:var(--p);}
+.ic{font-family:var(--mono);font-size:9pt;background:rgba(233,30,99,.08);padding:1px 5px;border-radius:3px;color:var(--pl);}
+.note{background:var(--s2);border-left:3px solid var(--p);padding:12px;border-radius:0 8px 8px 0;margin:14px 0;font-size:9.5pt;}
+.note b{color:var(--p);}
+.note.gn{border-left-color:var(--g);}
+.note.gn b{color:var(--gl);}
+
+/* Tabs */
+.tabs{display:flex;gap:2px;margin:14px 0 6px;}
+.tab{padding:5px 12px;border-radius:6px 6px 0 0;border:1px solid transparent;background:none;color:var(--mt);cursor:pointer;font-size:8.5pt;font-family:inherit;}
+.tab:hover{color:var(--pl);}
+.tab.on{background:var(--s2);color:var(--p);border-color:var(--bd);border-bottom-color:var(--s2);}
+.pan{display:none;background:var(--s2);border:1px solid var(--bd);border-radius:0 8px 8px 8px;padding:14px;font-size:10pt;}
+.pan.on{display:block;}
+.pan.si{border-left:3px solid var(--gl);}
+.pan.te{border-left:3px solid var(--p);}
+.pan.de{border-left:3px solid var(--purple);}
+
+/* Code */
+.cw{margin:10px 0;border:1px solid var(--bdg);border-radius:8px;overflow:hidden;background:#10101c;}
+.cwt{display:flex;justify-content:space-between;align-items:center;padding:3px 10px;background:rgba(46,125,50,.1);border-bottom:1px solid var(--bdg);font-size:7pt;}
+.cwl{color:var(--g);font-family:var(--mono);font-weight:bold;text-transform:uppercase;letter-spacing:1px;}
+.cwb{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--t2);padding:2px 7px;border-radius:4px;cursor:pointer;font-size:7pt;font-family:var(--mono);}
+.cwb:hover{background:var(--p);color:#fff;}
+pre{font-family:var(--mono);font-size:9.5pt;padding:10px;overflow-x:auto;white-space:pre;line-height:1.5;margin:0;color:var(--tx);background:#10101c;}
+pre .c{color:#555;font-style:italic;}pre .g{color:#a5d6a7;}pre .y{color:#fff59d;}pre .b{color:#90caf9;}pre .o{color:#ffcc80;}pre .p{color:#f48fb1;}pre .v{color:#ce93d8;}
+.out{background:rgba(46,125,50,.05);border-top:2px solid var(--g);padding:6px 10px;font-family:var(--mono);font-size:8.5pt;color:#a5d6a7;}
+.outl{color:var(--g);font-weight:bold;font-size:7pt;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;}
+
+/* Consequence map */
+.cm{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;}
+.cm>div{border-radius:8px;padding:10px;font-size:9pt;}
+.cm-do{background:rgba(46,125,50,.05);border:1px solid var(--bdg);}
+.cm-do b{color:var(--gl);}
+.cm-x{background:rgba(233,30,99,.04);border:1px solid var(--bd);}
+.cm-x b{color:var(--pl);}
+.cm p{margin:3px 0;color:var(--t2);}
+
+/* Quiz */
+.qz{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:12px;margin:12px 0;}
+.qz-q{color:var(--tx);font-size:10pt;margin-bottom:8px;}
+.qopts{display:flex;flex-direction:column;gap:5px;}
+.qo{padding:7px 12px;border:1px solid var(--bd);border-radius:8px;cursor:pointer;font-size:9pt;color:var(--t2);background:none;font-family:inherit;width:100%;text-align:left;transition:all .15s;}
+.qo:hover:not(:disabled){border-color:var(--p);color:var(--pl);}
+.qo.y{border-color:var(--g);background:rgba(46,125,50,.1);color:var(--gl);}
+.qo.n{border-color:var(--danger);background:rgba(255,82,82,.06);color:var(--danger);}
+.qfb{margin-top:6px;font-size:9pt;padding:8px;border-radius:6px;display:none;}
+.qfb.s{display:block;}
+.qfb.w{background:rgba(46,125,50,.08);color:var(--gl);border:1px solid var(--bdg);}
+.qfb.l{background:rgba(255,82,82,.05);color:var(--danger);border:1px solid rgba(255,82,82,.15);}
+
+/* Section divider */
+.sd{margin:40px 0 0;padding:16px 0 8px;border-top:1px solid rgba(233,30,99,.1);}
+.sd small{color:var(--mt);font-size:8pt;text-transform:uppercase;letter-spacing:2px;}
+
+/* Save */
+.sf{position:fixed;bottom:14px;right:14px;z-index:9999;}
+.sf button{padding:8px 16px;background:var(--g);color:#fff;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(0,0,0,.3);}
+.sf button:hover{background:var(--gl);color:#000;}
+
+.cover{text-align:center;padding:30px;margin-bottom:20px;background:linear-gradient(135deg,#1a0533,#0d1b2a);border:2px solid var(--g);border-radius:14px;box-shadow:0 0 30px var(--gg);}
+.cover h1{border:none;color:var(--gl);font-size:16pt;margin:0;}
+.cover p{color:var(--t2);font-size:10pt;}
+
+@media print{body{background:#fff;color:#333;}h1{color:#e91e63!important;}h2{color:#2e7d32!important;}pre{background:#f5f5f5!important;color:#333;border:1px solid #ddd;}.sf{display:none;}@page{size:A4;margin:1.5cm 1cm;}}
+</style>
+</head>
+<body>
+<div class="w">
+
+<div class="cover">
+  <h1>🧱 Brick 2 — BASH-F02: Variables & Data Types</h1>
+  <p>Complete module · 7 sections · 3 explanation levels each · All quizzes · All code examples</p>
+  <p style="font-size:8pt;color:var(--mt);margin-top:8px;">Part of the Pink Galaxy Platform · Integrates into the v3 shell</p>
+</div>
+
+<div class="note gn">
+  <b>📋 Integration Instructions:</b> This file works standalone for reading. To integrate into the Platform shell (pink_galaxy_platform_v3.html), copy the JavaScript functions at the bottom of this file and add them inside the &lt;script&gt; tag of the platform. Then update the module's <span class="ic">openMod</span> function to call them instead of <span class="ic">buildPlaceholder()</span>. Detailed instructions at the end of this file.
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 0: Variable Assignment                 -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s0"><small>BASH-F02.1 of 7 · ⏱ ~8 min</small></div>
+<h2>BASH-F02.1 — Variable Assignment</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+<button class="tab" onclick="sw(this,'de')">⚙️ Deep</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>A variable is a labeled box where you store a value. You give the box a name (like <span class="ic">greeting</span>) and put something inside it (like <span class="ic">"Hello"</span>). Later, when you need that value, you open the box by putting a dollar sign in front of the name: <span class="ic">$greeting</span>. The dollar sign is like saying "give me what's inside the box called greeting."</p>
+<p>The critical rule that trips up every beginner: <strong>no spaces around the equals sign.</strong> In bash, <span class="ic">name="Mari"</span> creates a variable, but <span class="ic">name = "Mari"</span> tries to run a program called <span class="ic">name</span> with arguments <span class="ic">=</span> and <span class="ic">"Mari"</span>. Bash is extremely literal about spaces.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>In bash, variables are untyped — they are all stored as strings internally. When you write <span class="ic">x=42</span>, bash stores the string "42", not an integer. Arithmetic contexts (<span class="ic">$(( ))</span> and <span class="ic">let</span>) parse these strings as numbers when needed. Variable names are case-sensitive (<span class="ic">Name</span> and <span class="ic">name</span> are different variables), must start with a letter or underscore, and can contain letters, digits, and underscores. Assignment uses <span class="ic">NAME=value</span> with no spaces. Access uses <span class="ic">$NAME</span> or the safer <span class="ic">${NAME}</span> form (braces disambiguate where the variable name ends).</p>
+</div>
+<div class="pan de" data-l="de">
+<p>Bash maintains an internal hash table (implemented as a chained hash map in the bash source code, file <span class="ic">variables.c</span>) mapping variable names to <span class="ic">SHELL_VAR</span> structs. Each struct contains the variable's value (a <span class="ic">char*</span>), attributes (integer, readonly, exported, array, etc.), and context level (for function-local scope). When you write <span class="ic">x=42</span>, the lexer tokenizes this as a WORD token, the parser identifies the <span class="ic">=</span> as an assignment operator (only when it appears before a command), and <span class="ic">bind_variable("x", "42")</span> is called. This either creates a new hash entry or updates the existing one's value pointer (freeing the old string via <span class="ic">free()</span>). When you reference <span class="ic">$x</span>, the expansion phase calls <span class="ic">find_variable("x")</span> which hashes the name and walks the chain to find the matching entry, returning the <span class="ic">char*</span> value.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="c"># ═══ Variable Assignment Basics ═══</span>
+
+<span class="c"># Simple assignment — NO SPACES around =</span>
+<span class="v">name</span>=<span class="y">"Mari"</span>
+<span class="v">age</span>=<span class="y">25</span>
+<span class="v">project</span>=<span class="y">"Pink Galaxy"</span>
+
+<span class="c"># Access with $ prefix</span>
+<span class="g">echo</span> <span class="y">"Hello, $name!"</span>
+<span class="g">echo</span> <span class="y">"Age: $age"</span>
+<span class="g">echo</span> <span class="y">"Working on: $project"</span>
+
+<span class="c"># Braces for clarity (ALWAYS use when concatenating)</span>
+<span class="v">fruit</span>=<span class="y">"apple"</span>
+<span class="g">echo</span> <span class="y">"I have 3 ${fruit}s"</span>         <span class="c"># ✓ "I have 3 apples"</span>
+<span class="g">echo</span> <span class="y">"I have 3 $fruits"</span>          <span class="c"># ✗ empty — looks for variable "fruits"</span>
+
+<span class="c"># Command substitution — store command output in a variable</span>
+<span class="v">today</span>=<span class="p">$(</span><span class="g">date</span> <span class="o">+%Y-%m-%d</span><span class="p">)</span>
+<span class="v">kernel</span>=<span class="p">$(</span><span class="g">uname</span> <span class="o">-r</span><span class="p">)</span>
+<span class="v">file_count</span>=<span class="p">$(</span><span class="g">ls</span> | <span class="g">wc</span> <span class="o">-l</span><span class="p">)</span>
+
+<span class="g">echo</span> <span class="y">"Today is $today, kernel $kernel, $file_count files here"</span></pre>
+<div class="out"><div class="outl">Expected Output</div><pre>Hello, Mari!
+Age: 25
+Working on: Pink Galaxy
+I have 3 apples
+I have 3
+Today is 2026-03-15, kernel 6.12.8-arch1-1, 12 files here</pre></div></div>
+
+<div class="cm">
+<div class="cm-do"><b>✅ If you master variables:</b><p>Every script you write uses them. Config values, user input, command output, file paths, counters — all stored in variables. Understanding the no-spaces rule and brace syntax prevents 90% of beginner debugging time.</p></div>
+<div class="cm-x"><b>❌ Common mistakes:</b><p>Adding spaces around <span class="ic">=</span> (breaks silently). Forgetting braces when concatenating (wrong variable name). Using unquoted variables with spaces (word splitting breaks paths with spaces).</p></div>
+</div>
+
+<div class="qz"><div class="qz-q">🧪 What does <span class="ic">echo "3 $fruits"</span> print if <span class="ic">fruit="apple"</span> is set?</div>
+<div class="qopts">
+<button class="qo" onclick="ck(this,false)">3 apples</button>
+<button class="qo" onclick="ck(this,true)">3 (followed by nothing — the variable "fruits" doesn't exist)</button>
+<button class="qo" onclick="ck(this,false)">An error message</button>
+</div><div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 1: Strings                             -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s1"><small>BASH-F02.2 of 7 · ⏱ ~8 min</small></div>
+<h2>BASH-F02.2 — Strings</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+<button class="tab" onclick="sw(this,'de')">⚙️ Deep</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>Strings are text — any sequence of characters. In bash, almost everything is a string: names, file paths, messages, even numbers (until you do math on them). You can join strings together (concatenation), measure their length, cut out pieces (substrings), and search/replace within them. Think of a string as a beaded necklace — each character is a bead, and you can count beads, cut the necklace at a certain point, or replace specific beads.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Bash strings are null-terminated C strings internally. There is no separate string type — all variables are strings by default. String operations are performed via parameter expansion (<span class="ic">${#var}</span> for length, <span class="ic">${var:offset:length}</span> for substring, <span class="ic">${var/pattern/replacement}</span> for substitution). These are evaluated during the expansion phase of command processing, before the command is executed. Double-quoted strings allow variable expansion and command substitution; single-quoted strings are completely literal (no expansion).</p>
+</div>
+<div class="pan de" data-l="de">
+<p>When bash processes <span class="ic">${#var}</span>, it calls <span class="ic">find_variable("var")</span>, gets the <span class="ic">char*</span> value pointer, and runs <span class="ic">strlen()</span> on it. For multi-byte encodings (UTF-8 under <span class="ic">LC_ALL</span>), bash uses <span class="ic">mbstowcs()</span> to count characters rather than bytes. The substring operation <span class="ic">${var:2:5}</span> computes a pointer offset into the string's char array. Pattern matching in <span class="ic">${var/pattern/replace}</span> uses bash's internal pattern matcher (a glob-style matcher, not regex), which compiles the pattern into an internal representation and matches character by character against the value string.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="c"># ═══ String Operations ═══</span>
+
+<span class="v">greeting</span>=<span class="y">"Hello, Pink Galaxy!"</span>
+
+<span class="c"># Length</span>
+<span class="g">echo</span> <span class="y">"Length: ${#greeting}"</span>              <span class="c"># 20 characters</span>
+
+<span class="c"># Substring (offset:length)</span>
+<span class="g">echo</span> <span class="y">"Sub: ${greeting:7:4}"</span>              <span class="c"># "Pink" (start at index 7, take 4)</span>
+
+<span class="c"># Search & Replace (first occurrence)</span>
+<span class="g">echo</span> <span class="y">"${greeting/Pink/Dark}"</span>             <span class="c"># "Hello, Dark Galaxy!"</span>
+
+<span class="c"># Replace ALL occurrences (double slash)</span>
+<span class="v">path</span>=<span class="y">"/home/mari/my project/docs"</span>
+<span class="g">echo</span> <span class="y">"${path// /_}"</span>                      <span class="c"># "/home/mari/my_project/docs"</span>
+
+<span class="c"># Remove prefix (shortest match)</span>
+<span class="v">file</span>=<span class="y">"/home/mari/projects/app.py"</span>
+<span class="g">echo</span> <span class="y">"Filename: ${file##*/}"</span>             <span class="c"># "app.py" (remove everything up to last /)</span>
+
+<span class="c"># Remove suffix</span>
+<span class="g">echo</span> <span class="y">"Without ext: ${file%.py}"</span>          <span class="c"># "/home/mari/projects/app"</span>
+
+<span class="c"># Uppercase / Lowercase (bash 4+)</span>
+<span class="v">name</span>=<span class="y">"mari"</span>
+<span class="g">echo</span> <span class="y">"Upper: ${name^^}"</span>                 <span class="c"># "MARI"</span>
+<span class="g">echo</span> <span class="y">"Capital: ${name^}"</span>                <span class="c"># "Mari" (first letter only)</span>
+
+<span class="c"># Concatenation (just put them next to each other)</span>
+<span class="v">first</span>=<span class="y">"Pink"</span>
+<span class="v">second</span>=<span class="y">"Galaxy"</span>
+<span class="v">combined</span>=<span class="y">"${first} ${second} Bible"</span>
+<span class="g">echo</span> <span class="y">"$combined"</span>                        <span class="c"># "Pink Galaxy Bible"</span></pre>
+<div class="out"><div class="outl">Expected Output</div><pre>Length: 20
+Sub: Pink
+Hello, Dark Galaxy!
+/home/mari/my_project/docs
+Filename: app.py
+Without ext: /home/mari/projects/app
+Upper: MARI
+Capital: Mari
+Pink Galaxy Bible</pre></div></div>
+
+<div class="qz"><div class="qz-q">🧪 Given <span class="ic">f="/var/log/syslog.txt"</span>, what does <span class="ic">${f##*/}</span> produce?</div>
+<div class="qopts">
+<button class="qo" onclick="ck(this,true)">syslog.txt (removes everything up to and including the last /)</button>
+<button class="qo" onclick="ck(this,false)">/var/log/syslog (removes .txt)</button>
+<button class="qo" onclick="ck(this,false)">/var/log/ (removes the filename)</button>
+</div><div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 2: Integers & Arithmetic               -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s2"><small>BASH-F02.3 of 7 · ⏱ ~7 min</small></div>
+<h2>BASH-F02.3 — Integers & Arithmetic</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+<button class="tab" onclick="sw(this,'de')">⚙️ Deep</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>Bash does not natively understand decimals (floating-point numbers). It only does whole-number (integer) math. For anything with decimal points, you hand the calculation to an external tool like <span class="ic">bc</span> or Python. Integer math in bash uses the <span class="ic">$(( ))</span> syntax — double parentheses create an arithmetic context where bash temporarily treats strings as numbers.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Arithmetic expansion <span class="ic">$(( expression ))</span> evaluates integer expressions using C-like syntax. It supports <span class="ic">+ - * / % ** ++ -- </span> and comparison operators. The result replaces the <span class="ic">$(( ))</span> in the command line. Inside <span class="ic">(( ))</span>, variable names do not require the <span class="ic">$</span> prefix. The <span class="ic">declare -i</span> attribute marks a variable as integer, making assignments automatically evaluate arithmetic. Division is integer division (truncates); use <span class="ic">bc -l</span> or <span class="ic">awk</span> for floating-point.</p>
+</div>
+<div class="pan de" data-l="de">
+<p>Inside <span class="ic">$(( ))</span>, bash invokes its arithmetic evaluator (file <span class="ic">expr.c</span>), a recursive-descent parser that handles operator precedence identically to C. It calls <span class="ic">atol()</span> (or <span class="ic">strtoimax()</span>) to convert string values to <span class="ic">intmax_t</span> (typically 64-bit signed integer). Overflow is silent — it wraps around like C integer overflow. The <span class="ic">**</span> exponentiation operator uses a simple loop multiplication (not <span class="ic">pow()</span>), so <span class="ic">$((2**63))</span> is exact but <span class="ic">$((2**64))</span> overflows to 0. The result is converted back to a string via <span class="ic">itos()</span> and substituted into the command line as a WORD token.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="c"># ═══ Integer Arithmetic ═══</span>
+
+<span class="v">a</span>=<span class="y">10</span>
+<span class="v">b</span>=<span class="y">3</span>
+
+<span class="c"># Arithmetic expansion $(( ))</span>
+<span class="g">echo</span> <span class="y">"Add: $((a + b))"</span>          <span class="c"># 13</span>
+<span class="g">echo</span> <span class="y">"Sub: $((a - b))"</span>          <span class="c"># 7</span>
+<span class="g">echo</span> <span class="y">"Mul: $((a * b))"</span>          <span class="c"># 30</span>
+<span class="g">echo</span> <span class="y">"Div: $((a / b))"</span>          <span class="c"># 3 (integer division! truncated)</span>
+<span class="g">echo</span> <span class="y">"Mod: $((a % b))"</span>          <span class="c"># 1 (remainder)</span>
+<span class="g">echo</span> <span class="y">"Pow: $((2 ** 10))"</span>        <span class="c"># 1024</span>
+
+<span class="c"># Increment / decrement</span>
+<span class="v">count</span>=<span class="y">0</span>
+<span class="p">((</span>count++<span class="p">))</span>                      <span class="c"># count is now 1</span>
+<span class="p">((</span>count += 5<span class="p">))</span>                   <span class="c"># count is now 6</span>
+<span class="g">echo</span> <span class="y">"Count: $count"</span>            <span class="c"># 6</span>
+
+<span class="c"># Floating point? Use bc or awk</span>
+<span class="v">result</span>=<span class="p">$(</span><span class="g">echo</span> <span class="y">"scale=2; 10/3"</span> | <span class="g">bc</span><span class="p">)</span>
+<span class="g">echo</span> <span class="y">"Float div: $result"</span>       <span class="c"># 3.33</span>
+
+<span class="c"># Or use awk for quick math</span>
+<span class="g">awk</span> <span class="y">'BEGIN{printf "%.2f\n", 10/3}'</span>   <span class="c"># 3.33</span></pre>
+<div class="out"><div class="outl">Expected Output</div><pre>Add: 13
+Sub: 7
+Mul: 30
+Div: 3
+Mod: 1
+Pow: 1024
+Count: 6
+Float div: 3.33
+3.33</pre></div></div>
+
+<div class="qz"><div class="qz-q">🧪 What does <span class="ic">echo $((10 / 3))</span> print?</div>
+<div class="qopts">
+<button class="qo" onclick="ck(this,false)">3.33</button>
+<button class="qo" onclick="ck(this,true)">3 (integer division truncates the decimal)</button>
+<button class="qo" onclick="ck(this,false)">An error because bash doesn't do math</button>
+</div><div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 3: Arrays                              -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s3"><small>BASH-F02.4 of 7 · ⏱ ~10 min</small></div>
+<h2>BASH-F02.4 — Arrays</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+<button class="tab" onclick="sw(this,'de')">⚙️ Deep</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>An array is a list of values stored under one name. Instead of creating <span class="ic">fruit1</span>, <span class="ic">fruit2</span>, <span class="ic">fruit3</span> as separate variables, you create one array called <span class="ic">fruits</span> that holds all of them. You access individual items by their position number (index), starting from 0. Think of an array as a numbered row of mailboxes — mailbox 0, mailbox 1, mailbox 2, etc. — all under the same street name.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Bash supports two array types: indexed arrays (integer keys, zero-based) and associative arrays (string keys, declared with <span class="ic">declare -A</span>). Arrays are sparse — you can set index 0 and index 100 without filling 1-99. <span class="ic">${arr[@]}</span> expands to all elements (each as a separate word when quoted: <span class="ic">"${arr[@]}"</span>). <span class="ic">${#arr[@]}</span> gives the count of set elements. <span class="ic">${!arr[@]}</span> gives the list of indices/keys. Arrays cannot be exported to child processes.</p>
+</div>
+<div class="pan de" data-l="de">
+<p>Bash arrays are implemented as linked lists of <span class="ic">ARRAY_ELEMENT</span> structs (file <span class="ic">array.c</span>), each containing an <span class="ic">arrayind_t</span> index and a <span class="ic">char*</span> value. This means access by index is O(n) in the worst case (linear scan), not O(1) like C arrays. Associative arrays use the same hash table implementation as regular variables. When you write <span class="ic">${arr[5]}</span>, bash walks the linked list comparing each element's index until it finds 5 or reaches the end. For large arrays (1000+ elements), this becomes noticeably slow compared to other languages.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="c"># ═══ Arrays ═══</span>
+
+<span class="c"># Create an indexed array</span>
+<span class="v">tools</span>=(<span class="y">"nmap"</span> <span class="y">"wireshark"</span> <span class="y">"burp"</span> <span class="y">"metasploit"</span> <span class="y">"sqlmap"</span>)
+
+<span class="c"># Access by index (0-based!)</span>
+<span class="g">echo</span> <span class="y">"First:  ${tools[0]}"</span>              <span class="c"># nmap</span>
+<span class="g">echo</span> <span class="y">"Third:  ${tools[2]}"</span>              <span class="c"># burp</span>
+
+<span class="c"># All elements</span>
+<span class="g">echo</span> <span class="y">"All: ${tools[@]}"</span>                 <span class="c"># nmap wireshark burp metasploit sqlmap</span>
+
+<span class="c"># Count</span>
+<span class="g">echo</span> <span class="y">"Count: ${#tools[@]}"</span>              <span class="c"># 5</span>
+
+<span class="c"># Loop through array</span>
+<span class="p">for</span> <span class="v">tool</span> <span class="p">in</span> <span class="y">"${tools[@]}"</span>; <span class="p">do</span>
+    <span class="g">echo</span> <span class="y">"  → $tool"</span>
+<span class="p">done</span>
+
+<span class="c"># Add element</span>
+<span class="v">tools</span>+=(<span class="y">"hashcat"</span>)
+<span class="g">echo</span> <span class="y">"Now: ${#tools[@]} tools"</span>           <span class="c"># 6</span>
+
+<span class="c"># Remove element (leaves a gap)</span>
+<span class="g">unset</span> <span class="y">'tools[2]'</span>                        <span class="c"># removes "burp"</span>
+<span class="g">echo</span> <span class="y">"After unset: ${tools[@]}"</span>          <span class="c"># nmap wireshark metasploit sqlmap hashcat</span>
+
+<span class="c"># ═══ Associative Array (like a dictionary/map) ═══</span>
+<span class="g">declare</span> <span class="o">-A</span> <span class="v">ports</span>
+<span class="v">ports</span>[ssh]=<span class="y">22</span>
+<span class="v">ports</span>[http]=<span class="y">80</span>
+<span class="v">ports</span>[https]=<span class="y">443</span>
+<span class="v">ports</span>[mysql]=<span class="y">3306</span>
+
+<span class="g">echo</span> <span class="y">"SSH runs on port ${ports[ssh]}"</span>     <span class="c"># 22</span>
+<span class="g">echo</span> <span class="y">"All services: ${!ports[@]}"</span>         <span class="c"># ssh http https mysql (keys)</span></pre>
+<div class="out"><div class="outl">Expected Output</div><pre>First:  nmap
+Third:  burp
+All: nmap wireshark burp metasploit sqlmap
+Count: 5
+  → nmap
+  → wireshark
+  → burp
+  → metasploit
+  → sqlmap
+Now: 6 tools
+After unset: nmap wireshark metasploit sqlmap hashcat
+SSH runs on port 22
+All services: ssh http https mysql</pre></div></div>
+
+<div class="qz"><div class="qz-q">🧪 What does <span class="ic">${#arr[@]}</span> return?</div>
+<div class="qopts">
+<button class="qo" onclick="ck(this,false)">The length of the first element</button>
+<button class="qo" onclick="ck(this,true)">The number of elements in the array</button>
+<button class="qo" onclick="ck(this,false)">All array elements joined into one string</button>
+</div><div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 4: Environment Variables               -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s4"><small>BASH-F02.5 of 7 · ⏱ ~8 min</small></div>
+<h2>BASH-F02.5 — Environment Variables</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+<button class="tab" onclick="sw(this,'de')">⚙️ Deep</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>Regular variables live only inside your current shell session — they are private notes on your desk. Environment variables are like notices posted on the office bulletin board: they are visible to every program you launch. When you run a program, it inherits copies of all environment variables. The most important one is <span class="ic">PATH</span> — it tells the shell where to find programs. If you install something and it says "command not found," the first thing to check is whether its location is in your PATH.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Environment variables are shell variables that have been <span class="ic">export</span>-ed. When bash calls <span class="ic">fork()/exec()</span> to run a child process, the kernel copies the parent's environment (an array of <span class="ic">KEY=VALUE</span> strings) into the child's memory space. The child can read these via <span class="ic">getenv()</span> in C or <span class="ic">$VAR</span> in bash, but modifying them in the child does NOT affect the parent (they are copies). Key environment variables: <span class="ic">PATH</span> (executable search path), <span class="ic">HOME</span> (user home directory), <span class="ic">USER</span> (username), <span class="ic">SHELL</span> (default shell), <span class="ic">LANG</span> (locale), <span class="ic">EDITOR</span> (default text editor).</p>
+</div>
+<div class="pan de" data-l="de">
+<p>The environment is passed to child processes through the third argument of <span class="ic">execve()</span>: <span class="ic">execve(path, argv, envp)</span> where <span class="ic">envp</span> is a NULL-terminated array of <span class="ic">char*</span> pointers, each pointing to a string of the form "KEY=VALUE". The kernel copies this array into the new process's stack during exec. In the child, the C library provides <span class="ic">environ</span> (a global <span class="ic">char**</span>) and <span class="ic">getenv()/setenv()/unsetenv()</span> functions. Bash's <span class="ic">export</span> command sets the <span class="ic">att_exported</span> attribute on a <span class="ic">SHELL_VAR</span>; only variables with this attribute are included in the <span class="ic">envp</span> array when fork/exec is called.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="c"># ═══ Environment Variables ═══</span>
+
+<span class="c"># View important environment variables</span>
+<span class="g">echo</span> <span class="y">"User: $USER"</span>
+<span class="g">echo</span> <span class="y">"Home: $HOME"</span>
+<span class="g">echo</span> <span class="y">"Shell: $SHELL"</span>
+<span class="g">echo</span> <span class="y">"Path: $PATH"</span>
+
+<span class="c"># Create a regular variable (NOT inherited by children)</span>
+<span class="v">secret</span>=<span class="y">"local only"</span>
+
+<span class="c"># Export it (NOW inherited by children)</span>
+<span class="g">export</span> <span class="v">MY_APP_ENV</span>=<span class="y">"production"</span>
+
+<span class="c"># One-shot: set env var for ONE command only</span>
+<span class="v">LANG</span>=<span class="y">C</span> <span class="g">sort</span> <span class="b">file.txt</span>           <span class="c"># sort using C locale, just for this command</span>
+
+<span class="c"># See all environment variables</span>
+<span class="g">env</span>                                <span class="c"># or: printenv</span>
+
+<span class="c"># Add to PATH (common in .zshrc/.bashrc)</span>
+<span class="g">export</span> <span class="v">PATH</span>=<span class="y">"$HOME/.local/bin:$PATH"</span>    <span class="c"># prepend your local bin</span></pre>
+<div class="out"><div class="outl">Expected Output</div><pre>User: mari
+Home: /home/mari
+Shell: /bin/zsh
+Path: /home/mari/.local/bin:/usr/local/bin:/usr/bin:/bin</pre></div></div>
+
+<div class="qz"><div class="qz-q">🧪 You set <span class="ic">x=hello</span> in your shell and run a Python script that does <span class="ic">os.environ.get('x')</span>. What does it get?</div>
+<div class="qopts">
+<button class="qo" onclick="ck(this,true)">None — the variable was not exported, so the child process doesn't see it</button>
+<button class="qo" onclick="ck(this,false)">"hello" — all variables are shared</button>
+<button class="qo" onclick="ck(this,false)">An error because Python can't read bash variables</button>
+</div><div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 5: Scope                               -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s5"><small>BASH-F02.6 of 7 · ⏱ ~7 min</small></div>
+<h2>BASH-F02.6 — Scope (local vs export)</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>Variable scope is about who can see a variable. There are three levels. A <strong>local variable</strong> (inside a function with <span class="ic">local</span>) is like a whispered secret — only the function that created it can hear it. A <strong>shell variable</strong> (created at the top level without <span class="ic">export</span>) is like talking in a room — everyone in the same shell session hears it, but nobody in other rooms. An <strong>environment variable</strong> (<span class="ic">export</span>-ed) is like a posted announcement — every new program you launch gets a copy of it. But here is the key rule: children can read the announcement, but they cannot change the parent's copy. Changes only flow downward, never upward.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Functions in bash do NOT have local scope by default — variables set inside a function are global to the shell. You must explicitly declare <span class="ic">local varname</span> inside a function to create function-local scope. This is a common source of bugs: a function accidentally overwrites a global variable. Best practice: always use <span class="ic">local</span> for every variable inside functions. Subshells (commands in parentheses or pipes) get copies of all variables but changes do not propagate back to the parent. This is because subshells are forked processes with their own memory space.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="c"># ═══ Scope Demonstration ═══</span>
+
+<span class="v">global_var</span>=<span class="y">"I'm global"</span>
+
+<span class="p">function</span> <span class="g">demo</span>() {
+    <span class="g">local</span> <span class="v">local_var</span>=<span class="y">"I'm local to demo()"</span>
+    <span class="v">leaked_var</span>=<span class="y">"I leaked! (no 'local' keyword)"</span>
+    <span class="g">echo</span> <span class="y">"Inside: global=$global_var"</span>
+    <span class="g">echo</span> <span class="y">"Inside: local=$local_var"</span>
+}
+
+<span class="g">demo</span>
+<span class="g">echo</span> <span class="y">"Outside: global=$global_var"</span>         <span class="c"># ✓ works</span>
+<span class="g">echo</span> <span class="y">"Outside: local=$local_var"</span>           <span class="c"># ✗ empty (local to function)</span>
+<span class="g">echo</span> <span class="y">"Outside: leaked=$leaked_var"</span>         <span class="c"># ⚠ works! (this is a bug)</span></pre>
+<div class="out"><div class="outl">Expected Output</div><pre>Inside: global=I'm global
+Inside: local=I'm local to demo()
+Outside: global=I'm global
+Outside: local=
+Outside: leaked=I leaked! (no 'local' keyword)</pre></div></div>
+
+<div class="cm">
+<div class="cm-do"><b>✅ Best practice:</b><p>Always use <span class="ic">local</span> inside functions. Always <span class="ic">export</span> variables that child processes need. Use <span class="ic">readonly</span> for constants that should never change.</p></div>
+<div class="cm-x"><b>❌ The leaked variable bug:</b><p>Forgetting <span class="ic">local</span> inside a function silently creates/overwrites a global variable. In a 200-line script with 20 functions, this creates impossible-to-debug race conditions where function A's variable gets clobbered by function B.</p></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 6: Practice                            -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s6"><small>BASH-F02.7 of 7 · ⏱ ~12 min</small></div>
+<h2>BASH-F02.7 — Practice Exercises</h2>
+
+<h3>Exercise 1 (Easy)</h3>
+<p>Write a script that stores your name, the current date (using <span class="ic">$(date)</span>), and the number of files in the current directory (using <span class="ic">$(ls | wc -l)</span>) in variables, then prints a formatted greeting.</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">solution</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="v">name</span>=<span class="y">"Mari"</span>
+<span class="v">today</span>=<span class="p">$(</span><span class="g">date</span> <span class="o">+"%A, %B %d"</span><span class="p">)</span>
+<span class="v">files</span>=<span class="p">$(</span><span class="g">ls</span> | <span class="g">wc</span> <span class="o">-l</span><span class="p">)</span>
+<span class="g">echo</span> <span class="y">"Hello $name! Today is $today. You have $files files here."</span></pre>
+<div class="out"><div class="outl">Output</div><pre>Hello Mari! Today is Saturday, March 15. You have 12 files here.</pre></div></div>
+
+<h3>Exercise 2 (Medium)</h3>
+<p>Create an associative array mapping 5 BlackArch tool names to their categories (e.g., nmap→scanner, burpsuite→webapp). Loop through the array and print each tool with its category in a formatted table.</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">solution</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="g">declare</span> <span class="o">-A</span> <span class="v">tools</span>
+<span class="v">tools</span>[nmap]=<span class="y">"scanner"</span>
+<span class="v">tools</span>[burpsuite]=<span class="y">"webapp"</span>
+<span class="v">tools</span>[metasploit]=<span class="y">"exploit"</span>
+<span class="v">tools</span>[hashcat]=<span class="y">"crypto"</span>
+<span class="v">tools</span>[wireshark]=<span class="y">"network"</span>
+
+<span class="g">printf</span> <span class="y">"%-15s %s\n"</span> <span class="y">"TOOL"</span> <span class="y">"CATEGORY"</span>
+<span class="g">printf</span> <span class="y">"%-15s %s\n"</span> <span class="y">"────"</span> <span class="y">"────────"</span>
+<span class="p">for</span> <span class="v">tool</span> <span class="p">in</span> <span class="y">"${!tools[@]}"</span>; <span class="p">do</span>
+    <span class="g">printf</span> <span class="y">"%-15s %s\n"</span> <span class="y">"$tool"</span> <span class="y">"${tools[$tool]}"</span>
+<span class="p">done</span></pre>
+<div class="out"><div class="outl">Output</div><pre>TOOL            CATEGORY
+────            ────────
+nmap            scanner
+burpsuite       webapp
+metasploit      exploit
+hashcat         crypto
+wireshark       network</pre></div></div>
+
+<h3>Exercise 3 (Hard)</h3>
+<p>Write a script that takes a file path as an argument, extracts the directory, filename, and extension into separate variables using parameter expansion (no external commands like <span class="ic">basename</span> or <span class="ic">dirname</span>), and prints all three.</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">solution</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="v">path</span>=<span class="y">"${1:?Usage: $0 &lt;filepath&gt;}"</span>    <span class="c"># exit with message if no argument</span>
+
+<span class="v">dir</span>=<span class="y">"${path%/*}"</span>                       <span class="c"># remove everything after last /</span>
+<span class="v">filename</span>=<span class="y">"${path##*/}"</span>                 <span class="c"># remove everything before last /</span>
+<span class="v">name</span>=<span class="y">"${filename%.*}"</span>                  <span class="c"># remove extension</span>
+<span class="v">ext</span>=<span class="y">"${filename##*.}"</span>                  <span class="c"># keep only extension</span>
+
+<span class="g">echo</span> <span class="y">"Full path:  $path"</span>
+<span class="g">echo</span> <span class="y">"Directory:  $dir"</span>
+<span class="g">echo</span> <span class="y">"Filename:   $filename"</span>
+<span class="g">echo</span> <span class="y">"Name only:  $name"</span>
+<span class="g">echo</span> <span class="y">"Extension:  $ext"</span></pre>
+<div class="out"><div class="outl">Output (with ./pathsplit.sh /home/mari/projects/app.py)</div><pre>Full path:  /home/mari/projects/app.py
+Directory:  /home/mari/projects
+Filename:   app.py
+Name only:  app
+Extension:  py</pre></div></div>
+
+<div class="note">
+<b>🌸 Module Complete!</b> You now understand bash variables: assignment rules, string operations, integer arithmetic, indexed and associative arrays, environment variables, and scope. These are the building blocks used in every single script you will ever write. Next module: BASH-F03 (Quoting & Expansion) — the rules that determine how bash interprets your text before executing it.
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          INTEGRATION INSTRUCTIONS                       -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd"><small>INTEGRATION GUIDE</small></div>
+<h2>How to Integrate into the Platform Shell</h2>
+
+<div class="note gn">
+<b>Method 1 (Quick):</b> In the platform shell's <span class="ic">&lt;script&gt;</span> section, find the <span class="ic">openMod</span> function. Where it calls <span class="ic">buildPlaceholder()</span> for BASH-F02, replace with the corresponding <span class="ic">buildBASHF02_SX()</span> function that returns the HTML for that section. Copy the HTML content from each section above into a JavaScript function that returns the string.
+
+<b>Method 2 (Recommended):</b> In your next conversation, paste this prompt:
+"I have Brick 2 (BASH-F02 complete content). Please integrate it into my pink_galaxy_platform_v3.html by adding the content functions for all 7 sections of BASH-F02."
+
+This keeps the platform shell growing with each brick, and the AI will do the integration for you.
+</div>
+
+</div><!-- end .w -->
+
+<div class="sf"><button onclick="saveAll()">💾 Save Brick 2</button></div>
+
+<script>
+function sw(btn,lv){const p=btn.closest('.w').querySelectorAll?btn.parentElement.nextElementSibling:null;let el=btn.parentElement.nextElementSibling;while(el&&!el.classList.contains('sd')&&!el.classList.contains('qz')&&!el.classList.contains('cm')&&!el.classList.contains('cw')){if(el.classList.contains('pan')){el.classList.toggle('on',el.dataset.l===lv);}el=el.nextElementSibling;}btn.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');}
+function ck(btn,ok){const box=btn.closest('.qz');box.querySelectorAll('.qo').forEach(o=>o.disabled=true);btn.classList.add(ok?'y':'n');const fb=box.querySelector('.qfb');fb.classList.add('s');fb.className=ok?'qfb s w':'qfb s l';fb.textContent=ok?'✓ Correct! +10 XP':'✗ Review the section above.';}
+function cpC(b){const pre=b.closest('.cw').querySelector('pre');navigator.clipboard.writeText(pre.textContent).then(()=>{b.textContent='✓';setTimeout(()=>b.textContent='Copy',1500);});}
+function saveAll(){const blob=new Blob(['<!DOCTYPE html>\n'+document.documentElement.outerHTML],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='brick2_BASHF02_variables_'+new Date().toISOString().slice(0,10)+'.html';a.click();}
+</script>
+</body>
+</html>

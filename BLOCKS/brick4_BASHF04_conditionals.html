@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧱 Brick 4 — BASH-F04: Conditionals (if, case, test)</title>
+<style>
+:root{--p:#e91e63;--pl:#f8bbd0;--g:#2e7d32;--gl:#a5d6a7;--bg:#0a0a12;--s2:#1a1a2e;--tx:#e8e6f0;--t2:#a8a6b8;--mt:#6c6a7e;--bd:rgba(233,30,99,.18);--bdg:rgba(46,125,50,.2);--purple:#9c27b0;--mono:"Courier New",monospace;--dn:#ff5252;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Calibri,"Segoe UI",sans-serif;background:var(--bg);color:var(--tx);font-size:11pt;line-height:1.65;padding:20px;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 20% 50%,rgba(233,30,99,.05),transparent 50%);}
+.w{max-width:900px;margin:0 auto;position:relative;z-index:1;}
+h1{color:var(--p);font-size:20pt;margin:30px 0 12px;border-bottom:2px solid var(--p);padding-bottom:8px;}
+h2{color:var(--g);font-size:15pt;margin:28px 0 10px;border-left:4px solid var(--g);padding-left:12px;}
+h3{color:var(--p);font-size:12pt;margin:20px 0 8px;}
+p{margin:8px 0;text-align:justify;}
+.ic{font-family:var(--mono);font-size:9pt;background:rgba(233,30,99,.08);padding:1px 5px;border-radius:3px;color:var(--pl);}
+.note{background:var(--s2);border-left:3px solid var(--p);padding:12px;border-radius:0 8px 8px 0;margin:14px 0;font-size:9.5pt;}.note b{color:var(--p);}.note.gn{border-left-color:var(--g);}.note.gn b{color:var(--gl);}
+.tabs{display:flex;gap:2px;margin:14px 0 6px;}
+.tab{padding:5px 12px;border-radius:6px 6px 0 0;border:1px solid transparent;background:none;color:var(--mt);cursor:pointer;font-size:8.5pt;font-family:inherit;}.tab.on{background:var(--s2);color:var(--p);border-color:var(--bd);border-bottom-color:var(--s2);}
+.pan{display:none;background:var(--s2);border:1px solid var(--bd);border-radius:0 8px 8px 8px;padding:14px;font-size:10pt;}.pan.on{display:block;}.pan.si{border-left:3px solid var(--gl);}.pan.te{border-left:3px solid var(--p);}.pan.de{border-left:3px solid var(--purple);}
+.cw{margin:10px 0;border:1px solid var(--bdg);border-radius:8px;overflow:hidden;background:#10101c;}
+.cwt{display:flex;justify-content:space-between;align-items:center;padding:3px 10px;background:rgba(46,125,50,.1);border-bottom:1px solid var(--bdg);font-size:7pt;}
+.cwl{color:var(--g);font-family:var(--mono);font-weight:bold;text-transform:uppercase;letter-spacing:1px;}
+.cwb{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--t2);padding:2px 7px;border-radius:4px;cursor:pointer;font-size:7pt;font-family:var(--mono);}.cwb:hover{background:var(--p);color:#fff;}
+pre{font-family:var(--mono);font-size:9.5pt;padding:10px;overflow-x:auto;white-space:pre;line-height:1.5;margin:0;color:var(--tx);background:#10101c;}
+pre .c{color:#555;font-style:italic;}pre .g{color:#a5d6a7;}pre .y{color:#fff59d;}pre .b{color:#90caf9;}pre .o{color:#ffcc80;}pre .p{color:#f48fb1;}pre .v{color:#ce93d8;}pre .k{color:#80cbc4;}
+.out{background:rgba(46,125,50,.05);border-top:2px solid var(--g);padding:6px 10px;font-family:var(--mono);font-size:8.5pt;color:#a5d6a7;}
+.outl{color:var(--g);font-weight:bold;font-size:7pt;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;}
+.cm{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;}.cm>div{border-radius:8px;padding:10px;font-size:9pt;}
+.cm-do{background:rgba(46,125,50,.05);border:1px solid var(--bdg);}.cm-do b{color:var(--gl);}
+.cm-x{background:rgba(233,30,99,.04);border:1px solid var(--bd);}.cm-x b{color:var(--pl);}
+.cm p{margin:3px 0;color:var(--t2);}
+.qz{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:12px;margin:12px 0;}.qz-q{color:var(--tx);font-size:10pt;margin-bottom:8px;}
+.qo{padding:7px 12px;border:1px solid var(--bd);border-radius:8px;cursor:pointer;font-size:9pt;color:var(--t2);background:none;font-family:inherit;width:100%;text-align:left;transition:all .15s;display:block;margin-bottom:5px;}.qo:hover:not(:disabled){border-color:var(--p);color:var(--pl);}.qo.y{border-color:var(--g);background:rgba(46,125,50,.1);color:var(--gl);}.qo.n{border-color:var(--dn);background:rgba(255,82,82,.06);color:var(--dn);}
+.qfb{margin-top:6px;font-size:9pt;padding:8px;border-radius:6px;display:none;}.qfb.s{display:block;}.qfb.w{background:rgba(46,125,50,.08);color:var(--gl);border:1px solid var(--bdg);}.qfb.l{background:rgba(255,82,82,.05);color:var(--dn);border:1px solid rgba(255,82,82,.15);}
+.sd{margin:40px 0 0;padding:16px 0 8px;border-top:1px solid rgba(233,30,99,.1);}.sd small{color:var(--mt);font-size:8pt;text-transform:uppercase;letter-spacing:2px;}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:9.5pt;}
+th{background:rgba(233,30,99,.1);color:var(--pl);padding:8px 10px;text-align:left;border-bottom:2px solid var(--p);}
+td{padding:6px 10px;border-bottom:1px solid var(--bd);color:var(--t2);}
+td code{font-family:var(--mono);font-size:9pt;color:var(--pl);background:rgba(233,30,99,.06);padding:1px 4px;border-radius:2px;}
+.sf{position:fixed;bottom:14px;right:14px;z-index:9999;}.sf button{padding:8px 16px;background:var(--g);color:#fff;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(0,0,0,.3);}
+.cover{text-align:center;padding:30px;margin-bottom:20px;background:linear-gradient(135deg,#1a0533,#0d1b2a);border:2px solid var(--g);border-radius:14px;}.cover h1{border:none;color:var(--gl);font-size:16pt;margin:0;}.cover p{color:var(--t2);font-size:10pt;}
+@media print{body{background:#fff;color:#333;}h1{color:#e91e63!important;}h2{color:#2e7d32!important;}pre{background:#f5f5f5!important;color:#333;}.sf{display:none;}@page{size:A4;margin:1.5cm 1cm;}}
+</style>
+</head>
+<body>
+<div class="w">
+
+<div class="cover">
+<h1>🧱 Brick 4 — BASH-F04: Conditionals</h1>
+<p>Making your scripts make decisions: if, elif, else, case, test, and logical operators</p>
+<p style="font-size:8pt;color:var(--mt);margin-top:6px;">6 sections · 3 explanation levels · Complete with quizzes and exercises</p>
+</div>
+
+<div class="note">
+<b>🎯 Why this matters:</b> Without conditionals, a script is just a list of commands that always does the same thing. With conditionals, your script becomes intelligent — it checks conditions, makes decisions, handles errors, validates input, and adapts to its environment. Every useful script you will ever write uses conditionals.
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 1: if / elif / else                    -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s0"><small>BASH-F04.1 of 6 · ⏱ ~10 min</small></div>
+<h2>BASH-F04.1 — if / elif / else</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+<button class="tab" onclick="sw(this,'de')">⚙️ Deep</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>An <span class="ic">if</span> statement is your script asking a yes/no question. "Is this file readable? If yes, open it. If no, print an error." The structure is always the same: <span class="ic">if</span> condition; <span class="ic">then</span> do-something; <span class="ic">fi</span> (which is "if" spelled backwards — that is how bash marks the end of the block). You can chain multiple questions with <span class="ic">elif</span> (else-if) and provide a fallback with <span class="ic">else</span>.</p>
+<p>The critical thing to understand is that bash does not check whether something is "true" or "false" in the way Python or JavaScript do. Instead, bash checks the <strong>exit code</strong> of the command after <span class="ic">if</span>. Exit code 0 means success (treated as "true"), and any non-zero exit code means failure (treated as "false"). This is the opposite of most programming languages where 0 is false!</p>
+</div>
+<div class="pan te" data-l="te">
+<p>The <span class="ic">if</span> statement evaluates the exit status of a command list. Syntax: <span class="ic">if command-list; then consequent-list; [elif command-list; then consequent-list;]... [else alternate-list;] fi</span>. The command after <span class="ic">if</span> can be any command — a test expression (<span class="ic">[ ]</span> or <span class="ic">[[ ]]</span>), a direct command (<span class="ic">grep -q</span>), a pipeline, or a compound command. If the command exits with status 0, the <span class="ic">then</span> block executes. If it exits non-zero, bash tries the next <span class="ic">elif</span> or falls through to <span class="ic">else</span>. The exit status of the entire <span class="ic">if</span> construct is the exit status of the last command executed within it.</p>
+</div>
+<div class="pan de" data-l="de">
+<p>When bash parses an <span class="ic">if</span> statement, it creates an internal <span class="ic">IF_COM</span> structure (file <span class="ic">command.h</span>) containing three lists: the test-command list, the true-branch list, and the false-branch list. Execution (<span class="ic">execute_if_command()</span> in <span class="ic">execute_cmd.c</span>) runs the test command(s) via <span class="ic">execute_command()</span>, captures the exit status in the global <span class="ic">last_command_exit_value</span>, and branches accordingly. The <span class="ic">[ ]</span> syntax is actually calling <span class="ic">/usr/bin/[</span> (or the bash builtin <span class="ic">test</span>), which evaluates its arguments as a conditional expression and exits 0 (true) or 1 (false). The <span class="ic">[[ ]]</span> syntax is a bash keyword parsed at compile time, enabling features like regex matching (<span class="ic">=~</span>) and pattern matching without word splitting.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="c"># ═══ Basic if / elif / else ═══</span>
+
+<span class="v">age</span>=<span class="y">25</span>
+
+<span class="k">if</span> [[ <span class="v">$age</span> <span class="o">-ge</span> <span class="y">18</span> ]]; <span class="k">then</span>
+    <span class="g">echo</span> <span class="y">"Adult (age $age)"</span>
+<span class="k">elif</span> [[ <span class="v">$age</span> <span class="o">-ge</span> <span class="y">13</span> ]]; <span class="k">then</span>
+    <span class="g">echo</span> <span class="y">"Teenager"</span>
+<span class="k">else</span>
+    <span class="g">echo</span> <span class="y">"Child"</span>
+<span class="k">fi</span>
+
+<span class="c"># ═══ Using a command directly as the condition ═══</span>
+<span class="c"># grep -q returns exit code 0 if pattern found, 1 if not</span>
+
+<span class="k">if</span> <span class="g">grep</span> <span class="o">-q</span> <span class="y">"error"</span> <span class="b">/var/log/syslog</span> 2>/dev/null; <span class="k">then</span>
+    <span class="g">echo</span> <span class="y">"⚠️ Errors found in syslog"</span>
+<span class="k">else</span>
+    <span class="g">echo</span> <span class="y">"✓ No errors in syslog"</span>
+<span class="k">fi</span>
+
+<span class="c"># ═══ Check if a command exists ═══</span>
+<span class="k">if</span> <span class="g">command</span> <span class="o">-v</span> <span class="y">docker</span> &>/dev/null; <span class="k">then</span>
+    <span class="g">echo</span> <span class="y">"Docker is installed: $(docker --version)"</span>
+<span class="k">else</span>
+    <span class="g">echo</span> <span class="y">"Docker is NOT installed"</span>
+<span class="k">fi</span>
+
+<span class="c"># ═══ File existence check ═══</span>
+<span class="v">config</span>=<span class="y">"/etc/pacman.conf"</span>
+<span class="k">if</span> [[ <span class="o">-f</span> <span class="y">"$config"</span> ]]; <span class="k">then</span>
+    <span class="g">echo</span> <span class="y">"Config found: $(wc -l < "$config") lines"</span>
+<span class="k">else</span>
+    <span class="g">echo</span> <span class="y">"Config not found!"</span>
+<span class="k">fi</span></pre>
+<div class="out"><div class="outl">Expected Output</div><pre>Adult (age 25)
+✓ No errors in syslog
+Docker is installed: Docker version 26.x.x
+Config found: 42 lines</pre></div></div>
+
+<div class="cm">
+<div class="cm-do"><b>✅ Key insight:</b><p>The condition after <span class="ic">if</span> is not a boolean expression — it is a command. Bash runs that command and checks its exit code. This means you can use ANY command as a condition: <span class="ic">grep</span>, <span class="ic">ping</span>, <span class="ic">curl</span>, your own scripts. Exit 0 = true, anything else = false.</p></div>
+<div class="cm-x"><b>❌ Common mistake:</b><p>Forgetting the semicolon before <span class="ic">then</span> when writing on one line (<span class="ic">if [[ ... ]]; then</span>). Or forgetting <span class="ic">fi</span> at the end. Or using <span class="ic">=</span> for numeric comparison instead of <span class="ic">-eq</span> (they are different — see Section 2).</p></div>
+</div>
+
+<div class="qz"><div class="qz-q">🧪 In bash, what does "true" mean for an <span class="ic">if</span> condition?</div>
+<div class="qo" onclick="ck(this,false)">The value is non-zero (like Python)</div>
+<div class="qo" onclick="ck(this,true)">The command exits with code 0 (success = true, which is the opposite of most languages)</div>
+<div class="qo" onclick="ck(this,false)">The string equals "true"</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 2: test, [ ], and operators            -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s1"><small>BASH-F04.2 of 6 · ⏱ ~10 min</small></div>
+<h2>BASH-F04.2 — test, [ ], and Comparison Operators</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>The square brackets <span class="ic">[ condition ]</span> are not special syntax — they are literally a command called <span class="ic">test</span> (or <span class="ic">[</span>, which requires a closing <span class="ic">]</span>). This means the spaces inside are mandatory: <span class="ic">[ "$x" = "hello" ]</span> works, but <span class="ic">["$x"="hello"]</span> fails because bash thinks you are trying to run a program called <span class="ic">["hello"="hello"]</span>. Think of the brackets as a program that evaluates conditions and reports back with an exit code.</p>
+<p>There are two separate systems for comparisons: string operators and integer operators. Using the wrong one gives wrong results. String comparison uses <span class="ic">=</span> and <span class="ic">!=</span>. Integer comparison uses <span class="ic">-eq</span>, <span class="ic">-ne</span>, <span class="ic">-lt</span>, <span class="ic">-gt</span>, <span class="ic">-le</span>, <span class="ic">-ge</span>. These stand for "equal", "not equal", "less than", "greater than", "less or equal", "greater or equal".</p>
+</div>
+<div class="pan te" data-l="te">
+<p>The <span class="ic">test</span> builtin and <span class="ic">[</span> are synonymous (<span class="ic">[</span> is a builtin that requires its last argument to be <span class="ic">]</span>). They support three categories of tests: file tests (<span class="ic">-f</span>, <span class="ic">-d</span>, <span class="ic">-r</span>, <span class="ic">-w</span>, <span class="ic">-x</span>, <span class="ic">-e</span>, <span class="ic">-s</span>, <span class="ic">-L</span>), string tests (<span class="ic">=</span>, <span class="ic">!=</span>, <span class="ic">-z</span> empty, <span class="ic">-n</span> non-empty), and integer tests (<span class="ic">-eq</span>, <span class="ic">-ne</span>, <span class="ic">-lt</span>, <span class="ic">-gt</span>, <span class="ic">-le</span>, <span class="ic">-ge</span>). Word splitting and glob expansion apply inside <span class="ic">[ ]</span>, so always quote variables: <span class="ic">[ "$var" = "value" ]</span>. An unquoted empty variable causes a syntax error because the token disappears after expansion.</p>
+</div>
+
+<table>
+<tr><th colspan="2">File Tests</th><th colspan="2">String Tests</th><th colspan="2">Integer Tests</th></tr>
+<tr><td><code>-f file</code></td><td>is regular file?</td><td><code>"$a" = "$b"</code></td><td>strings equal?</td><td><code>$a -eq $b</code></td><td>equal?</td></tr>
+<tr><td><code>-d dir</code></td><td>is directory?</td><td><code>"$a" != "$b"</code></td><td>strings differ?</td><td><code>$a -ne $b</code></td><td>not equal?</td></tr>
+<tr><td><code>-e path</code></td><td>exists?</td><td><code>-z "$a"</code></td><td>is empty?</td><td><code>$a -lt $b</code></td><td>less than?</td></tr>
+<tr><td><code>-r file</code></td><td>is readable?</td><td><code>-n "$a"</code></td><td>is non-empty?</td><td><code>$a -gt $b</code></td><td>greater than?</td></tr>
+<tr><td><code>-w file</code></td><td>is writable?</td><td></td><td></td><td><code>$a -le $b</code></td><td>less or equal?</td></tr>
+<tr><td><code>-x file</code></td><td>is executable?</td><td></td><td></td><td><code>$a -ge $b</code></td><td>greater or equal?</td></tr>
+<tr><td><code>-s file</code></td><td>non-zero size?</td><td></td><td></td><td></td><td></td></tr>
+<tr><td><code>-L file</code></td><td>is symlink?</td><td></td><td></td><td></td><td></td></tr>
+</table>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="c"># ═══ Comparison Operators in Practice ═══</span>
+
+<span class="c"># String comparison</span>
+<span class="v">lang</span>=<span class="y">"python"</span>
+<span class="k">if</span> [ <span class="y">"$lang"</span> = <span class="y">"python"</span> ]; <span class="k">then</span>
+    <span class="g">echo</span> <span class="y">"🐍 Python detected"</span>
+<span class="k">fi</span>
+
+<span class="c"># Integer comparison</span>
+<span class="v">count</span>=<span class="y">42</span>
+<span class="k">if</span> [ <span class="y">"$count"</span> <span class="o">-gt</span> <span class="y">10</span> ]; <span class="k">then</span>
+    <span class="g">echo</span> <span class="y">"Count ($count) is greater than 10"</span>
+<span class="k">fi</span>
+
+<span class="c"># ⚠️ THE TRAP: = vs -eq</span>
+<span class="v">a</span>=<span class="y">"10"</span>
+<span class="v">b</span>=<span class="y">"9"</span>
+<span class="c"># String comparison: "10" &lt; "9" because "1" comes before "9" alphabetically!</span>
+<span class="k">if</span> [ <span class="y">"$a"</span> \> <span class="y">"$b"</span> ]; <span class="k">then</span> <span class="g">echo</span> <span class="y">"string: $a > $b"</span>; <span class="k">else</span> <span class="g">echo</span> <span class="y">"string: $a NOT > $b"</span>; <span class="k">fi</span>
+<span class="c"># Integer comparison: 10 > 9 numerically</span>
+<span class="k">if</span> [ <span class="y">"$a"</span> <span class="o">-gt</span> <span class="y">"$b"</span> ]; <span class="k">then</span> <span class="g">echo</span> <span class="y">"integer: $a > $b"</span>; <span class="k">else</span> <span class="g">echo</span> <span class="y">"integer: $a NOT > $b"</span>; <span class="k">fi</span>
+
+<span class="c"># File tests</span>
+<span class="k">if</span> [ <span class="o">-f</span> <span class="b">~/.zshrc</span> ] && [ <span class="o">-r</span> <span class="b">~/.zshrc</span> ]; <span class="k">then</span>
+    <span class="g">echo</span> <span class="y">"~/.zshrc exists and is readable"</span>
+<span class="k">fi</span>
+
+<span class="c"># Empty/non-empty string</span>
+<span class="v">name</span>=<span class="y">""</span>
+<span class="k">if</span> [ <span class="o">-z</span> <span class="y">"$name"</span> ]; <span class="k">then</span>
+    <span class="g">echo</span> <span class="y">"Name is empty!"</span>
+<span class="k">fi</span></pre>
+<div class="out"><div class="outl">Expected Output</div><pre>🐍 Python detected
+Count (42) is greater than 10
+string: 10 NOT > 9
+integer: 10 > 9
+~/.zshrc exists and is readable
+Name is empty!</pre></div></div>
+
+<div class="qz"><div class="qz-q">🧪 What is the result of <span class="ic">[ "10" \> "9" ]</span> using string comparison?</div>
+<div class="qo" onclick="ck(this,true)">False — because "1" comes before "9" in ASCII/dictionary order, "10" is considered less than "9" as a string</div>
+<div class="qo" onclick="ck(this,false)">True — because 10 is greater than 9</div>
+<div class="qo" onclick="ck(this,false)">Error — you can't compare numbers with string operators</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 3: [[ ]] vs [ ]                        -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s2"><small>BASH-F04.3 of 6 · ⏱ ~8 min</small></div>
+<h2>BASH-F04.3 — [[ ]] vs [ ] — Why Double Brackets Are Better</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>Bash has two versions of the test command: the old <span class="ic">[ ]</span> (POSIX-compatible, works in any shell) and the modern <span class="ic">[[ ]]</span> (bash-specific, much safer). Think of <span class="ic">[ ]</span> as a bicycle and <span class="ic">[[ ]]</span> as a car — both get you there, but the car has seatbelts (no word splitting on unquoted variables), airbags (no glob expansion inside), and cruise control (supports regex matching with <span class="ic">=~</span> and pattern matching with <span class="ic">==</span> globs). Since you are writing bash scripts (not POSIX sh), always use <span class="ic">[[ ]]</span>.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Key differences: (1) <span class="ic">[[ ]]</span> does not perform word splitting or pathname expansion on variables, so <span class="ic">[[ $var = "hello" ]]</span> is safe even without quoting (though quoting is still recommended by convention). (2) <span class="ic">[[ ]]</span> supports <span class="ic">&&</span> and <span class="ic">||</span> for logical operators inside the brackets (instead of <span class="ic">-a</span> and <span class="ic">-o</span>). (3) <span class="ic">[[ ]]</span> supports regex matching: <span class="ic">[[ "$str" =~ ^[0-9]+$ ]]</span>. (4) <span class="ic">[[ ]]</span> supports glob patterns on the right side of <span class="ic">==</span>: <span class="ic">[[ "$file" == *.py ]]</span>. (5) <span class="ic">[[ ]]</span> uses <span class="ic"><</span> and <span class="ic">></span> for string comparison without escaping. Use <span class="ic">[[ ]]</span> for all bash scripts; use <span class="ic">[ ]</span> only when writing POSIX sh scripts.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="c"># ═══ [[ ]] Superpowers ═══</span>
+
+<span class="c"># Pattern matching (glob)</span>
+<span class="v">file</span>=<span class="y">"deploy_v2.py"</span>
+<span class="k">if</span> [[ <span class="y">"$file"</span> == <span class="y">*.py</span> ]]; <span class="k">then</span>
+    <span class="g">echo</span> <span class="y">"$file is a Python file"</span>
+<span class="k">fi</span>
+
+<span class="c"># Regex matching</span>
+<span class="v">email</span>=<span class="y">"mari@galaxy.dev"</span>
+<span class="k">if</span> [[ <span class="y">"$email"</span> =~ ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ ]]; <span class="k">then</span>
+    <span class="g">echo</span> <span class="y">"$email looks like a valid email"</span>
+<span class="k">fi</span>
+
+<span class="c"># Logical operators INSIDE the brackets</span>
+<span class="v">age</span>=<span class="y">25</span>
+<span class="v">name</span>=<span class="y">"Mari"</span>
+<span class="k">if</span> [[ <span class="y">"$age"</span> <span class="o">-ge</span> <span class="y">18</span> && <span class="y">"$name"</span> == <span class="y">"Mari"</span> ]]; <span class="k">then</span>
+    <span class="g">echo</span> <span class="y">"Welcome, adult Mari!"</span>
+<span class="k">fi</span>
+
+<span class="c"># Safe with empty variables (no quotes needed, but recommended)</span>
+<span class="v">empty</span>=<span class="y">""</span>
+<span class="k">if</span> [[ <span class="o">-z</span> <span class="v">$empty</span> ]]; <span class="k">then</span>     <span class="c"># works fine even without quotes in [[ ]]</span>
+    <span class="g">echo</span> <span class="y">"Empty variable handled safely"</span>
+<span class="k">fi</span>
+
+<span class="c"># Check if a string is a number</span>
+<span class="v">input</span>=<span class="y">"42"</span>
+<span class="k">if</span> [[ <span class="y">"$input"</span> =~ ^[0-9]+$ ]]; <span class="k">then</span>
+    <span class="g">echo</span> <span class="y">"'$input' is a valid number"</span>
+<span class="k">fi</span></pre>
+<div class="out"><div class="outl">Expected Output</div><pre>deploy_v2.py is a Python file
+mari@galaxy.dev looks like a valid email
+Welcome, adult Mari!
+Empty variable handled safely
+'42' is a valid number</pre></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 4: case                                -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s3"><small>BASH-F04.4 of 6 · ⏱ ~8 min</small></div>
+<h2>BASH-F04.4 — case Statements (Pattern Matching Switch)</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>A <span class="ic">case</span> statement is like a multi-way switch. Instead of writing a long chain of <span class="ic">if/elif/elif/elif</span> checking the same variable against different values, you use <span class="ic">case</span> which is cleaner and faster to read. It is especially useful for handling command-line arguments, user menu choices, and file type detection. Each pattern ends with <span class="ic">)</span> and the block ends with <span class="ic">;;</span> (double semicolon).</p>
+</div>
+<div class="pan te" data-l="te">
+<p>The <span class="ic">case</span> statement performs pattern matching (glob-style, not regex) against the value of a word. Patterns can use <span class="ic">*</span> (match anything), <span class="ic">?</span> (match one character), <span class="ic">[...]</span> (character classes), and <span class="ic">|</span> (OR between patterns). The <span class="ic">*)</span> catch-all pattern at the end acts as a default. The <span class="ic">;;&</span> terminator (instead of <span class="ic">;;</span>) enables fall-through testing of subsequent patterns (like C's switch without break). This is a bash 4.0+ feature.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="c"># ═══ case Statement ═══</span>
+
+<span class="c"># Handle script arguments</span>
+<span class="v">action</span>=<span class="y">"${1:-help}"</span>    <span class="c"># default to "help" if no argument</span>
+
+<span class="k">case</span> <span class="y">"$action"</span> <span class="k">in</span>
+    start|run)
+        <span class="g">echo</span> <span class="y">"🚀 Starting service..."</span>
+        ;;
+    stop)
+        <span class="g">echo</span> <span class="y">"🛑 Stopping service..."</span>
+        ;;
+    restart)
+        <span class="g">echo</span> <span class="y">"🔄 Restarting..."</span>
+        ;;
+    status|info)
+        <span class="g">echo</span> <span class="y">"ℹ️ Service is running"</span>
+        ;;
+    help|--help|-h)
+        <span class="g">echo</span> <span class="y">"Usage: $0 {start|stop|restart|status|help}"</span>
+        ;;
+    *)
+        <span class="g">echo</span> <span class="y">"❌ Unknown action: $action"</span> >&2
+        <span class="g">exit</span> <span class="y">1</span>
+        ;;
+<span class="k">esac</span>
+
+<span class="c"># ═══ File type detection ═══</span>
+<span class="v">file</span>=<span class="y">"photo.jpg"</span>
+<span class="k">case</span> <span class="y">"$file"</span> <span class="k">in</span>
+    *.py)           <span class="g">echo</span> <span class="y">"Python script"</span> ;;
+    *.sh|*.bash)    <span class="g">echo</span> <span class="y">"Shell script"</span> ;;
+    *.jpg|*.png)    <span class="g">echo</span> <span class="y">"Image file"</span> ;;
+    *.tar.gz|*.tgz) <span class="g">echo</span> <span class="y">"Compressed archive"</span> ;;
+    *)              <span class="g">echo</span> <span class="y">"Unknown type"</span> ;;
+<span class="k">esac</span></pre>
+<div class="out"><div class="outl">Expected Output (./script.sh restart)</div><pre>🔄 Restarting...
+Image file</pre></div></div>
+
+<div class="qz"><div class="qz-q">🧪 In a case statement, what does <span class="ic">*)</span> at the end do?</div>
+<div class="qo" onclick="ck(this,true)">Acts as the default/catch-all — matches anything not caught by previous patterns (like "else" for case)</div>
+<div class="qo" onclick="ck(this,false)">Matches files ending with a closing parenthesis</div>
+<div class="qo" onclick="ck(this,false)">It is a syntax error — case statements do not have a default</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 5: Logical Operators                   -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s4"><small>BASH-F04.5 of 6 · ⏱ ~7 min</small></div>
+<h2>BASH-F04.5 — Logical Operators (&amp;&amp;, ||, !)</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>Logical operators let you combine conditions or chain commands based on success/failure. <span class="ic">&&</span> means "AND — run the next command only if the previous one succeeded." <span class="ic">||</span> means "OR — run the next command only if the previous one failed." <span class="ic">!</span> means "NOT — flip the exit code." These are used constantly in scripts and one-liners as compact alternatives to full if/then/fi blocks.</p>
+<p>Think of <span class="ic">&&</span> as "and then" and <span class="ic">||</span> as "or else." The pattern <span class="ic">command && echo "worked" || echo "failed"</span> is a common compact if/else.</p>
+</div>
+<div class="pan te" data-l="te">
+<p><span class="ic">&&</span> is a list operator that short-circuits: in <span class="ic">cmd1 && cmd2</span>, cmd2 only executes if cmd1 exits 0. <span class="ic">||</span> is the opposite: <span class="ic">cmd1 || cmd2</span> runs cmd2 only if cmd1 exits non-zero. These are evaluated left-to-right with <span class="ic">&&</span> binding tighter than <span class="ic">||</span> (but use explicit grouping with <span class="ic">{ }</span> or <span class="ic">( )</span> to be safe). The <span class="ic">!</span> operator inverts the exit status of the following command. A common defensive pattern is <span class="ic">cd /some/dir || exit 1</span> which aborts the script if the <span class="ic">cd</span> fails, preventing subsequent commands from running in the wrong directory.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="c"># ═══ Logical Operators ═══</span>
+
+<span class="c"># && = AND (run next only if previous succeeded)</span>
+<span class="g">mkdir</span> <span class="b">test_dir</span> && <span class="g">echo</span> <span class="y">"✓ Directory created"</span>
+
+<span class="c"># || = OR (run next only if previous failed)</span>
+<span class="g">cd</span> <span class="b">/nonexistent</span> 2>/dev/null || <span class="g">echo</span> <span class="y">"⚠️ Directory not found"</span>
+
+<span class="c"># Combined: compact if/else pattern</span>
+<span class="g">ping</span> <span class="o">-c1</span> <span class="y">google.com</span> &>/dev/null && <span class="g">echo</span> <span class="y">"✓ Online"</span> || <span class="g">echo</span> <span class="y">"✗ Offline"</span>
+
+<span class="c"># ! = NOT (invert exit code)</span>
+<span class="k">if</span> ! <span class="g">grep</span> <span class="o">-q</span> <span class="y">"blackarch"</span> <span class="b">/etc/pacman.conf</span>; <span class="k">then</span>
+    <span class="g">echo</span> <span class="y">"BlackArch repo not yet added"</span>
+<span class="k">fi</span>
+
+<span class="c"># ═══ DEFENSIVE SCRIPTING: the cd || exit pattern ═══</span>
+<span class="c"># Without this, if cd fails, ALL following commands run</span>
+<span class="c"># in the WRONG directory (potentially catastrophic with rm!)</span>
+<span class="g">cd</span> <span class="y">"$project_dir"</span> || { <span class="g">echo</span> <span class="y">"FATAL: cannot cd to $project_dir"</span> >&2; <span class="g">exit</span> <span class="y">1</span>; }
+
+<span class="c"># Multiple conditions combined</span>
+<span class="v">age</span>=<span class="y">25</span>
+<span class="v">citizen</span>=<span class="y">"yes"</span>
+<span class="k">if</span> [[ <span class="y">"$age"</span> <span class="o">-ge</span> <span class="y">18</span> ]] && [[ <span class="y">"$citizen"</span> == <span class="y">"yes"</span> ]]; <span class="k">then</span>
+    <span class="g">echo</span> <span class="y">"Eligible to vote"</span>
+<span class="k">fi</span></pre>
+<div class="out"><div class="outl">Expected Output</div><pre>✓ Directory created
+⚠️ Directory not found
+✓ Online
+BlackArch repo not yet added
+Eligible to vote</pre></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 6: Practice                            -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s5"><small>BASH-F04.6 of 6 · ⏱ ~12 min</small></div>
+<h2>BASH-F04.6 — Practice Exercises</h2>
+
+<h3>Exercise 1 (Easy) — User Greeting</h3>
+<p>Write a script that checks the current hour (using <span class="ic">$(date +%H)</span>) and prints "Good morning", "Good afternoon", or "Good evening" accordingly (morning = before 12, afternoon = 12-17, evening = after 17).</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">solution</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="v">hour</span>=<span class="p">$(</span><span class="g">date</span> <span class="o">+%H</span><span class="p">)</span>
+
+<span class="k">if</span> [[ <span class="y">"$hour"</span> <span class="o">-lt</span> <span class="y">12</span> ]]; <span class="k">then</span>
+    <span class="g">echo</span> <span class="y">"🌅 Good morning!"</span>
+<span class="k">elif</span> [[ <span class="y">"$hour"</span> <span class="o">-lt</span> <span class="y">18</span> ]]; <span class="k">then</span>
+    <span class="g">echo</span> <span class="y">"☀️ Good afternoon!"</span>
+<span class="k">else</span>
+    <span class="g">echo</span> <span class="y">"🌙 Good evening!"</span>
+<span class="k">fi</span></pre></div>
+
+<h3>Exercise 2 (Medium) — System Health Check</h3>
+<p>Write a script that checks: (1) if Docker is running, (2) if the disk is more than 80% full, (3) if there are any failed systemd services. Print a status line for each check with ✓ or ✗.</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">solution</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="c"># ═══ System Health Check ═══</span>
+
+<span class="c"># Check Docker</span>
+<span class="k">if</span> <span class="g">systemctl</span> <span class="o">is-active</span> <span class="o">--quiet</span> <span class="y">docker</span>; <span class="k">then</span>
+    <span class="g">echo</span> <span class="y">"✓ Docker is running"</span>
+<span class="k">else</span>
+    <span class="g">echo</span> <span class="y">"✗ Docker is NOT running"</span>
+<span class="k">fi</span>
+
+<span class="c"># Check disk usage</span>
+<span class="v">usage</span>=<span class="p">$(</span><span class="g">df</span> <span class="o">/</span> | <span class="g">awk</span> <span class="y">'NR==2{gsub(/%/,"",$5); print $5}'</span><span class="p">)</span>
+<span class="k">if</span> [[ <span class="y">"$usage"</span> <span class="o">-gt</span> <span class="y">80</span> ]]; <span class="k">then</span>
+    <span class="g">echo</span> <span class="y">"✗ Disk usage critical: ${usage}%"</span>
+<span class="k">else</span>
+    <span class="g">echo</span> <span class="y">"✓ Disk usage OK: ${usage}%"</span>
+<span class="k">fi</span>
+
+<span class="c"># Check failed services</span>
+<span class="v">failed</span>=<span class="p">$(</span><span class="g">systemctl</span> <span class="o">--failed</span> <span class="o">--no-legend</span> | <span class="g">wc</span> <span class="o">-l</span><span class="p">)</span>
+<span class="k">if</span> [[ <span class="y">"$failed"</span> <span class="o">-eq</span> <span class="y">0</span> ]]; <span class="k">then</span>
+    <span class="g">echo</span> <span class="y">"✓ No failed services"</span>
+<span class="k">else</span>
+    <span class="g">echo</span> <span class="y">"✗ $failed failed service(s)!"</span>
+<span class="k">fi</span></pre>
+<div class="out"><div class="outl">Expected Output</div><pre>✓ Docker is running
+✓ Disk usage OK: 32%
+✓ No failed services</pre></div></div>
+
+<h3>Exercise 3 (Hard) — Smart File Processor</h3>
+<p>Write a script that accepts a filename argument and uses a <span class="ic">case</span> statement to perform a different action based on file extension: <span class="ic">.py</span> → run with python, <span class="ic">.sh</span> → run with bash, <span class="ic">.md</span> → render with <span class="ic">glow</span> (or cat if glow not installed), <span class="ic">.tar.gz</span> → list contents. Include input validation: check the file exists and is readable before processing.</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">solution</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="c"># ═══ Smart File Processor ═══</span>
+
+<span class="v">file</span>=<span class="y">"${1:?Usage: $0 <filename>}"</span>
+
+<span class="c"># Validate: file exists and is readable</span>
+<span class="k">if</span> [[ ! -f <span class="y">"$file"</span> ]]; <span class="k">then</span>
+    <span class="g">echo</span> <span class="y">"Error: '$file' not found"</span> >&2
+    <span class="g">exit</span> <span class="y">1</span>
+<span class="k">fi</span>
+<span class="k">if</span> [[ ! -r <span class="y">"$file"</span> ]]; <span class="k">then</span>
+    <span class="g">echo</span> <span class="y">"Error: '$file' is not readable"</span> >&2
+    <span class="g">exit</span> <span class="y">1</span>
+<span class="k">fi</span>
+
+<span class="c"># Process based on extension</span>
+<span class="k">case</span> <span class="y">"$file"</span> <span class="k">in</span>
+    *.py)
+        <span class="g">echo</span> <span class="y">"🐍 Running Python: $file"</span>
+        <span class="g">python</span> <span class="y">"$file"</span>
+        ;;
+    *.sh|*.bash)
+        <span class="g">echo</span> <span class="y">"🐚 Running shell script: $file"</span>
+        <span class="g">bash</span> <span class="y">"$file"</span>
+        ;;
+    *.md)
+        <span class="g">echo</span> <span class="y">"📄 Rendering Markdown: $file"</span>
+        <span class="k">if</span> <span class="g">command</span> <span class="o">-v</span> <span class="y">glow</span> &>/dev/null; <span class="k">then</span>
+            <span class="g">glow</span> <span class="y">"$file"</span>
+        <span class="k">else</span>
+            <span class="g">cat</span> <span class="y">"$file"</span>
+        <span class="k">fi</span>
+        ;;
+    *.tar.gz|*.tgz)
+        <span class="g">echo</span> <span class="y">"📦 Archive contents:"</span>
+        <span class="g">tar</span> <span class="o">tzf</span> <span class="y">"$file"</span>
+        ;;
+    *)
+        <span class="g">echo</span> <span class="y">"❓ Unknown file type: $file"</span>
+        <span class="g">echo</span> <span class="y">"   Opening with default viewer..."</span>
+        <span class="g">xdg-open</span> <span class="y">"$file"</span> 2>/dev/null || <span class="g">cat</span> <span class="y">"$file"</span>
+        ;;
+<span class="k">esac</span></pre></div>
+
+<div class="note gn">
+<b>🌸 Module Complete!</b> You now understand bash conditionals: if/elif/else, the test command and its operators (file tests, string tests, integer tests), why <span class="ic">[[ ]]</span> is safer than <span class="ic">[ ]</span>, case statements for pattern matching, and logical operators for compact conditional chains. The <span class="ic">cd || exit</span> defensive pattern and the <span class="ic">command -v</span> existence check are tools you will use in every script you write. Next module: BASH-F05 (Loops) — making your scripts repeat things intelligently.
+</div>
+
+</div>
+<div class="sf"><button onclick="svB()">💾 Save Brick 4</button></div>
+<script>
+function sw(btn,lv){let el=btn.parentElement.nextElementSibling;while(el&&!el.classList.contains('sd')&&!el.classList.contains('qz')&&!el.classList.contains('cm')&&!el.classList.contains('cw')&&el.tagName!=='H3'){if(el.classList.contains('pan'))el.classList.toggle('on',el.dataset.l===lv);el=el.nextElementSibling;}btn.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');}
+function ck(btn,ok){const box=btn.closest('.qz');box.querySelectorAll('.qo').forEach(o=>o.disabled=true);btn.classList.add(ok?'y':'n');const fb=box.querySelector('.qfb');fb.classList.add('s');fb.className=ok?'qfb s w':'qfb s l';fb.textContent=ok?'✓ Correct! +10 XP':'✗ Review the section above.';}
+function cpC(b){const pre=b.closest('.cw').querySelector('pre');navigator.clipboard.writeText(pre.textContent).then(()=>{b.textContent='✓';setTimeout(()=>b.textContent='Copy',1500);});}
+function svB(){const blob=new Blob(['<!DOCTYPE html>\n'+document.documentElement.outerHTML],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='brick4_BASHF04_conditionals_'+new Date().toISOString().slice(0,10)+'.html';a.click();}
+</script>
+</body>
+</html>

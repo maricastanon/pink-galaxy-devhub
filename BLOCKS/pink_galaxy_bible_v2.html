@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌸 Pink Galaxy Bible — Interactive Learning Platform</title>
+<style>
+:root{--p:#e91e63;--pl:#f8bbd0;--pd:#880e4f;--pg:rgba(233,30,99,.25);--g:#2e7d32;--gl:#a5d6a7;--gd:#1b5e20;--gg:rgba(46,125,50,.25);--bg:#0a0a12;--s1:#0f0f1e;--s2:#1a1a2e;--s3:#242440;--tx:#e8e6f0;--t2:#a8a6b8;--mt:#6c6a7e;--bd:rgba(233,30,99,.18);--r:12px;--purple:#ab47bc;--blue:#5c6bc0;--cyan:#00acc1;--orange:#ff9800;--yellow:#ffd600;--danger:#ff5252;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Calibri,"Segoe UI",sans-serif;background:var(--bg);color:var(--tx);overflow-x:hidden;font-size:11pt;line-height:1.6;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 15% 50%,rgba(233,30,99,.06),transparent 50%),radial-gradient(ellipse at 85% 25%,rgba(46,125,50,.04),transparent 50%);}
+a{color:var(--p);text-decoration:none;}
+
+/* ═══ TOP BAR ═══ */
+.top{position:fixed;top:0;left:0;right:0;height:50px;background:var(--s1);border-bottom:1px solid var(--bd);z-index:9000;display:flex;align-items:center;padding:0 16px;gap:12px;backdrop-filter:blur(12px);}
+.logo{display:flex;align-items:center;gap:8px;font-weight:bold;font-size:14pt;color:var(--p);}
+.logo span{font-size:20px;}
+.nav-tabs{display:flex;gap:2px;margin-left:20px;}
+.nav-tab{padding:6px 16px;border-radius:8px 8px 0 0;cursor:pointer;font-size:9.5pt;color:var(--t2);border:1px solid transparent;border-bottom:none;transition:all .2s;font-family:inherit;background:none;}
+.nav-tab:hover{color:var(--pl);background:rgba(233,30,99,.06);}
+.nav-tab.active{color:var(--p);background:var(--s2);border-color:var(--bd);}
+.top-right{margin-left:auto;display:flex;gap:8px;align-items:center;}
+.search-mini{padding:6px 14px 6px 30px;background:var(--s2);border:1px solid var(--bd);border-radius:20px;color:var(--tx);font-size:9pt;width:200px;outline:none;font-family:inherit;}
+.search-mini:focus{border-color:var(--p);box-shadow:0 0 10px var(--pg);width:280px;transition:width .3s;}
+.search-mini::placeholder{color:var(--mt);}
+.xp-badge{display:flex;align-items:center;gap:6px;padding:4px 12px;background:linear-gradient(135deg,var(--pd),var(--p));border-radius:16px;font-size:8.5pt;font-weight:bold;color:#fff;}
+.streak-badge{padding:4px 10px;background:rgba(255,214,0,.15);border:1px solid rgba(255,214,0,.3);border-radius:16px;font-size:8.5pt;color:var(--yellow);}
+.tbtn{background:none;border:1px solid var(--bd);color:var(--t2);padding:5px 10px;border-radius:6px;cursor:pointer;font-size:9pt;font-family:inherit;}
+.tbtn:hover{background:var(--p);color:#fff;border-color:var(--p);}
+
+/* ═══ MAIN CONTAINER ═══ */
+.container{margin-top:50px;min-height:calc(100vh - 50px);position:relative;z-index:1;}
+.view{display:none;padding:20px;animation:fadeIn .3s;}
+.view.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* ═══ DASHBOARD VIEW ═══ */
+.dash-header{text-align:center;padding:30px 20px 20px;}
+.dash-header h1{font-size:24pt;color:var(--p);text-shadow:0 0 30px var(--pg);margin-bottom:6px;}
+.dash-header p{color:var(--t2);font-size:11pt;}
+.stats-row{display:flex;justify-content:center;gap:16px;margin:20px 0;flex-wrap:wrap;}
+.stat-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:14px 20px;text-align:center;min-width:120px;}
+.stat-num{font-size:22pt;font-weight:bold;color:var(--p);}
+.stat-label{font-size:8pt;color:var(--mt);text-transform:uppercase;letter-spacing:1px;}
+.stat-card.green .stat-num{color:var(--gl);}
+
+/* Filters bar */
+.filters{display:flex;flex-wrap:wrap;gap:6px;padding:12px 20px;justify-content:center;align-items:center;}
+.filter-group{display:flex;gap:3px;}
+.fbtn{padding:4px 12px;border-radius:16px;border:1px solid var(--bd);background:none;color:var(--t2);font-size:8pt;cursor:pointer;font-family:inherit;transition:all .15s;}
+.fbtn:hover,.fbtn.on{background:var(--p);color:#fff;border-color:var(--p);}
+.fbtn.green:hover,.fbtn.green.on{background:var(--g);border-color:var(--g);}
+.fbtn.purple:hover,.fbtn.purple.on{background:var(--purple);border-color:var(--purple);}
+
+/* Module cards grid */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;padding:10px 20px 40px;max-width:1400px;margin:0 auto;}
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:16px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.card:hover{border-color:var(--p);transform:translateY(-3px);box-shadow:0 8px 24px rgba(233,30,99,.15);}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.card[data-vol="1"]::before{background:linear-gradient(90deg,var(--p),var(--pl));}
+.card[data-vol="2"]::before{background:linear-gradient(90deg,var(--danger),var(--orange));}
+.card[data-vol="3"]::before{background:linear-gradient(90deg,var(--purple),var(--blue));}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+.card-id{font-size:8pt;color:var(--mt);font-family:"Courier New",monospace;letter-spacing:1px;}
+.card-diff{font-size:7pt;padding:2px 8px;border-radius:8px;font-weight:bold;text-transform:uppercase;}
+.card-diff.beg{background:rgba(46,125,50,.2);color:var(--gl);}
+.card-diff.int{background:rgba(255,152,0,.2);color:var(--orange);}
+.card-diff.adv{background:rgba(233,30,99,.2);color:var(--pl);}
+.card h3{font-size:11pt;color:var(--tx);margin-bottom:6px;}
+.card-desc{font-size:9pt;color:var(--t2);margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.card-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;}
+.tag{padding:1px 8px;border-radius:8px;font-size:7pt;background:rgba(233,30,99,.1);color:var(--pl);}
+.tag.g{background:rgba(46,125,50,.1);color:var(--gl);}
+.tag.b{background:rgba(92,107,192,.15);color:var(--blue);}
+.card-progress{display:flex;align-items:center;gap:8px;}
+.cpbar{flex:1;height:6px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden;}
+.cpfill{height:100%;background:linear-gradient(90deg,var(--p),var(--g));border-radius:3px;transition:width .4s;}
+.card-pct{font-size:8pt;color:var(--mt);min-width:28px;text-align:right;}
+.card-xp{position:absolute;bottom:8px;right:12px;font-size:7pt;color:var(--mt);}
+.card-sections{font-size:8pt;color:var(--mt);margin-bottom:4px;}
+
+/* ═══ MINDMAP VIEW ═══ */
+.map-controls{display:flex;gap:4px;padding:12px 20px;flex-wrap:wrap;align-items:center;}
+.map-type{padding:6px 14px;border-radius:8px;border:1px solid var(--bd);background:none;color:var(--t2);cursor:pointer;font-size:9pt;font-family:inherit;display:flex;align-items:center;gap:5px;}
+.map-type:hover,.map-type.active{background:var(--p);color:#fff;border-color:var(--p);}
+.map-type .icon{font-size:12px;}
+.map-canvas{margin:0 20px;background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);min-height:calc(100vh - 180px);position:relative;overflow:hidden;}
+.map-node{position:absolute;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;font-size:7.5pt;text-align:center;font-weight:bold;color:#fff;line-height:1.2;padding:4px;}
+.map-node:hover{transform:scale(1.15);z-index:100;box-shadow:0 0 20px rgba(233,30,99,.4);}
+.map-node[data-vol="1"]{background:var(--p);}
+.map-node[data-vol="2"]{background:var(--danger);}
+.map-node[data-vol="3"]{background:var(--purple);}
+.map-line{position:absolute;background:rgba(233,30,99,.15);transform-origin:0 50%;height:1px;pointer-events:none;}
+.map-legend{display:flex;gap:12px;padding:8px 20px;font-size:8pt;color:var(--mt);}
+.legend-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:middle;}
+
+/* ═══ MODULE DETAIL VIEW ═══ */
+.mod-back{display:inline-flex;align-items:center;gap:6px;color:var(--t2);font-size:9pt;cursor:pointer;padding:8px 0;margin-bottom:12px;}
+.mod-back:hover{color:var(--p);}
+.mod-header{background:linear-gradient(135deg,var(--s1),var(--s2));border:1px solid var(--bd);border-radius:var(--r);padding:24px;margin-bottom:20px;}
+.mod-header h1{font-size:20pt;color:var(--p);border:none;margin:0 0 6px;padding:0;}
+.mod-meta{display:flex;gap:16px;flex-wrap:wrap;font-size:9pt;color:var(--t2);margin-bottom:12px;}
+.mod-desc{color:var(--t2);font-size:10pt;}
+
+/* Section cards within module */
+.sec-cards{display:flex;flex-direction:column;gap:12px;max-width:900px;}
+.sec-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;transition:border-color .2s;}
+.sec-card:hover{border-color:rgba(233,30,99,.4);}
+.sec-card-head{padding:14px 18px;cursor:pointer;display:flex;align-items:center;gap:12px;}
+.sec-card-head:hover{background:rgba(233,30,99,.03);}
+.sec-status{width:28px;height:28px;border-radius:50%;border:2px solid var(--mt);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;transition:all .2s;cursor:pointer;}
+.sec-status.done{border-color:var(--g);background:var(--g);color:#fff;}
+.sec-status.active{border-color:var(--p);background:rgba(233,30,99,.15);color:var(--p);}
+.sec-title{flex:1;}
+.sec-title h3{font-size:11pt;color:var(--tx);margin:0;}
+.sec-title .sec-sub{font-size:8pt;color:var(--mt);}
+.sec-est{font-size:8pt;color:var(--mt);white-space:nowrap;}
+.sec-expand{color:var(--mt);font-size:14px;transition:transform .2s;}
+.sec-card.open .sec-expand{transform:rotate(180deg);}
+.sec-body{display:none;padding:0 18px 18px;border-top:1px solid var(--bd);}
+.sec-card.open .sec-body{display:block;animation:fadeIn .3s;}
+
+/* Content blocks inside sections */
+.explain-tabs{display:flex;gap:2px;margin:12px 0 8px;}
+.ex-tab{padding:4px 12px;border-radius:6px 6px 0 0;border:1px solid var(--bd);border-bottom:none;background:none;color:var(--mt);cursor:pointer;font-size:8.5pt;font-family:inherit;}
+.ex-tab.on{background:var(--s2);color:var(--p);border-color:var(--bd);}
+.ex-panel{display:none;background:var(--s2);border:1px solid var(--bd);border-radius:0 8px 8px 8px;padding:14px;font-size:10pt;}
+.ex-panel.on{display:block;}
+.ex-panel.layman{border-left:3px solid var(--gl);}
+.ex-panel.technical{border-left:3px solid var(--p);}
+.ex-panel.deep{border-left:3px solid var(--purple);}
+
+/* Code blocks (reused from previous) */
+.cw{margin:12px 0;border:1px solid var(--gg);border-radius:8px;overflow:hidden;background:#12121f;}
+.cwh{display:flex;justify-content:space-between;align-items:center;padding:4px 10px;background:rgba(46,125,50,.1);border-bottom:1px solid var(--gg);font-size:7.5pt;}
+.cwl{color:var(--g);font-family:"Courier New",monospace;font-weight:bold;text-transform:uppercase;letter-spacing:1px;}
+.cwc{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:var(--t2);padding:2px 8px;border-radius:4px;cursor:pointer;font-size:7pt;font-family:"Courier New",monospace;}
+.cwc:hover{background:var(--p);color:#fff;}
+pre{font-family:"Courier New",monospace;font-size:10pt;padding:10px;overflow-x:auto;white-space:pre;line-height:1.5;margin:0;color:var(--tx);background:#12121f;}
+pre .c{color:#6a6a8a;font-style:italic;}pre .g{color:#a5d6a7;}pre .y{color:#fff59d;}pre .b{color:#90caf9;}pre .o{color:#ffcc80;}pre .p{color:#f48fb1;}
+.out{background:rgba(46,125,50,.06);border-top:2px solid var(--g);padding:8px 10px;font-family:"Courier New",monospace;font-size:8.5pt;color:#a5d6a7;}
+.outl{color:var(--g);font-weight:bold;font-size:7pt;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;}
+
+/* Exercises */
+.quiz{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:14px;margin:12px 0;}
+.quiz-q{color:var(--tx);font-size:10pt;margin-bottom:10px;}
+.quiz-opts{display:flex;flex-direction:column;gap:6px;}
+.quiz-opt{padding:8px 14px;border:1px solid var(--bd);border-radius:8px;cursor:pointer;font-size:9.5pt;color:var(--t2);transition:all .15s;text-align:left;background:none;font-family:inherit;width:100%;}
+.quiz-opt:hover{border-color:var(--p);color:var(--pl);background:rgba(233,30,99,.04);}
+.quiz-opt.correct{border-color:var(--g);background:rgba(46,125,50,.1);color:var(--gl);}
+.quiz-opt.wrong{border-color:var(--danger);background:rgba(255,82,82,.08);color:var(--danger);}
+.quiz-result{margin-top:8px;font-size:9pt;padding:8px;border-radius:6px;}
+.quiz-result.win{background:rgba(46,125,50,.1);color:var(--gl);border:1px solid var(--gg);}
+.quiz-result.lose{background:rgba(255,82,82,.06);color:var(--danger);border:1px solid rgba(255,82,82,.2);}
+
+/* ═══ SAVE FLOAT ═══ */
+.sf{position:fixed;bottom:16px;right:16px;z-index:9999;display:flex;gap:8px;}
+.sf button{padding:8px 14px;border:none;border-radius:8px;font-weight:bold;font-size:9pt;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(0,0,0,.3);}
+.sf .save{background:var(--g);color:#fff;}
+.sf .save:hover{background:var(--gl);color:#000;}
+.sf .sticky-btn{background:var(--p);color:#fff;}
+
+@media(max-width:700px){.cards{grid-template-columns:1fr;}.nav-tabs{display:none;}.top{flex-wrap:wrap;height:auto;padding:8px;}}
+@media print{.top,.sf,.map-controls{display:none!important;}.container{margin-top:0;}body{background:#fff;color:#333;}@page{size:A4;margin:1.5cm;}}
+</style>
+</head>
+<body>
+
+<!-- ═══ TOP BAR ═══ -->
+<div class="top">
+  <div class="logo"><span>🌸</span> Galaxy Bible</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showView('dashboard')">🏠 Dashboard</button>
+    <button class="nav-tab" onclick="showView('mindmap')">🧠 Mindmap</button>
+    <button class="nav-tab" onclick="showView('module')">📖 Module</button>
+    <button class="nav-tab" onclick="showView('cheatsheets')">⚡ Cheatsheets</button>
+  </div>
+  <div class="top-right">
+    <input class="search-mini" placeholder="🔍 Search… (Ctrl+K)" onkeydown="if(event.key==='Enter')searchAll(this.value)">
+    <div class="xp-badge">⭐ <span id="totalXP">0</span> XP</div>
+    <div class="streak-badge">🔥 <span id="streakCount">0</span> day streak</div>
+    <button class="tbtn" onclick="saveAll()">💾</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--                    DASHBOARD VIEW                       -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="container">
+<div class="view active" id="v-dashboard">
+  <div class="dash-header">
+    <h1>🌸 The Pink Galaxy Bible</h1>
+    <p>Arch Linux • BlackArch • Bash • Security — Your interactive learning cockpit</p>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-num" id="statModules">0/28</div><div class="stat-label">Modules</div></div>
+    <div class="stat-card green"><div class="stat-num" id="statSections">0/156</div><div class="stat-label">Sections</div></div>
+    <div class="stat-card"><div class="stat-num" id="statXP">0</div><div class="stat-label">Total XP</div></div>
+    <div class="stat-card green"><div class="stat-num" id="statStreak">0</div><div class="stat-label">Day Streak 🔥</div></div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <span style="font-size:8pt;color:var(--mt);margin-right:8px;">VOLUME</span>
+    <div class="filter-group">
+      <button class="fbtn on" data-f="vol" data-v="all" onclick="filterCards(this)">All</button>
+      <button class="fbtn" data-f="vol" data-v="1" onclick="filterCards(this)">V1 Foundations</button>
+      <button class="fbtn" data-f="vol" data-v="2" onclick="filterCards(this)">V2 Security</button>
+      <button class="fbtn purple" data-f="vol" data-v="3" onclick="filterCards(this)">V3 Advanced</button>
+    </div>
+    <span style="font-size:8pt;color:var(--mt);margin:0 8px;">DIFFICULTY</span>
+    <div class="filter-group">
+      <button class="fbtn green" data-f="diff" data-v="all" onclick="filterCards(this)">All</button>
+      <button class="fbtn green" data-f="diff" data-v="beg" onclick="filterCards(this)">Beginner</button>
+      <button class="fbtn" data-f="diff" data-v="int" onclick="filterCards(this)">Intermediate</button>
+      <button class="fbtn purple" data-f="diff" data-v="adv" onclick="filterCards(this)">Advanced</button>
+    </div>
+    <span style="font-size:8pt;color:var(--mt);margin:0 8px;">STATUS</span>
+    <div class="filter-group">
+      <button class="fbtn" data-f="status" data-v="all" onclick="filterCards(this)">All</button>
+      <button class="fbtn" data-f="status" data-v="new" onclick="filterCards(this)">New</button>
+      <button class="fbtn green" data-f="status" data-v="progress" onclick="filterCards(this)">In Progress</button>
+      <button class="fbtn" data-f="status" data-v="done" onclick="filterCards(this)">Complete</button>
+    </div>
+  </div>
+
+  <!-- Module Cards -->
+  <div class="cards" id="cardsGrid"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--                    MINDMAP VIEW                         -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="view" id="v-mindmap">
+  <div class="map-controls">
+    <button class="map-type active" data-type="clusters" onclick="setMapType(this)"><span class="icon">🧩</span> Clusters</button>
+    <button class="map-type" data-type="network" onclick="setMapType(this)"><span class="icon">🕸️</span> Network</button>
+    <button class="map-type" data-type="radial" onclick="setMapType(this)"><span class="icon">🎯</span> Radial</button>
+    <button class="map-type" data-type="tree" onclick="setMapType(this)"><span class="icon">🌲</span> Tree</button>
+    <button class="map-type" data-type="timeline" onclick="setMapType(this)"><span class="icon">📅</span> Timeline</button>
+    <button class="map-type" data-type="bubbles" onclick="setMapType(this)"><span class="icon">🫧</span> Bubbles</button>
+    <span style="margin-left:auto;font-size:8.5pt;color:var(--mt)" id="mapInfo">28 modules · 3 volumes</span>
+  </div>
+  <div class="map-canvas" id="mapCanvas"></div>
+  <div class="map-legend">
+    <span><span class="legend-dot" style="background:var(--p)"></span> V1 Foundations</span>
+    <span><span class="legend-dot" style="background:var(--danger)"></span> V2 Security</span>
+    <span><span class="legend-dot" style="background:var(--purple)"></span> V3 Advanced</span>
+    <span style="margin-left:auto;font-size:8pt;color:var(--mt);">Click any node to open module</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--                   MODULE DETAIL VIEW                    -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="view" id="v-module">
+  <div id="moduleDetail">
+    <div class="mod-back" onclick="showView('dashboard')">← Back to Dashboard</div>
+    <div class="mod-header">
+      <h1 id="modTitle">Select a module</h1>
+      <div class="mod-meta" id="modMeta"></div>
+      <div class="mod-desc" id="modDesc"></div>
+      <div class="card-progress" style="margin-top:12px;"><div class="cpbar"><div class="cpfill" id="modProgress" style="width:0%"></div></div><span class="card-pct" id="modPct">0%</span></div>
+    </div>
+    <div class="sec-cards" id="secCards"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--                  CHEATSHEETS VIEW                       -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="view" id="v-cheatsheets">
+  <div style="max-width:1000px;margin:0 auto;padding:20px;">
+    <h1 style="color:var(--p);border-bottom:2px solid var(--p);padding-bottom:8px;">⚡ Quick Reference Cheatsheets</h1>
+    <p style="color:var(--t2);margin-bottom:20px;">Click any card to expand. Every command at your fingertips.</p>
+    <div class="cards" style="padding:0;" id="cheatCards"></div>
+  </div>
+</div>
+
+</div><!-- end container -->
+
+<!-- Save buttons -->
+<div class="sf">
+  <button class="sticky-btn" onclick="addGlobalSticky()">📌</button>
+  <button class="save" onclick="saveAll()">💾 Save</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--                    DATA & ENGINE                        -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<script>
+const MODULES=[
+{id:'M01',title:'Bash Basics',vol:1,diff:'beg',hrs:4,desc:'Your first Linux commands: navigation, files, getting help.',tags:['bash','cli'],sections:['The Terminal','Command Anatomy','Navigation (pwd/cd/ls)','File Operations','Viewing Files','Getting Help'],xp:100},
+{id:'M02',title:'Text Processing',vol:1,diff:'beg',hrs:5,desc:'Pipes, grep, sed, awk — the Unix philosophy of chaining small tools.',tags:['bash','text','pipes'],sections:['Pipes & Redirection','grep / ripgrep','sed','awk','sort/uniq/wc/cut','xargs','Real-World Pipelines'],xp:120},
+{id:'M03',title:'Filesystem Deep Dive',vol:1,diff:'int',hrs:6,desc:'Inodes, permissions, links, ACLs, disk management, LVM.',tags:['filesystem','permissions'],sections:['Hierarchy (/etc /var /usr)','Inodes & Links','chmod/chown/umask','SUID/SGID/Sticky','ACLs','File Types & Magic','Disk Management'],xp:150},
+{id:'M04',title:'Processes & Systemd',vol:1,diff:'int',hrs:5,desc:'Process lifecycle, signals, job control, systemd services, journalctl.',tags:['processes','systemd'],sections:['Process Concepts','Lifecycle (fork/exec)','ps/top/htop','Signals & kill','Job Control','Systemd Services','journalctl','cron & Timers'],xp:140},
+{id:'M05',title:'Networking',vol:1,diff:'int',hrs:7,desc:'TCP/IP, DNS, SSH, firewalls, curl — the network from the terminal.',tags:['networking','ssh','firewall'],sections:['OSI & TCP/IP','IP & Subnets','DNS','ip/nmcli/iwctl','Ports & ss','curl','SSH Deep Dive','Firewalls','Troubleshooting'],xp:180},
+{id:'M06',title:'Bash Scripting L1',vol:1,diff:'int',hrs:8,desc:'Variables, conditionals, loops, functions, error handling — write real scripts.',tags:['bash','scripting'],sections:['First Script','Variables & Types','Quoting Rules','if/elif/else','Loops','Functions','I/O','Exit Codes & Errors','10 Scripts'],xp:200},
+{id:'M07',title:'Bash Scripting L2',vol:1,diff:'adv',hrs:8,desc:'Parameter expansion, regex, process substitution, debugging, optimization.',tags:['bash','advanced'],sections:['Parameter Expansion','Regex in Bash','Process Substitution','Subshells','Signal Handling','Debugging','Performance','Associative Arrays','Automation Projects'],xp:250},
+{id:'M08',title:'Sysadmin & Packages',vol:1,diff:'int',hrs:6,desc:'pacman mastery, AUR, building from source, boot process, kernel management.',tags:['pacman','sysadmin'],sections:['pacman Reference','paru & AUR','Building Packages','User Management','LVM & LUKS','Boot Process','Kernel','Monitoring'],xp:160},
+{id:'M09',title:'Security Foundations',vol:2,diff:'beg',hrs:4,desc:'CIA triad, threat modeling, MITRE ATT&CK, legal considerations, lab setup.',tags:['security','theory'],sections:['CIA Triad','Threat Modeling','Kill Chain & ATT&CK','Legal (§202a StGB)','Lab Environment','Resources'],xp:100},
+{id:'M10',title:'Reconnaissance',vol:2,diff:'int',hrs:6,desc:'OSINT, nmap, DNS enumeration, web enumeration, service fingerprinting.',tags:['recon','nmap','osint'],sections:['Passive Recon / OSINT','nmap Mastery','DNS Enum','Web Enum (gobuster)','Fingerprinting','CTF Recon'],xp:160},
+{id:'M11',title:'Network Attacks',vol:2,diff:'int',hrs:6,desc:'Wireshark, tcpdump, ARP spoofing, MITM, wireless security.',tags:['network','wireshark','wireless'],sections:['Wireshark','tcpdump','ARP Spoofing','MITM','Wireless (aircrack)','Exercises'],xp:170},
+{id:'M12',title:'Web App Security',vol:2,diff:'int',hrs:8,desc:'OWASP Top 10, Burp Suite, SQLi, XSS, CSRF, API testing.',tags:['web','owasp','burp'],sections:['OWASP Top 10','Burp Suite','SQL Injection','XSS','CSRF/SSRF/IDOR','Auth Bypass','API Testing','Practice Labs'],xp:220},
+{id:'M13',title:'Exploitation',vol:2,diff:'adv',hrs:8,desc:'Metasploit, payload generation, buffer overflows, privilege escalation.',tags:['exploit','metasploit'],sections:['Vuln Assessment','Metasploit','Payloads (msfvenom)','Buffer Overflows','Privilege Escalation','Post-Exploitation','Exercises'],xp:250},
+{id:'M14',title:'Password Attacks',vol:2,diff:'int',hrs:5,desc:'Hash algorithms, John, Hashcat, Hydra, wordlists, credential stuffing.',tags:['passwords','cracking'],sections:['Hashing Algorithms','John the Ripper','Hashcat (GPU)','Online Attacks (Hydra)','Spraying & Stuffing','Wordlists','Exercises'],xp:140},
+{id:'M15',title:'Reverse Engineering',vol:2,diff:'adv',hrs:8,desc:'Assembly basics, Ghidra, radare2, GDB, dynamic analysis, malware basics.',tags:['reversing','ghidra'],sections:['x86 Assembly','Ghidra','radare2','GDB','Dynamic Analysis','Malware Basics','CrackMe Challenges'],xp:260},
+{id:'M16',title:'Digital Forensics',vol:2,diff:'int',hrs:6,desc:'Evidence acquisition, filesystem forensics, memory analysis, steganography.',tags:['forensics','volatility'],sections:['Evidence Acquisition','Filesystem Forensics','Memory (Volatility)','Log Analysis','File Carving','Steganography','Exercises'],xp:170},
+{id:'M17',title:'Active Directory',vol:2,diff:'adv',hrs:7,desc:'AD concepts, BloodHound, Kerberoasting, CrackMapExec, lateral movement.',tags:['AD','windows','kerberos'],sections:['AD Concepts','Enumeration','Kerberoasting','CrackMapExec/Impacket','Lateral Movement','Practice Labs'],xp:230},
+{id:'M18',title:'Cryptography',vol:2,diff:'int',hrs:6,desc:'AES, RSA, TLS, GPG, LUKS disk encryption — theory and practice.',tags:['crypto','encryption'],sections:['Symmetric (AES)','Asymmetric (RSA)','Hashing & MACs','TLS/SSL','GPG','LUKS','Crypto Challenges'],xp:170},
+{id:'M19',title:'Cloud Security',vol:2,diff:'adv',hrs:6,desc:'AWS/Azure misconfigs, container escapes, cloud enumeration tools.',tags:['cloud','aws','azure'],sections:['AWS Security','Azure Security','Container Escape','Cloud Enumeration','Serverless Attacks','Exercises'],xp:200},
+{id:'M20',title:'CTF Guide',vol:2,diff:'beg',hrs:4,desc:'Categories, strategy, essential tools, platforms, walkthrough.',tags:['ctf','practice'],sections:['CTF Categories','Essential Tools','Common Patterns','Platforms','Write-Up Method','Walkthrough'],xp:100},
+{id:'M21',title:'Advanced Bash',vol:3,diff:'adv',hrs:7,desc:'Complex architectures, parallel execution, IPC, systemd services.',tags:['bash','advanced'],sections:['Script Architecture','Parallel Execution','IPC','Expect','SystemD Services','Projects'],xp:220},
+{id:'M22',title:'Containers & K8s',vol:3,diff:'int',hrs:7,desc:'Docker deep dive, Compose, Kubernetes, kubectl, Helm.',tags:['docker','kubernetes'],sections:['Docker Deep Dive','Docker Compose','K8s Concepts','kubectl','Helm','Deploy Project'],xp:190},
+{id:'M23',title:'CI/CD & DevOps',vol:3,diff:'int',hrs:6,desc:'Git advanced, GitHub Actions, Terraform, Ansible, monitoring.',tags:['git','cicd','terraform'],sections:['Git Advanced','GitHub Actions','Terraform','Ansible','Monitoring','Full Pipeline'],xp:170},
+{id:'M24',title:'Linux Internals',vol:3,diff:'adv',hrs:8,desc:'Kernel architecture, syscalls, virtual memory, scheduling, eBPF.',tags:['kernel','internals'],sections:['Kernel Architecture','System Calls','Virtual Memory','Scheduling','Kernel Modules','/proc & /sys','eBPF'],xp:270},
+{id:'M25',title:'Python for Security',vol:3,diff:'int',hrs:7,desc:'Sockets, scapy, pwntools, automation — build your own security tools.',tags:['python','security'],sections:['Networking (sockets)','Security Tools','Pwntools','Automation','Data Analysis','Build 5 Tools'],xp:200},
+{id:'M26',title:'Networking Deep',vol:3,diff:'adv',hrs:6,desc:'TCP/IP internals, VPNs, proxychains, network namespaces.',tags:['networking','vpn'],sections:['TCP/IP Internals','Routing','VPNs (WireGuard)','Proxychains/Tor','Network Namespaces','Lab Build'],xp:190},
+{id:'M27',title:'Resources & Links',vol:3,diff:'beg',hrs:2,desc:'Learning platforms, news, communities, certifications, YouTube.',tags:['resources','learning'],sections:['Platforms','Documentation','News & Research','Communities','Certifications','Media'],xp:50},
+{id:'M28',title:'Cheatsheets',vol:3,diff:'beg',hrs:1,desc:'Quick reference cards for bash, git, nmap, docker, regex, vim.',tags:['reference','cheatsheet'],sections:['Bash One-Liners','Regex','Vim','Git','nmap','Metasploit','Docker','Python Security','Ports'],xp:50}
+];
+
+const K='pgbible_v2';
+let state;
+try{state=JSON.parse(localStorage.getItem(K))||{};}catch{state={};}
+if(!state.done)state.done={};if(!state.xp)state.xp=0;if(!state.streak)state.streak=0;if(!state.lastVisit)state.lastVisit='';
+function save(){localStorage.setItem(K,JSON.stringify(state));}
+
+// ═══ VIEW SWITCHING ═══
+window.showView=function(v){
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.getElementById('v-'+v).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>{if(t.textContent.toLowerCase().includes(v.slice(0,4)))t.classList.add('active');});
+  if(v==='mindmap')renderMap('clusters');
+};
+
+// ═══ DASHBOARD CARDS ═══
+function renderCards(){
+  const grid=document.getElementById('cardsGrid');
+  grid.innerHTML='';
+  MODULES.forEach(m=>{
+    const done=state.done[m.id]||{};
+    const total=m.sections.length;
+    const completed=Object.values(done).filter(Boolean).length;
+    const pct=total>0?Math.round(completed/total*100):0;
+    const card=document.createElement('div');
+    card.className='card';
+    card.dataset.vol=m.vol;
+    card.dataset.diff=m.diff;
+    card.dataset.status=pct===100?'done':pct>0?'progress':'new';
+    card.onclick=()=>openModule(m.id);
+    card.innerHTML=`
+      <div class="card-top"><span class="card-id">${m.id}</span><span class="card-diff ${m.diff}">${m.diff==='beg'?'Beginner':m.diff==='int'?'Intermediate':'Advanced'}</span></div>
+      <h3>${m.title}</h3>
+      <div class="card-desc">${m.desc}</div>
+      <div class="card-tags">${m.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+      <div class="card-sections">${completed}/${total} sections · ${m.hrs}h</div>
+      <div class="card-progress"><div class="cpbar"><div class="cpfill" style="width:${pct}%"></div></div><span class="card-pct">${pct}%</span></div>
+      <span class="card-xp">${m.xp} XP</span>`;
+    grid.appendChild(card);
+  });
+  updateStats();
+}
+
+// ═══ FILTERS ═══
+let activeFilters={vol:'all',diff:'all',status:'all'};
+window.filterCards=function(btn){
+  const f=btn.dataset.f,v=btn.dataset.v;
+  activeFilters[f]=v;
+  btn.closest('.filter-group').querySelectorAll('.fbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.card').forEach(c=>{
+    let show=true;
+    if(activeFilters.vol!=='all'&&c.dataset.vol!==activeFilters.vol)show=false;
+    if(activeFilters.diff!=='all'&&c.dataset.diff!==activeFilters.diff)show=false;
+    if(activeFilters.status!=='all'&&c.dataset.status!==activeFilters.status)show=false;
+    c.style.display=show?'':'none';
+  });
+};
+
+// ═══ MODULE DETAIL ═══
+window.openModule=function(id){
+  const m=MODULES.find(x=>x.id===id);if(!m)return;
+  showView('module');
+  document.getElementById('modTitle').textContent=`${m.id} — ${m.title}`;
+  document.getElementById('modMeta').innerHTML=`<span>Volume ${m.vol}</span><span>${m.diff==='beg'?'Beginner':m.diff==='int'?'Intermediate':'Advanced'}</span><span>⏱ ${m.hrs} hours</span><span>⭐ ${m.xp} XP</span>`;
+  document.getElementById('modDesc').textContent=m.desc;
+  const done=state.done[id]||{};
+  const total=m.sections.length;
+  const completed=Object.values(done).filter(Boolean).length;
+  const pct=total>0?Math.round(completed/total*100):0;
+  document.getElementById('modProgress').style.width=pct+'%';
+  document.getElementById('modPct').textContent=pct+'%';
+  const container=document.getElementById('secCards');
+  container.innerHTML='';
+  m.sections.forEach((sec,i)=>{
+    const secId=`${id}_${i}`;
+    const isDone=done[secId];
+    const card=document.createElement('div');
+    card.className='sec-card';
+    card.innerHTML=`
+      <div class="sec-card-head" onclick="this.parentElement.classList.toggle('open')">
+        <div class="sec-status ${isDone?'done':''}" onclick="event.stopPropagation();toggleSection('${id}','${secId}',this)">${isDone?'✓':i+1}</div>
+        <div class="sec-title"><h3>${m.id}.${i+1} — ${sec}</h3><span class="sec-sub">${isDone?'Completed ✓':'Click to expand'}</span></div>
+        <span class="sec-est">⏱ ~${Math.round(m.hrs/m.sections.length*60)} min</span>
+        <span class="sec-expand">▼</span>
+      </div>
+      <div class="sec-body">
+        <div class="explain-tabs">
+          <button class="ex-tab on" onclick="switchTab(this,'layman')">🧑 Simple</button>
+          <button class="ex-tab" onclick="switchTab(this,'technical')">🔧 Technical</button>
+          <button class="ex-tab" onclick="switchTab(this,'deep')">⚙️ Deep Dive</button>
+        </div>
+        <div class="ex-panel layman on" data-level="layman">
+          <p><em>Content for "${sec}" will appear here. Each section has three explanation levels that you switch between using the tabs above. The Simple tab uses analogies and everyday language. The Technical tab uses precise terminology. The Deep Dive tab explains what happens at the kernel/CPU/binary level.</em></p>
+        </div>
+        <div class="ex-panel technical" data-level="technical"><p><em>Technical explanation placeholder — to be filled following the Blueprint specification.</em></p></div>
+        <div class="ex-panel deep" data-level="deep"><p><em>Algorithmic / kernel-level explanation placeholder.</em></p></div>
+        <div class="quiz">
+          <div class="quiz-q">🧪 Quick check: placeholder quiz for "${sec}"</div>
+          <div class="quiz-opts">
+            <button class="quiz-opt" onclick="checkQuiz(this,true)">Correct answer placeholder</button>
+            <button class="quiz-opt" onclick="checkQuiz(this,false)">Wrong answer placeholder</button>
+            <button class="quiz-opt" onclick="checkQuiz(this,false)">Wrong answer placeholder</button>
+          </div>
+          <div class="quiz-result" id="qr-${secId}"></div>
+        </div>
+      </div>`;
+    container.appendChild(card);
+  });
+};
+window.switchTab=function(btn,level){
+  const body=btn.closest('.sec-body');
+  body.querySelectorAll('.ex-tab').forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on');
+  body.querySelectorAll('.ex-panel').forEach(p=>p.classList.toggle('on',p.dataset.level===level));
+};
+window.toggleSection=function(modId,secId,el){
+  if(!state.done[modId])state.done[modId]={};
+  state.done[modId][secId]=!state.done[modId][secId];
+  el.classList.toggle('done');
+  el.textContent=state.done[modId][secId]?'✓':el.textContent;
+  if(state.done[modId][secId])state.xp+=15;
+  save();updateStats();
+};
+window.checkQuiz=function(btn,correct){
+  const opts=btn.closest('.quiz-opts');
+  opts.querySelectorAll('.quiz-opt').forEach(o=>o.disabled=true);
+  btn.classList.add(correct?'correct':'wrong');
+  const result=btn.closest('.quiz').querySelector('.quiz-result');
+  if(correct){result.className='quiz-result win';result.textContent='✓ Correct! +10 XP';state.xp+=10;save();updateStats();}
+  else{result.className='quiz-result lose';result.textContent='✗ Not quite — try reviewing the section above.';}
+};
+
+// ═══ MINDMAP ═══
+window.renderMap=function(type){
+  const canvas=document.getElementById('mapCanvas');
+  const W=canvas.offsetWidth,H=canvas.offsetHeight||600;
+  canvas.innerHTML='';
+  const colors={1:'var(--p)',2:'var(--danger)',3:'var(--purple)'};
+  if(type==='clusters'){
+    const groups={1:[],2:[],3:[]};
+    MODULES.forEach(m=>groups[m.vol].push(m));
+    const cx={1:W*0.22,2:W*0.52,3:W*0.82};
+    const cy={1:H*0.5,2:H*0.5,3:H*0.5};
+    Object.keys(groups).forEach(v=>{
+      const mods=groups[v];
+      const r=Math.min(W*0.15,H*0.35);
+      mods.forEach((m,i)=>{
+        const angle=(i/mods.length)*Math.PI*2-Math.PI/2;
+        const x=cx[v]+Math.cos(angle)*r-25;
+        const y=cy[v]+Math.sin(angle)*r-25;
+        const size=30+m.xp/10;
+        const node=document.createElement('div');
+        node.className='map-node';
+        node.dataset.vol=v;
+        node.style.cssText=`left:${x}px;top:${y}px;width:${size}px;height:${size}px;font-size:${Math.max(6,size/5)}pt;`;
+        node.textContent=m.id.replace('M','');
+        node.title=m.title;
+        node.onclick=()=>openModule(m.id);
+        canvas.appendChild(node);
+      });
+    });
+  }else if(type==='radial'){
+    const cx=W/2,cy=H/2;
+    MODULES.forEach((m,i)=>{
+      const angle=(i/MODULES.length)*Math.PI*2-Math.PI/2;
+      const r=Math.min(W,H)*0.35;
+      const x=cx+Math.cos(angle)*r-22;
+      const y=cy+Math.sin(angle)*r-22;
+      const node=document.createElement('div');
+      node.className='map-node';node.dataset.vol=m.vol;
+      node.style.cssText=`left:${x}px;top:${y}px;width:44px;height:44px;`;
+      node.textContent=m.id.replace('M','');node.title=m.title;
+      node.onclick=()=>openModule(m.id);
+      canvas.appendChild(node);
+      const line=document.createElement('div');
+      line.className='map-line';
+      const dx=x+22-cx,dy=y+22-cy,len=Math.sqrt(dx*dx+dy*dy);
+      line.style.cssText=`left:${cx}px;top:${cy}px;width:${len}px;transform:rotate(${Math.atan2(dy,dx)}rad);`;
+      canvas.appendChild(line);
+    });
+    const center=document.createElement('div');
+    center.className='map-node';center.dataset.vol='1';
+    center.style.cssText=`left:${cx-30}px;top:${cy-30}px;width:60px;height:60px;font-size:9pt;background:linear-gradient(135deg,var(--p),var(--purple));`;
+    center.textContent='🌸';
+    canvas.appendChild(center);
+  }else if(type==='timeline'){
+    const padX=60,gap=(W-padX*2)/MODULES.length;
+    MODULES.forEach((m,i)=>{
+      const x=padX+i*gap;
+      const y=m.vol===1?H*0.3:m.vol===2?H*0.5:H*0.7;
+      const node=document.createElement('div');
+      node.className='map-node';node.dataset.vol=m.vol;
+      node.style.cssText=`left:${x-16}px;top:${y-16}px;width:32px;height:32px;font-size:7pt;`;
+      node.textContent=m.id.replace('M','');node.title=m.title;
+      node.onclick=()=>openModule(m.id);
+      canvas.appendChild(node);
+    });
+  }else{
+    // Default: network-style scattered
+    MODULES.forEach((m,i)=>{
+      const x=80+Math.random()*(W-160);
+      const y=40+Math.random()*(H-80);
+      const size=30+m.xp/8;
+      const node=document.createElement('div');
+      node.className='map-node';node.dataset.vol=m.vol;
+      node.style.cssText=`left:${x}px;top:${y}px;width:${size}px;height:${size}px;font-size:${Math.max(6,size/5)}pt;`;
+      node.textContent=m.id.replace('M','');node.title=m.title;
+      node.onclick=()=>openModule(m.id);
+      canvas.appendChild(node);
+    });
+  }
+};
+window.setMapType=function(btn){
+  document.querySelectorAll('.map-type').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderMap(btn.dataset.type);
+};
+
+// ═══ CHEATSHEETS ═══
+const CHEATS=[
+  {title:'Bash One-Liners',icon:'🐚',items:['find . -name "*.py" -exec wc -l {} +','ps aux | sort -nrk 4 | head','du -sh * | sort -rh | head -10','grep -rn "TODO" --include="*.py" .','tar czf backup.tar.gz --exclude=node_modules dir/','curl -sS https://api.ip.sb/ip','awk \'{sum+=$1} END {print sum}\' nums.txt','sort file | uniq -c | sort -rn | head']},
+  {title:'Git',icon:'🔀',items:['git log --oneline --graph --all','git stash && git pull && git stash pop','git diff --staged','git reset --soft HEAD~1','git cherry-pick <hash>','git reflog (undo anything!)','git bisect start/bad/good']},
+  {title:'nmap',icon:'🔍',items:['nmap -sC -sV -oN scan.txt <ip>','nmap -p- --min-rate 5000 <ip>','nmap -sU --top-ports 100 <ip>','nmap --script vuln <ip>','nmap -sn 192.168.1.0/24 (ping sweep)']},
+  {title:'Docker',icon:'🐳',items:['docker ps -a','docker exec -it <id> bash','docker compose up -d','docker logs -f <id>','docker system prune -af','docker build -t name:tag .']},
+  {title:'Metasploit',icon:'💀',items:['msfconsole','search <term>','use exploit/...','show options','set RHOSTS <ip>','exploit / run','sessions -l']},
+  {title:'Regex',icon:'🔤',items:['. = any char','* = 0+ of prev','+ = 1+ of prev','? = 0 or 1','^ = start of line','$ = end of line','\\d = digit, \\w = word char','[a-z] = character class','(group|alt) = alternatives']},
+  {title:'Vim Survival',icon:'📝',items:['i = insert mode','Esc = normal mode',':w = save, :q = quit, :wq = both',':q! = quit without saving','dd = delete line, yy = copy line','p = paste, u = undo','/search = search forward',':%s/old/new/g = replace all']},
+  {title:'Network Ports',icon:'🌐',items:['21=FTP, 22=SSH, 23=Telnet','25=SMTP, 53=DNS, 80=HTTP','110=POP3, 143=IMAP, 443=HTTPS','445=SMB, 3306=MySQL, 5432=PostgreSQL','6379=Redis, 8080=HTTP-alt','3389=RDP, 5900=VNC']},
+];
+function renderCheats(){
+  const grid=document.getElementById('cheatCards');
+  grid.innerHTML='';
+  CHEATS.forEach(ch=>{
+    const card=document.createElement('div');
+    card.className='card';card.dataset.vol='1';
+    card.innerHTML=`<h3>${ch.icon} ${ch.title}</h3><div class="card-desc">${ch.items.length} entries</div><div style="margin-top:8px;font-family:'Courier New',monospace;font-size:8.5pt;color:var(--t2);max-height:200px;overflow:auto;">${ch.items.map(it=>'<div style="padding:3px 0;border-bottom:1px solid var(--bd);">'+it+'</div>').join('')}</div>`;
+    grid.appendChild(card);
+  });
+}
+
+// ═══ STATS ═══
+function updateStats(){
+  document.getElementById('totalXP').textContent=state.xp;
+  document.getElementById('statXP').textContent=state.xp;
+  document.getElementById('streakCount').textContent=state.streak;
+  document.getElementById('statStreak').textContent=state.streak;
+  let totalSections=0,completedSections=0,completedModules=0;
+  MODULES.forEach(m=>{
+    totalSections+=m.sections.length;
+    const done=state.done[m.id]||{};
+    const c=Object.values(done).filter(Boolean).length;
+    completedSections+=c;
+    if(c===m.sections.length)completedModules++;
+  });
+  document.getElementById('statModules').textContent=completedModules+'/'+MODULES.length;
+  document.getElementById('statSections').textContent=completedSections+'/'+totalSections;
+  // Update streak
+  const today=new Date().toISOString().slice(0,10);
+  if(state.lastVisit!==today){
+    const yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);
+    state.streak=state.lastVisit===yesterday?state.streak+1:1;
+    state.lastVisit=today;
+    save();
+  }
+}
+
+// ═══ SEARCH ═══
+window.searchAll=function(q){
+  if(!q)return;
+  showView('dashboard');
+  document.querySelectorAll('.card').forEach(c=>{
+    const text=(c.textContent||'').toLowerCase();
+    c.style.display=text.includes(q.toLowerCase())?'':'none';
+  });
+};
+
+// ═══ STICKY ═══
+window.addGlobalSticky=function(){
+  const s=document.createElement('div');
+  s.style.cssText='position:fixed;bottom:60px;right:60px;width:180px;min-height:100px;background:#f8bbd0;border-radius:6px;box-shadow:2px 4px 14px rgba(0,0,0,.4);z-index:8000;padding:6px;';
+  s.innerHTML='<div style="display:flex;justify-content:space-between;cursor:grab;font-size:10px;padding:2px 4px;" onmousedown="dragS(event,this.parentElement)"><span>📌</span><button style="border:none;background:none;cursor:pointer;" onclick="this.closest(\'div[style]\').remove()">✕</button></div><textarea style="width:100%;min-height:70px;border:none;background:transparent;padding:4px;font-family:Calibri;font-size:9pt;color:#333;outline:none;" placeholder="Note…"></textarea>';
+  document.body.appendChild(s);
+};
+window.dragS=function(e,el){e.preventDefault();let sx=e.clientX,sy=e.clientY,ol=el.offsetLeft,ot=el.offsetTop;function mv(ev){el.style.left=(ol+ev.clientX-sx)+'px';el.style.top=(ot+ev.clientY-sy)+'px';el.style.right='auto';el.style.bottom='auto';}function up(){document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);}document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);};
+
+// ═══ SAVE ═══
+window.saveAll=function(){save();const b=new Blob(['<!DOCTYPE html>\n'+document.documentElement.outerHTML],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='pink_galaxy_bible_'+new Date().toISOString().slice(0,10)+'.html';a.click();};
+
+// ═══ KEYBOARD ═══
+document.addEventListener('keydown',e=>{if(e.ctrlKey&&e.key==='k'){e.preventDefault();document.querySelector('.search-mini').focus();}});
+
+// ═══ INIT ═══
+renderCards();
+renderCheats();
+updateStats();
+</script>
+</body>
+</html>

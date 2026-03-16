@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧱 Brick 3 — BASH-F03: Quoting & Expansion</title>
+<style>
+:root{--p:#e91e63;--pl:#f8bbd0;--g:#2e7d32;--gl:#a5d6a7;--bg:#0a0a12;--s2:#1a1a2e;--tx:#e8e6f0;--t2:#a8a6b8;--mt:#6c6a7e;--bd:rgba(233,30,99,.18);--bdg:rgba(46,125,50,.2);--purple:#9c27b0;--mono:"Courier New",monospace;--dn:#ff5252;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Calibri,"Segoe UI",sans-serif;background:var(--bg);color:var(--tx);font-size:11pt;line-height:1.65;padding:20px;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 20% 50%,rgba(233,30,99,.05),transparent 50%);}
+.w{max-width:900px;margin:0 auto;position:relative;z-index:1;}
+h1{color:var(--p);font-size:20pt;margin:30px 0 12px;border-bottom:2px solid var(--p);padding-bottom:8px;}
+h2{color:var(--g);font-size:15pt;margin:28px 0 10px;border-left:4px solid var(--g);padding-left:12px;}
+h3{color:var(--p);font-size:12pt;margin:20px 0 8px;}
+p{margin:8px 0;text-align:justify;}
+a{color:var(--p);}
+.ic{font-family:var(--mono);font-size:9pt;background:rgba(233,30,99,.08);padding:1px 5px;border-radius:3px;color:var(--pl);}
+.note{background:var(--s2);border-left:3px solid var(--p);padding:12px;border-radius:0 8px 8px 0;margin:14px 0;font-size:9.5pt;}
+.note b{color:var(--p);}.note.gn{border-left-color:var(--g);}.note.gn b{color:var(--gl);}
+.tabs{display:flex;gap:2px;margin:14px 0 6px;}
+.tab{padding:5px 12px;border-radius:6px 6px 0 0;border:1px solid transparent;background:none;color:var(--mt);cursor:pointer;font-size:8.5pt;font-family:inherit;}
+.tab.on{background:var(--s2);color:var(--p);border-color:var(--bd);border-bottom-color:var(--s2);}
+.pan{display:none;background:var(--s2);border:1px solid var(--bd);border-radius:0 8px 8px 8px;padding:14px;font-size:10pt;}
+.pan.on{display:block;}
+.pan.si{border-left:3px solid var(--gl);}.pan.te{border-left:3px solid var(--p);}.pan.de{border-left:3px solid var(--purple);}
+.cw{margin:10px 0;border:1px solid var(--bdg);border-radius:8px;overflow:hidden;background:#10101c;}
+.cwt{display:flex;justify-content:space-between;align-items:center;padding:3px 10px;background:rgba(46,125,50,.1);border-bottom:1px solid var(--bdg);font-size:7pt;}
+.cwl{color:var(--g);font-family:var(--mono);font-weight:bold;text-transform:uppercase;letter-spacing:1px;}
+.cwb{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--t2);padding:2px 7px;border-radius:4px;cursor:pointer;font-size:7pt;font-family:var(--mono);}
+.cwb:hover{background:var(--p);color:#fff;}
+pre{font-family:var(--mono);font-size:9.5pt;padding:10px;overflow-x:auto;white-space:pre;line-height:1.5;margin:0;color:var(--tx);background:#10101c;}
+pre .c{color:#555;font-style:italic;}pre .g{color:#a5d6a7;}pre .y{color:#fff59d;}pre .b{color:#90caf9;}pre .o{color:#ffcc80;}pre .p{color:#f48fb1;}pre .v{color:#ce93d8;}
+.out{background:rgba(46,125,50,.05);border-top:2px solid var(--g);padding:6px 10px;font-family:var(--mono);font-size:8.5pt;color:#a5d6a7;}
+.outl{color:var(--g);font-weight:bold;font-size:7pt;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;}
+.cm{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;}
+.cm>div{border-radius:8px;padding:10px;font-size:9pt;}
+.cm-do{background:rgba(46,125,50,.05);border:1px solid var(--bdg);}.cm-do b{color:var(--gl);}
+.cm-x{background:rgba(233,30,99,.04);border:1px solid var(--bd);}.cm-x b{color:var(--pl);}
+.cm p{margin:3px 0;color:var(--t2);}
+.qz{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:12px;margin:12px 0;}
+.qz-q{color:var(--tx);font-size:10pt;margin-bottom:8px;}
+.qo{padding:7px 12px;border:1px solid var(--bd);border-radius:8px;cursor:pointer;font-size:9pt;color:var(--t2);background:none;font-family:inherit;width:100%;text-align:left;transition:all .15s;display:block;margin-bottom:5px;}
+.qo:hover:not(:disabled){border-color:var(--p);color:var(--pl);}
+.qo.y{border-color:var(--g);background:rgba(46,125,50,.1);color:var(--gl);}
+.qo.n{border-color:var(--dn);background:rgba(255,82,82,.06);color:var(--dn);}
+.qfb{margin-top:6px;font-size:9pt;padding:8px;border-radius:6px;display:none;}
+.qfb.s{display:block;}.qfb.w{background:rgba(46,125,50,.08);color:var(--gl);border:1px solid var(--bdg);}.qfb.l{background:rgba(255,82,82,.05);color:var(--dn);border:1px solid rgba(255,82,82,.15);}
+.sd{margin:40px 0 0;padding:16px 0 8px;border-top:1px solid rgba(233,30,99,.1);}
+.sd small{color:var(--mt);font-size:8pt;text-transform:uppercase;letter-spacing:2px;}
+.sf{position:fixed;bottom:14px;right:14px;z-index:9999;}
+.sf button{padding:8px 16px;background:var(--g);color:#fff;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(0,0,0,.3);}
+.cover{text-align:center;padding:30px;margin-bottom:20px;background:linear-gradient(135deg,#1a0533,#0d1b2a);border:2px solid var(--g);border-radius:14px;}
+.cover h1{border:none;color:var(--gl);font-size:16pt;margin:0;}
+.cover p{color:var(--t2);font-size:10pt;}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:9.5pt;}
+th{background:rgba(233,30,99,.1);color:var(--pl);padding:8px 10px;text-align:left;border-bottom:2px solid var(--p);}
+td{padding:6px 10px;border-bottom:1px solid var(--bd);color:var(--t2);font-family:var(--mono);font-size:9pt;}
+@media print{body{background:#fff;color:#333;}h1{color:#e91e63!important;}h2{color:#2e7d32!important;}pre{background:#f5f5f5!important;color:#333;}.sf{display:none;}@page{size:A4;margin:1.5cm 1cm;}}
+</style>
+</head>
+<body>
+<div class="w">
+
+<div class="cover">
+<h1>🧱 Brick 3 — BASH-F03: Quoting & Expansion</h1>
+<p>The rules that determine how bash reads your text before executing it</p>
+<p style="font-size:8pt;color:var(--mt);margin-top:6px;">6 sections · 3 explanation levels · Complete with quizzes and exercises</p>
+</div>
+
+<div class="note">
+<b>🎯 Why this module matters:</b> Quoting is the #1 source of bash bugs. Understanding when bash expands variables, splits words, and interprets special characters versus when it treats text literally is the difference between a script that works and one that silently corrupts your data. Master this module and you eliminate an entire category of bugs from your scripts forever.
+</div>
+
+<!-- ═══ SECTION 1: The Quoting Cheat Table ═══ -->
+<div class="sd" id="s0"><small>BASH-F03.1 of 6 · ⏱ ~10 min</small></div>
+<h2>BASH-F03.1 — The Quoting Rules (Big Picture)</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>There are three types of quoting in bash, and each one controls how much bash "processes" the text inside it. Think of it like three levels of mail handling. <strong>No quotes</strong> means the post office opens your letter, reads it, rearranges the words, and delivers what it thinks you meant (dangerous!). <strong>Double quotes</strong> means the post office peeks inside to fill in any address placeholders ($variables) but otherwise delivers it intact. <strong>Single quotes</strong> means the post office delivers the sealed envelope without opening it at all — completely literal, no changes.</p>
+<p>The golden rule for beginners: <strong>when in doubt, use double quotes.</strong> Specifically, always double-quote your variables: <span class="ic">"$var"</span> instead of <span class="ic">$var</span>. This single habit prevents the most common category of bash bugs (word splitting and glob expansion on variables containing spaces or special characters).</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Bash processes text through several expansion stages in this order: brace expansion → tilde expansion → parameter/variable expansion → command substitution → arithmetic expansion → word splitting → pathname (glob) expansion. Quoting controls which of these stages are applied. Single quotes suppress ALL expansions. Double quotes suppress word splitting and pathname expansion but allow parameter expansion, command substitution, and arithmetic expansion. No quotes allow everything. Understanding this pipeline is essential for predicting bash behavior.</p>
+</div>
+
+<table>
+<tr><th>Quoting</th><th>Syntax</th><th>$var expands?</th><th>$(cmd) runs?</th><th>Spaces split?</th><th>Globs expand?</th><th>Use when</th></tr>
+<tr><td>None</td><td><span class="ic">$var</span></td><td>✅ Yes</td><td>✅ Yes</td><td>⚠️ Yes!</td><td>⚠️ Yes!</td><td>Almost never (dangerous)</td></tr>
+<tr><td>Double</td><td><span class="ic">"$var"</span></td><td>✅ Yes</td><td>✅ Yes</td><td>❌ No</td><td>❌ No</td><td><strong>Default choice</strong> — safe for variables</td></tr>
+<tr><td>Single</td><td><span class="ic">'$var'</span></td><td>❌ No</td><td>❌ No</td><td>❌ No</td><td>❌ No</td><td>Literal text, regex patterns, awk scripts</td></tr>
+</table>
+
+<div class="cm">
+<div class="cm-do"><b>✅ The habit that saves you:</b><p>Always write <span class="ic">"$variable"</span> with double quotes. Always. Even when you think it is not necessary. The one time it IS necessary will be the one time you forgot, and your script will delete the wrong files or break on a filename with spaces.</p></div>
+<div class="cm-x"><b>❌ The classic disaster:</b><p><span class="ic">rm $file</span> where file contains "my documents" → bash splits this into <span class="ic">rm my documents</span> → deletes files named "my" and "documents" instead of the file "my documents". With quotes: <span class="ic">rm "$file"</span> → correctly deletes "my documents".</p></div>
+</div>
+
+<div class="qz"><div class="qz-q">🧪 You have <span class="ic">file="my report.pdf"</span>. What happens with <span class="ic">cat $file</span> (no quotes)?</div>
+<div class="qo" onclick="ck(this,false)">It prints the contents of "my report.pdf"</div>
+<div class="qo" onclick="ck(this,true)">Bash splits it into two arguments: cat tries to open "my" and "report.pdf" separately (both probably fail)</div>
+<div class="qo" onclick="ck(this,false)">It prints an error about quoting</div>
+<div class="qfb"></div></div>
+
+<!-- ═══ SECTION 2: Single Quotes ═══ -->
+<div class="sd" id="s1"><small>BASH-F03.2 of 6 · ⏱ ~7 min</small></div>
+<h2>BASH-F03.2 — Single Quotes (Absolute Literal)</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+<button class="tab" onclick="sw(this,'de')">⚙️ Deep</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>Single quotes are a force field. Absolutely nothing inside them gets interpreted or changed by bash. The dollar sign is just a dollar sign. The asterisk is just a star. The exclamation mark is just punctuation. What you type is exactly what you get. This makes single quotes perfect for regex patterns, awk programs, and any text where you want bash to keep its hands off completely.</p>
+<p>The one catch: you cannot put a single quote inside single quotes. If you need a literal single quote inside single-quoted text, you have to end the single quotes, add an escaped single quote, then restart single quotes: <span class="ic">'can'\''t'</span> produces the text <span class="ic">can't</span>.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Within single quotes, every character is treated literally. No expansion of any kind occurs: no variable expansion (<span class="ic">$var</span> stays as the literal string "$var"), no command substitution, no escape sequences (<span class="ic">\n</span> is a literal backslash followed by 'n', not a newline), no glob expansion, no brace expansion. The only character that cannot appear inside single quotes is the single quote itself — it always terminates the quoted string. The workaround <span class="ic">'text'\''more'</span> works because bash concatenates adjacent strings: 'text' + \' (escaped single quote) + 'more' = text'more.</p>
+</div>
+<div class="pan de" data-l="de">
+<p>In bash's lexer (file <span class="ic">parse.y</span>), when the scanner encounters a single quote character, it enters the <span class="ic">SQSTRING</span> state. In this state, every character is accumulated into the current token's buffer verbatim until another single quote is encountered, which terminates the state. The token is then flagged with <span class="ic">W_QUOTED</span> and <span class="ic">W_NOGLOB</span> attributes, which tell the expansion engine to skip all expansion stages for this token. No further processing is applied — the raw bytes are passed directly to the command as an argument.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="v">name</span>=<span class="y">"Mari"</span>
+
+<span class="c"># Single quotes: NOTHING is expanded</span>
+<span class="g">echo</span> <span class="y">'Hello $name'</span>              <span class="c"># Hello $name  (literal dollar sign)</span>
+<span class="g">echo</span> <span class="y">'Today is $(date)'</span>          <span class="c"># Today is $(date)  (literal text)</span>
+<span class="g">echo</span> <span class="y">'Files: *.txt'</span>              <span class="c"># Files: *.txt  (literal asterisk)</span>
+<span class="g">echo</span> <span class="y">'Path: ~/'</span>                  <span class="c"># Path: ~/  (literal tilde)</span>
+<span class="g">echo</span> <span class="y">'Tab:\there'</span>                <span class="c"># Tab:\there  (literal backslash-t)</span>
+
+<span class="c"># Perfect for: awk, grep patterns, regex</span>
+<span class="g">awk</span> <span class="y">'{print $1}'</span> <span class="b">file.txt</span>      <span class="c"># $1 is awk's column 1, NOT a bash variable</span>
+<span class="g">grep</span> <span class="y">'^[0-9]+$'</span> <span class="b">data.txt</span>      <span class="c"># regex stays intact</span>
+
+<span class="c"># Embedding a single quote (the '\'' trick)</span>
+<span class="g">echo</span> <span class="y">'I can'\''t stop learning'</span>  <span class="c"># I can't stop learning</span></pre>
+<div class="out"><div class="outl">Expected Output</div><pre>Hello $name
+Today is $(date)
+Files: *.txt
+Path: ~/
+Tab:\there
+I can't stop learning</pre></div></div>
+
+<div class="qz"><div class="qz-q">🧪 Why are single quotes used for awk scripts like <span class="ic">awk '{print $1}'</span>?</div>
+<div class="qo" onclick="ck(this,true)">Because awk uses $1 to mean "first column" — without single quotes, bash would try to expand $1 as a bash variable before awk ever sees it</div>
+<div class="qo" onclick="ck(this,false)">Because awk requires single quotes in its syntax</div>
+<div class="qo" onclick="ck(this,false)">For readability only — double quotes would work the same way</div>
+<div class="qfb"></div></div>
+
+<!-- ═══ SECTION 3: Double Quotes ═══ -->
+<div class="sd" id="s2"><small>BASH-F03.3 of 6 · ⏱ ~8 min</small></div>
+<h2>BASH-F03.3 — Double Quotes (Selective Expansion)</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+<button class="tab" onclick="sw(this,'de')">⚙️ Deep</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>Double quotes are the sweet spot — they let bash fill in your variables and run command substitutions, but they protect you from the two most dangerous automatic behaviors: word splitting (spaces breaking your arguments apart) and glob expansion (asterisks matching random filenames). This is why double quotes are the default choice for almost all situations where you reference variables.</p>
+<p>Inside double quotes, three special characters still work: <span class="ic">$</span> (variable/command expansion), <span class="ic">`</span> (old-style command substitution — prefer <span class="ic">$()</span> instead), and <span class="ic">\</span> (escape the next character). Everything else is literal.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Double quotes create a "weak quoting" context. The expansion pipeline still runs parameter expansion (<span class="ic">$var</span>, <span class="ic">${var}</span>), command substitution (<span class="ic">$(cmd)</span>), and arithmetic expansion (<span class="ic">$((expr))</span>). However, the post-expansion stages of word splitting (IFS-based tokenization) and pathname expansion (glob matching) are suppressed. This means <span class="ic">"$var"</span> always produces exactly one argument to the command, regardless of what <span class="ic">$var</span> contains — spaces, tabs, newlines, asterisks, question marks — all are treated as literal characters within that single argument.</p>
+</div>
+<div class="pan de" data-l="de">
+<p>When the bash lexer encounters a double quote, it enters the <span class="ic">DQSTRING</span> state. In this state, it still recognizes <span class="ic">$</span>, <span class="ic">`</span>, <span class="ic">\</span>, and <span class="ic">"</span> as special but treats all other characters literally. After lexing, the token is flagged with <span class="ic">W_QUOTED</span> but NOT <span class="ic">W_NOGLOB</span> — however, the expansion engine checks the quoted flag and skips the <span class="ic">word_split()</span> and <span class="ic">glob_expand()</span> stages for quoted regions. The key function is <span class="ic">string_extract_double_quoted()</span> in <span class="ic">subst.c</span>, which recursively processes nested <span class="ic">$()</span> and <span class="ic">${}</span> constructs while maintaining the quoting context.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="v">name</span>=<span class="y">"Mari"</span>
+<span class="v">path</span>=<span class="y">"/home/mari/my project"</span>     <span class="c"># has a space!</span>
+<span class="v">pattern</span>=<span class="y">"*.py"</span>
+
+<span class="c"># Double quotes: variables expand, spaces are preserved</span>
+<span class="g">echo</span> <span class="y">"Hello $name"</span>                <span class="c"># Hello Mari  (expanded!)</span>
+<span class="g">echo</span> <span class="y">"Date: $(date +%Y-%m-%d)"</span>   <span class="c"># Date: 2026-03-15  (command runs!)</span>
+<span class="g">echo</span> <span class="y">"Path: $path"</span>                <span class="c"># Path: /home/mari/my project  (space preserved!)</span>
+<span class="g">echo</span> <span class="y">"Pattern: $pattern"</span>           <span class="c"># Pattern: *.py  (NOT expanded to filenames!)</span>
+
+<span class="c"># THE CRITICAL DIFFERENCE — with and without quotes:</span>
+<span class="v">files</span>=<span class="y">"file one.txt   file two.txt"</span>
+
+<span class="c"># Without quotes: word splitting happens</span>
+<span class="p">for</span> <span class="v">f</span> <span class="p">in</span> $files; <span class="p">do</span>
+    <span class="g">echo</span> <span class="y">"  NO QUOTES: [$f]"</span>
+<span class="p">done</span>
+<span class="c"># Prints 4 iterations: [file] [one.txt] [file] [two.txt]  ← BROKEN</span>
+
+<span class="c"># With quotes: stays as one unit</span>
+<span class="g">echo</span> <span class="y">"  QUOTED: [$files]"</span>
+<span class="c"># Prints: [file one.txt   file two.txt]  ← CORRECT</span></pre>
+<div class="out"><div class="outl">Expected Output</div><pre>Hello Mari
+Date: 2026-03-15
+Path: /home/mari/my project
+Pattern: *.py
+  NO QUOTES: [file]
+  NO QUOTES: [one.txt]
+  NO QUOTES: [file]
+  NO QUOTES: [two.txt]
+  QUOTED: [file one.txt   file two.txt]</pre></div></div>
+
+<div class="qz"><div class="qz-q">🧪 You have <span class="ic">dir="/home/mari/My Documents"</span>. Which command safely changes into it?</div>
+<div class="qo" onclick="ck(this,false)">cd $dir</div>
+<div class="qo" onclick="ck(this,true)">cd "$dir"</div>
+<div class="qo" onclick="ck(this,false)">cd '$dir'</div>
+<div class="qfb"></div></div>
+
+<!-- ═══ SECTION 4: Command Substitution ═══ -->
+<div class="sd" id="s3"><small>BASH-F03.4 of 6 · ⏱ ~7 min</small></div>
+<h2>BASH-F03.4 — Command Substitution: $() and Backticks</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>Command substitution lets you capture the output of a command and use it as text. Wrap any command in <span class="ic">$(command)</span> and bash runs it in a subshell, captures everything it prints to stdout, strips trailing newlines, and substitutes the result in place. It is like asking a coworker a question and using their answer in your sentence: "The server has <span class="ic">$(df -h / | awk 'NR==2{print $5}')</span> disk usage" becomes "The server has 42% disk usage."</p>
+<p>You may see backtick syntax <span class="ic">`command`</span> in older scripts — it does the same thing but is harder to read and cannot be nested. Always prefer <span class="ic">$(command)</span>.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>The <span class="ic">$()</span> syntax forks a subshell, redirects its stdout to a pipe, executes the enclosed command(s) in that subshell, reads the pipe output into a buffer, strips all trailing newlines from the buffer, and substitutes the resulting string into the command line. Unlike backticks, <span class="ic">$()</span> supports clean nesting: <span class="ic">$(echo $(date))</span> works without escaping. The subshell inherits the parent's environment but runs in a separate process — changes to variables inside <span class="ic">$()</span> do not affect the parent. If the command produces no output, the substitution results in an empty string.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="c"># ═══ Command Substitution ═══</span>
+
+<span class="c"># Store command output in a variable</span>
+<span class="v">kernel</span>=<span class="p">$(</span><span class="g">uname</span> <span class="o">-r</span><span class="p">)</span>
+<span class="v">ip_addr</span>=<span class="p">$(</span><span class="g">hostname</span> <span class="o">-I</span> | <span class="g">awk</span> <span class="y">'{print $1}'</span><span class="p">)</span>
+<span class="v">git_branch</span>=<span class="p">$(</span><span class="g">git</span> <span class="o">branch</span> <span class="o">--show-current</span> 2>/dev/null || <span class="g">echo</span> <span class="y">"not a repo"</span><span class="p">)</span>
+<span class="v">line_count</span>=<span class="p">$(</span><span class="g">wc</span> <span class="o">-l</span> < <span class="b">~/.zshrc</span><span class="p">)</span>
+
+<span class="g">echo</span> <span class="y">"Kernel: $kernel"</span>
+<span class="g">echo</span> <span class="y">"IP: $ip_addr"</span>
+<span class="g">echo</span> <span class="y">"Branch: $git_branch"</span>
+<span class="g">echo</span> <span class="y">"Zshrc has $line_count lines"</span>
+
+<span class="c"># Nested substitution (try this with backticks — impossible to read!)</span>
+<span class="g">echo</span> <span class="y">"Config dir has $(ls $(echo ~/.config) | wc -l) items"</span>
+
+<span class="c"># Use in conditionals</span>
+<span class="p">if</span> [[ <span class="p">$(</span><span class="g">whoami</span><span class="p">)</span> == <span class="y">"root"</span> ]]; <span class="p">then</span>
+    <span class="g">echo</span> <span class="y">"⚠️ Running as root!"</span>
+<span class="p">else</span>
+    <span class="g">echo</span> <span class="y">"✓ Running as normal user"</span>
+<span class="p">fi</span>
+
+<span class="c"># Timestamp in filenames</span>
+<span class="v">backup_name</span>=<span class="y">"backup_$(date +%Y%m%d_%H%M%S).tar.gz"</span>
+<span class="g">echo</span> <span class="y">"Will create: $backup_name"</span></pre>
+<div class="out"><div class="outl">Expected Output</div><pre>Kernel: 6.12.8-arch1-1
+IP: 192.168.178.42
+Branch: main
+Zshrc has 85 lines
+Config dir has 23 items
+✓ Running as normal user
+Will create: backup_20260315_143022.tar.gz</pre></div></div>
+
+<div class="qz"><div class="qz-q">🧪 What is the key difference between <span class="ic">$(command)</span> and backticks <span class="ic">`command`</span>?</div>
+<div class="qo" onclick="ck(this,false)">Backticks are faster</div>
+<div class="qo" onclick="ck(this,false)">They produce different output</div>
+<div class="qo" onclick="ck(this,true)">$() can be cleanly nested and is easier to read — backticks require escaping for nesting and are deprecated in style</div>
+<div class="qfb"></div></div>
+
+<!-- ═══ SECTION 5: Brace & Tilde Expansion ═══ -->
+<div class="sd" id="s4"><small>BASH-F03.5 of 6 · ⏱ ~6 min</small></div>
+<h2>BASH-F03.5 — Brace & Tilde Expansion</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>Brace expansion is bash's copy-paste shortcut. Instead of typing <span class="ic">mkdir src tests docs config</span>, you type <span class="ic">mkdir {src,tests,docs,config}</span>. Bash expands the braces into all the listed words. You can also do ranges: <span class="ic">{1..10}</span> generates numbers 1 through 10, and <span class="ic">{a..z}</span> generates the entire alphabet. This is incredibly useful for creating directory structures, generating file lists, and writing compact commands.</p>
+<p>Tilde expansion is simpler: <span class="ic">~</span> expands to your home directory. <span class="ic">~mari</span> expands to user mari's home directory. It only works at the beginning of a word and only when unquoted.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Brace expansion happens FIRST in bash's expansion pipeline — before variable expansion. This means <span class="ic">{$a,$b}</span> does NOT work as expected (the braces are expanded before $a and $b are resolved). Brace expansion produces a purely textual substitution: <span class="ic">pre{A,B}suf</span> → <span class="ic">preAsuf preBsuf</span>. Ranges support zero-padding: <span class="ic">{01..10}</span> → <span class="ic">01 02 03 ... 10</span>. Tilde expansion calls <span class="ic">getpwnam()</span> to look up the user's home directory from <span class="ic">/etc/passwd</span>.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="c"># ═══ Brace Expansion ═══</span>
+
+<span class="c"># Comma-separated list</span>
+<span class="g">echo</span> <span class="y">{apple,banana,cherry}</span>
+<span class="c"># Output: apple banana cherry</span>
+
+<span class="c"># Create project structure in ONE command</span>
+<span class="g">mkdir</span> <span class="o">-p</span> <span class="b">project/{src,tests,docs,config,scripts}</span>
+
+<span class="c"># Number range</span>
+<span class="g">echo</span> <span class="y">{1..5}</span>                       <span class="c"># 1 2 3 4 5</span>
+<span class="g">echo</span> <span class="y">{01..12}</span>                     <span class="c"># 01 02 03 ... 12 (zero-padded!)</span>
+<span class="g">echo</span> <span class="y">{a..f}</span>                       <span class="c"># a b c d e f</span>
+
+<span class="c"># Step value</span>
+<span class="g">echo</span> <span class="y">{0..20..5}</span>                   <span class="c"># 0 5 10 15 20</span>
+
+<span class="c"># Combine with prefix/suffix</span>
+<span class="g">echo</span> <span class="y">file{1..3}.txt</span>               <span class="c"># file1.txt file2.txt file3.txt</span>
+<span class="g">echo</span> <span class="y">/var/log/{syslog,auth,kern}.log</span>
+
+<span class="c"># Backup trick: rename file by adding .bak</span>
+<span class="g">cp</span> <span class="b">config.yml{,.bak}</span>              <span class="c"># expands to: cp config.yml config.yml.bak</span>
+
+<span class="c"># ═══ Tilde Expansion ═══</span>
+<span class="g">echo</span> <span class="y">~</span>                             <span class="c"># /home/mari</span>
+<span class="g">echo</span> <span class="y">~/projects</span>                   <span class="c"># /home/mari/projects</span>
+<span class="g">echo</span> <span class="y">'~'</span>                           <span class="c"># ~ (literal! single quotes block expansion)</span></pre>
+<div class="out"><div class="outl">Expected Output</div><pre>apple banana cherry
+1 2 3 4 5
+01 02 03 04 05 06 07 08 09 10 11 12
+a b c d e f
+0 5 10 15 20
+file1.txt file2.txt file3.txt
+/var/log/syslog.log /var/log/auth.log /var/log/kern.log
+/home/mari
+/home/mari/projects
+~</pre></div></div>
+
+<div class="qz"><div class="qz-q">🧪 What does <span class="ic">cp important.conf{,.bak}</span> expand to?</div>
+<div class="qo" onclick="ck(this,true)">cp important.conf important.conf.bak — the {,.bak} means "empty string" and ".bak" appended to the prefix</div>
+<div class="qo" onclick="ck(this,false)">It copies the .bak file to important.conf</div>
+<div class="qo" onclick="ck(this,false)">It creates a backup directory</div>
+<div class="qfb"></div></div>
+
+<!-- ═══ SECTION 6: Practice ═══ -->
+<div class="sd" id="s5"><small>BASH-F03.6 of 6 · ⏱ ~10 min</small></div>
+<h2>BASH-F03.6 — Practice Exercises</h2>
+
+<h3>Exercise 1 (Easy) — Quote Diagnosis</h3>
+<p>For each line below, predict the output. Then test in your terminal.</p>
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="v">x</span>=<span class="y">"world"</span>
+<span class="g">echo</span> <span class="y">"Hello $x"</span>       <span class="c"># ?</span>
+<span class="g">echo</span> <span class="y">'Hello $x'</span>       <span class="c"># ?</span>
+<span class="g">echo</span> Hello $x          <span class="c"># ?</span>
+<span class="g">echo</span> <span class="y">"$(date +%H:%M)"</span> <span class="c"># ?</span>
+<span class="g">echo</span> <span class="y">'$(date +%H:%M)'</span> <span class="c"># ?</span></pre>
+<div class="out"><div class="outl">Answers</div><pre>Hello world        ← double quotes: $x expanded
+Hello $x           ← single quotes: literal
+Hello world        ← no quotes: $x expanded (works here but risky)
+14:30              ← double quotes: command substitution runs
+$(date +%H:%M)     ← single quotes: literal text</pre></div></div>
+
+<h3>Exercise 2 (Medium) — Safe File Handler</h3>
+<p>Write a script that takes a filename as an argument (which may contain spaces) and prints its size, line count, and word count. Handle the case where the file does not exist. Use proper quoting throughout.</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">solution</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="v">file</span>=<span class="y">"${1:?Usage: $0 &lt;filename&gt;}"</span>
+
+<span class="p">if</span> [[ ! -f <span class="y">"$file"</span> ]]; <span class="p">then</span>
+    <span class="g">echo</span> <span class="y">"Error: '$file' not found"</span> >&2
+    <span class="g">exit</span> <span class="y">1</span>
+<span class="p">fi</span>
+
+<span class="v">size</span>=<span class="p">$(</span><span class="g">stat</span> <span class="o">-c</span> <span class="y">%s</span> <span class="y">"$file"</span><span class="p">)</span>
+<span class="v">lines</span>=<span class="p">$(</span><span class="g">wc</span> <span class="o">-l</span> < <span class="y">"$file"</span><span class="p">)</span>
+<span class="v">words</span>=<span class="p">$(</span><span class="g">wc</span> <span class="o">-w</span> < <span class="y">"$file"</span><span class="p">)</span>
+
+<span class="g">echo</span> <span class="y">"File:  $file"</span>
+<span class="g">echo</span> <span class="y">"Size:  $size bytes"</span>
+<span class="g">echo</span> <span class="y">"Lines: $lines"</span>
+<span class="g">echo</span> <span class="y">"Words: $words"</span></pre>
+<div class="out"><div class="outl">Output (with ./fileinfo.sh "my report.txt")</div><pre>File:  my report.txt
+Size:  4521 bytes
+Lines: 89
+Words: 612</pre></div></div>
+
+<h3>Exercise 3 (Hard) — Project Scaffolding</h3>
+<p>Write a one-liner (using brace expansion) that creates the following directory structure and empty files. No loops — just one <span class="ic">mkdir</span> and one <span class="ic">touch</span> command.</p>
+<div class="cw"><div class="cwt"><span class="cwl">target structure</span></div>
+<pre>myapp/
+├── src/
+│   ├── main.py
+│   └── utils.py
+├── tests/
+│   └── test_main.py
+├── docs/
+├── config/
+├── README.md
+└── .gitignore</pre></div>
+
+<div class="cw"><div class="cwt"><span class="cwl">solution</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="g">mkdir</span> <span class="o">-p</span> <span class="b">myapp/{src,tests,docs,config}</span>
+<span class="g">touch</span> <span class="b">myapp/{README.md,.gitignore,src/{main,utils}.py,tests/test_main.py}</span></pre></div>
+
+<div class="note gn">
+<b>🌸 Module Complete!</b> You now understand bash's quoting and expansion system — the rules that determine what bash does with your text before executing it. Single quotes for literal text, double quotes for safe variable expansion, <span class="ic">$()</span> for command substitution, <span class="ic">{}</span> for brace expansion. The habit of always double-quoting variables will prevent more bugs than any other single practice in bash scripting. Next module: BASH-F04 (Conditionals) — making your scripts make decisions.
+</div>
+
+<div class="note">
+<b>📋 Integration:</b> To add this module to the platform shell, follow the same process as Brick 2. In your next session, provide this file and ask: "Integrate Brick 3 (BASH-F03) into my platform shell." The content functions will be generated to match the platform's format.
+</div>
+
+</div><!-- end .w -->
+<div class="sf"><button onclick="saveAll()">💾 Save Brick 3</button></div>
+<script>
+function sw(btn,lv){let el=btn.parentElement.nextElementSibling;while(el&&!el.classList.contains('sd')&&!el.classList.contains('qz')&&!el.classList.contains('cm')&&!el.classList.contains('cw')){if(el.classList.contains('pan'))el.classList.toggle('on',el.dataset.l===lv);el=el.nextElementSibling;}btn.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');}
+function ck(btn,ok){const box=btn.closest('.qz');box.querySelectorAll('.qo').forEach(o=>o.disabled=true);btn.classList.add(ok?'y':'n');const fb=box.querySelector('.qfb');fb.classList.add('s');fb.className=ok?'qfb s w':'qfb s l';fb.textContent=ok?'✓ Correct! +10 XP':'✗ Review the section above.';}
+function cpC(b){const pre=b.closest('.cw').querySelector('pre');navigator.clipboard.writeText(pre.textContent).then(()=>{b.textContent='✓';setTimeout(()=>b.textContent='Copy',1500);});}
+function saveAll(){const blob=new Blob(['<!DOCTYPE html>\n'+document.documentElement.outerHTML],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='brick3_BASHF03_quoting_'+new Date().toISOString().slice(0,10)+'.html';a.click();}
+</script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌸 Pink Galaxy DevHub — Your Universal Learning Operating System</title>
+<style>
+:root{--p:#e91e63;--pl:#f8bbd0;--pd:#880e4f;--pg:rgba(233,30,99,.25);--g:#2e7d32;--gl:#a5d6a7;--gd:#1b5e20;--gg:rgba(46,125,50,.25);--bg:#0a0a12;--s1:#0f0f1e;--s2:#1a1a2e;--s3:#242440;--tx:#e8e6f0;--t2:#a8a6b8;--mt:#6c6a7e;--bd:rgba(233,30,99,.18);--r:12px;--purple:#ab47bc;--blue:#5c6bc0;--cyan:#00acc1;--orange:#ff9800;--yellow:#ffd600;--danger:#ff5252;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Calibri,"Segoe UI",sans-serif;background:var(--bg);color:var(--tx);overflow-x:hidden;font-size:11pt;line-height:1.6;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 15% 50%,rgba(233,30,99,.06),transparent 50%),radial-gradient(ellipse at 85% 25%,rgba(46,125,50,.04),transparent 50%);}
+a{color:var(--p);text-decoration:none;}
+.container{padding:40px 20px;max-width:1200px;margin:0 auto;position:relative;z-index:1;}
+h1{color:var(--p);text-align:center;font-size:32pt;margin-bottom:20px;text-shadow:0 0 30px var(--pg);}
+.subtitle{text-align:center;color:var(--t2);font-size:14pt;margin-bottom:40px;}
+.status-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-bottom:40px;}
+.status-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:20px;}
+.status-card h3{color:var(--p);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.status-list{list-style:none;}
+.status-list li{padding:4px 0;color:var(--t2);display:flex;align-items:center;gap:8px;}
+.status-ok{color:var(--gl);}
+.status-ready{color:var(--yellow);}
+.info{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:24px;margin-bottom:20px;}
+.info h3{color:var(--p);margin-bottom:12px;}
+.auth-demo{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);padding:20px;margin:20px 0;}
+.auth-demo h4{color:var(--orange);margin-bottom:12px;}
+.credentials{background:var(--s3);padding:12px;border-radius:8px;font-family:"Courier New",monospace;font-size:10pt;}
+.next-steps{background:linear-gradient(135deg,var(--s1),var(--s2));border:1px solid var(--bd);border-radius:var(--r);padding:24px;margin-top:20px;}
+.next-steps h3{color:var(--g);margin-bottom:16px;}
+.steps{list-style:none;counter-reset:step;}
+.steps li{counter-increment:step;margin:12px 0;padding-left:30px;position:relative;}
+.steps li::before{content:counter(step);position:absolute;left:0;top:0;background:var(--p);color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:9pt;font-weight:bold;}
+.highlight{background:rgba(233,30,99,0.1);padding:2px 6px;border-radius:4px;color:var(--pl);}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🌸 Pink Galaxy DevHub</h1>
+<div class="subtitle">Your Universal Learning Operating System<br>AWS Infrastructure Status & Next Steps</div>
+
+<div class="status-grid">
+  <div class="status-card">
+    <h3>☁️ AWS Infrastructure</h3>
+    <ul class="status-list">
+      <li><span class="status-ok">✅</span> DynamoDB Tables (3) with Point-in-Time Recovery</li>
+      <li><span class="status-ok">✅</span> S3 Storage with versioning & encryption</li>
+      <li><span class="status-ok">✅</span> Lambda Functions ready for deployment</li>
+      <li><span class="status-ok">✅</span> IAM Roles & Policies configured</li>
+      <li><span class="status-ready">⚠️</span> API Gateway endpoints (ready to deploy)</li>
+      <li><span class="status-ready">⚠️</span> Amplify hosting (ready to connect)</li>
+    </ul>
+  </div>
+
+  <div class="status-card">
+    <h3>📚 Content Foundation</h3>
+    <ul class="status-list">
+      <li><span class="status-ok">✅</span> 19 Bricks Ready (Bash + Arch + Security)</li>
+      <li><span class="status-ok">✅</span> Blueprint v2 Complete</li>
+      <li><span class="status-ok">✅</span> Pink Galaxy Bible v2 Platform</li>
+      <li><span class="status-ok">✅</span> Module JSON Specification</li>
+      <li><span class="status-ready">⚠️</span> Platform Integration (next step)</li>
+    </ul>
+  </div>
+</div>
+
+<div class="info">
+  <h3>🌌 The Pink Galaxy Universe</h3>
+  <p>This is not a simple learning platform. This is your <strong>personal operating system for mastering technology</strong> — 6 complete universes with 180+ modules covering everything from Linux installation to security penetration testing to cloud architecture.</p>
+  
+  <p><strong>Current Progress:</strong> You have 19 complete "bricks" (modules) ready to integrate:</p>
+  <ul style="margin:12px 0 0 20px;color:var(--t2);">
+    <li><span class="highlight">Bash Fundamentals Track (F01-F08)</span>: Complete — from first script to production error handling</li>
+    <li><span class="highlight">Arch Commands Track (CMD01-CMD06)</span>: Navigation, text processing, permissions, processes, networking, packages</li>
+    <li><span class="highlight">Security Track (F01, REC01-02, WEB01, NET01)</span>: Foundations through web exploitation and network analysis</li>
+  </ul>
+</div>
+
+<div class="auth-demo">
+  <h4>🔐 Authentication Test Credentials</h4>
+  <div class="credentials">
+    <strong>Admin User:</strong><br>
+    Username: linda<br>
+    Password: Mari62739!<br><br>
+    <strong>Standard User:</strong><br>
+    Username: amor<br>
+    Password: Amor62739!
+  </div>
+</div>
+
+<div class="next-steps">
+  <h3>🚀 Next Deployment Steps</h3>
+  <ol class="steps">
+    <li>Replace this placeholder with the complete <strong>Pink Galaxy Bible v2 HTML</strong> platform</li>
+    <li>Integrate all 19 existing bricks as modules with their JSON data</li>
+    <li>Deploy Lambda functions to AWS and connect API endpoints</li>
+    <li>Set up Cognito authentication with real user management</li>
+    <li>Configure Amplify hosting with GitHub auto-deploy</li>
+    <li>Test full cloud sync and cross-device persistence</li>
+    <li>Begin content expansion: Python track, Cloud track, etc.</li>
+  </ol>
+</div>
+
+<div class="info">
+  <h3>📂 Repository Structure</h3>
+  <p><strong>BLOCKS/</strong> directory contains:</p>
+  <ul style="margin:8px 0 0 20px;color:var(--t2);">
+    <li><code>BLUEPRINT_v2.md</code> — Complete platform specification</li>
+    <li><code>pink_galaxy_bible_v2.html</code> — Full platform implementation</li>
+    <li><code>BRICKS.txt</code> — Inventory of all 19 ready modules</li>
+  </ul>
+  
+  <p style="margin-top:16px;"><strong>Current Location:</strong> <code>C:\Users\casta\OneDrive\Documentos\GitHub\DevHub\</code></p>
+  <p><strong>GitHub Repository:</strong> <a href="https://github.com/maricastanon/pink-galaxy-devhub">pink-galaxy-devhub</a></p>
+</div>
+
+</div>
+</body>
+</html>

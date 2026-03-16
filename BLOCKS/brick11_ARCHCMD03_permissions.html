@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧱 Brick 11 — ARCH-CMD03: Permissions & Users</title>
+<style>
+:root{--p:#e91e63;--pl:#f8bbd0;--g:#2e7d32;--gl:#a5d6a7;--bg:#0a0a12;--s2:#1a1a2e;--tx:#e8e6f0;--t2:#a8a6b8;--mt:#6c6a7e;--bd:rgba(233,30,99,.18);--bdg:rgba(46,125,50,.2);--purple:#9c27b0;--mono:"Courier New",monospace;--dn:#ff5252;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Calibri,"Segoe UI",sans-serif;background:var(--bg);color:var(--tx);font-size:11pt;line-height:1.65;padding:20px;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 20% 50%,rgba(233,30,99,.05),transparent 50%);}
+.w{max-width:900px;margin:0 auto;position:relative;z-index:1;}
+h1{color:var(--p);font-size:20pt;margin:30px 0 12px;border-bottom:2px solid var(--p);padding-bottom:8px;}
+h2{color:var(--g);font-size:15pt;margin:28px 0 10px;border-left:4px solid var(--g);padding-left:12px;}
+h3{color:var(--p);font-size:12pt;margin:20px 0 8px;}
+p{margin:8px 0;text-align:justify;}
+.ic{font-family:var(--mono);font-size:9pt;background:rgba(233,30,99,.08);padding:1px 5px;border-radius:3px;color:var(--pl);}
+.note{background:var(--s2);border-left:3px solid var(--p);padding:12px;border-radius:0 8px 8px 0;margin:14px 0;font-size:9.5pt;}.note b{color:var(--p);}.note.gn{border-left-color:var(--g);}.note.gn b{color:var(--gl);}.note.dn{border-left-color:var(--dn);}.note.dn b{color:var(--dn);}
+.tabs{display:flex;gap:2px;margin:14px 0 6px;}
+.tab{padding:5px 12px;border-radius:6px 6px 0 0;border:1px solid transparent;background:none;color:var(--mt);cursor:pointer;font-size:8.5pt;font-family:inherit;}.tab.on{background:var(--s2);color:var(--p);border-color:var(--bd);border-bottom-color:var(--s2);}
+.pan{display:none;background:var(--s2);border:1px solid var(--bd);border-radius:0 8px 8px 8px;padding:14px;font-size:10pt;}.pan.on{display:block;}.pan.si{border-left:3px solid var(--gl);}.pan.te{border-left:3px solid var(--p);}.pan.de{border-left:3px solid var(--purple);}
+.cw{margin:10px 0;border:1px solid var(--bdg);border-radius:8px;overflow:hidden;background:#10101c;}
+.cwt{display:flex;justify-content:space-between;align-items:center;padding:3px 10px;background:rgba(46,125,50,.1);border-bottom:1px solid var(--bdg);font-size:7pt;}
+.cwl{color:var(--g);font-family:var(--mono);font-weight:bold;text-transform:uppercase;letter-spacing:1px;}
+.cwb{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--t2);padding:2px 7px;border-radius:4px;cursor:pointer;font-size:7pt;font-family:var(--mono);}.cwb:hover{background:var(--p);color:#fff;}
+pre{font-family:var(--mono);font-size:9.5pt;padding:10px;overflow-x:auto;white-space:pre;line-height:1.5;margin:0;color:var(--tx);background:#10101c;}
+pre .c{color:#555;font-style:italic;}pre .g{color:#a5d6a7;}pre .y{color:#fff59d;}pre .b{color:#90caf9;}pre .o{color:#ffcc80;}pre .p{color:#f48fb1;}pre .v{color:#ce93d8;}
+.out{background:rgba(46,125,50,.05);border-top:2px solid var(--g);padding:6px 10px;font-family:var(--mono);font-size:8.5pt;color:#a5d6a7;}
+.outl{color:var(--g);font-weight:bold;font-size:7pt;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;}
+.cm{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;}.cm>div{border-radius:8px;padding:10px;font-size:9pt;}
+.cm-do{background:rgba(46,125,50,.05);border:1px solid var(--bdg);}.cm-do b{color:var(--gl);}
+.cm-x{background:rgba(233,30,99,.04);border:1px solid var(--bd);}.cm-x b{color:var(--pl);}
+.cm p{margin:3px 0;color:var(--t2);}
+.qz{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:12px;margin:12px 0;}.qz-q{color:var(--tx);font-size:10pt;margin-bottom:8px;}
+.qo{padding:7px 12px;border:1px solid var(--bd);border-radius:8px;cursor:pointer;font-size:9pt;color:var(--t2);background:none;font-family:inherit;width:100%;text-align:left;transition:all .15s;display:block;margin-bottom:5px;}.qo:hover:not(:disabled){border-color:var(--p);color:var(--pl);}.qo.y{border-color:var(--g);background:rgba(46,125,50,.1);color:var(--gl);}.qo.n{border-color:var(--dn);background:rgba(255,82,82,.06);color:var(--dn);}
+.qfb{margin-top:6px;font-size:9pt;padding:8px;border-radius:6px;display:none;}.qfb.s{display:block;}.qfb.w{background:rgba(46,125,50,.08);color:var(--gl);border:1px solid var(--bdg);}.qfb.l{background:rgba(255,82,82,.05);color:var(--dn);border:1px solid rgba(255,82,82,.15);}
+.sd{margin:40px 0 0;padding:16px 0 8px;border-top:1px solid rgba(233,30,99,.1);}.sd small{color:var(--mt);font-size:8pt;text-transform:uppercase;letter-spacing:2px;}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:9.5pt;}
+th{background:rgba(233,30,99,.1);color:var(--pl);padding:8px 10px;text-align:left;border-bottom:2px solid var(--p);}
+td{padding:6px 10px;border-bottom:1px solid var(--bd);color:var(--t2);}
+td code{font-family:var(--mono);font-size:9pt;color:var(--pl);background:rgba(233,30,99,.06);padding:1px 4px;border-radius:2px;}
+.sf{position:fixed;bottom:14px;right:14px;z-index:9999;}.sf button{padding:8px 16px;background:var(--g);color:#fff;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(0,0,0,.3);}
+.cover{text-align:center;padding:30px;margin-bottom:20px;background:linear-gradient(135deg,#1a0533,#0d1b2a);border:2px solid #c62828;border-radius:14px;position:relative;overflow:hidden;}.cover h1{border:none;color:#ef9a9a;font-size:16pt;margin:0;}.cover p{color:var(--t2);font-size:10pt;}.cover::after{content:'🔐';position:absolute;font-size:80pt;opacity:0.04;right:10px;top:-10px;}
+@media print{body{background:#fff;color:#333;}h1{color:#e91e63!important;}h2{color:#2e7d32!important;}pre{background:#f5f5f5!important;color:#333;}.sf{display:none;}@page{size:A4;margin:1.5cm 1cm;}}
+</style>
+</head>
+<body>
+<div class="w">
+
+<div class="cover">
+<h1>🧱 Brick 11 — ARCH-CMD03: Permissions & Users</h1>
+<p>Who can read, write, and execute what — the security foundation of Linux</p>
+<p style="font-size:8pt;color:var(--mt);margin-top:6px;">🐧 ARCH Commands Track · 6 sections · Octal math made visual</p>
+</div>
+
+<div class="note">
+<b>🎯 Why this matters:</b> Permissions are the immune system of your Linux machine. Every file, every directory, every device, every socket has permissions that control exactly who can read it, write to it, or execute it. Misconfigured permissions are one of the most common causes of security breaches — and also one of the most common causes of "permission denied" errors that stop your scripts and services from working. Understanding permissions deeply means you can secure your system AND troubleshoot access problems in seconds.
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 1: Understanding Permission Strings    -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s0"><small>ARCH-CMD03.1 of 6 · ⏱ ~12 min</small></div>
+<h2>ARCH-CMD03.1 — Reading Permission Strings</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+<button class="tab" onclick="sw(this,'de')">⚙️ Deep</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>When you run <span class="ic">ls -l</span>, the first column shows a 10-character string like <span class="ic">-rwxr-xr--</span>. This string is a complete access control specification. It answers three questions for three groups of people. The three questions are: Can you <strong>read</strong> it? Can you <strong>write</strong> to it? Can you <strong>execute</strong> it? The three groups are: the file's <strong>owner</strong> (the person who created it), the file's <strong>group</strong> (a team of users), and <strong>others</strong> (everyone else on the system).</p>
+<p>Think of it like a building with three security zones. The owner is in the executive suite — they might have full access (rwx). The group is employees on the same floor — they can probably read and execute but not modify (r-x). Others are visitors in the lobby — they might only be able to read (r--) or have no access at all (---).</p>
+</div>
+<div class="pan te" data-l="te">
+<p>The 10-character permission string decomposes as: position 0 is the file type (<span class="ic">-</span> regular file, <span class="ic">d</span> directory, <span class="ic">l</span> symlink, <span class="ic">c</span> character device, <span class="ic">b</span> block device, <span class="ic">p</span> pipe, <span class="ic">s</span> socket), positions 1-3 are owner permissions (rwx), 4-6 are group permissions, 7-9 are other permissions. Each position is either the letter (permission granted) or a dash (permission denied). For directories, the meaning changes subtly: <span class="ic">r</span> means you can list the directory contents (readdir), <span class="ic">w</span> means you can create/delete files in the directory (modify directory entries), and <span class="ic">x</span> means you can traverse the directory (cd into it, access files inside by name). This means a directory with <span class="ic">--x</span> lets you access files if you know their names, but you cannot list what is inside — a useful security technique.</p>
+</div>
+<div class="pan de" data-l="de">
+<p>Permissions are stored in the inode's <span class="ic">i_mode</span> field — a 16-bit integer. The low 12 bits encode permissions: bits 0-2 are other (rwx), bits 3-5 are group, bits 6-8 are owner, and bits 9-11 are the special bits (sticky, setgid, setuid). Bits 12-15 encode the file type (regular, directory, symlink, etc.). When a process attempts a file operation (open for read, open for write, execute), the kernel's <span class="ic">inode_permission()</span> function in <span class="ic">fs/namei.c</span> checks: if the process's effective UID matches the inode's <span class="ic">i_uid</span>, the owner bits are checked. Otherwise if any of the process's GIDs (primary + supplementary) match the inode's <span class="ic">i_gid</span>, the group bits are checked. Otherwise the other bits are checked. If the effective UID is 0 (root), all permission checks are bypassed (CAP_DAC_OVERRIDE capability). This three-tier lookup happens on every single file access operation — thousands of times per second on a busy system.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">visual breakdown</span></div>
+<pre><span class="c">    ┌─ file type (- = regular file, d = directory, l = symlink)</span>
+    │  ┌── owner permissions (user who owns the file)</span>
+    │  │     ┌── group permissions (users in the file's group)</span>
+    │  │     │     ┌── other permissions (everyone else)</span>
+    │  │     │     │</span>
+    <span class="p">-</span>  <span class="g">rwx</span>  <span class="b">r-x</span>  <span class="o">r--</span>
+
+    <span class="g">r</span> = <span class="g">read</span>    (files: view contents | dirs: list files)
+    <span class="g">w</span> = <span class="g">write</span>   (files: modify contents | dirs: create/delete files)
+    <span class="g">x</span> = <span class="g">execute</span> (files: run as program | dirs: cd into / traverse)
+    <span class="p">-</span> = <span class="p">denied</span>  (permission not granted)
+
+<span class="c">Example: -rwxr-xr--</span>
+  Owner (mari):  <span class="g">rwx</span> = can read, write, and execute
+  Group (dev):   <span class="b">r-x</span> = can read and execute, but NOT modify
+  Others:        <span class="o">r--</span> = can only read, nothing else</pre></div>
+
+<p>Every permission triplet (rwx) maps to a 3-bit binary number, which maps to an octal digit. This is where the "magic numbers" like 755 and 644 come from — they are just the three octal digits for owner, group, and other.</p>
+
+<table>
+<tr><th>Permission</th><th>Binary</th><th>Octal</th><th>Meaning</th></tr>
+<tr><td><code>---</code></td><td>000</td><td>0</td><td>No access</td></tr>
+<tr><td><code>--x</code></td><td>001</td><td>1</td><td>Execute only</td></tr>
+<tr><td><code>-w-</code></td><td>010</td><td>2</td><td>Write only</td></tr>
+<tr><td><code>-wx</code></td><td>011</td><td>3</td><td>Write + execute</td></tr>
+<tr><td><code>r--</code></td><td>100</td><td>4</td><td>Read only</td></tr>
+<tr><td><code>r-x</code></td><td>101</td><td>5</td><td>Read + execute</td></tr>
+<tr><td><code>rw-</code></td><td>110</td><td>6</td><td>Read + write</td></tr>
+<tr><td><code>rwx</code></td><td>111</td><td>7</td><td>Full access</td></tr>
+</table>
+
+<p>So <span class="ic">chmod 754</span> means: owner gets <span class="ic">rwx</span> (7), group gets <span class="ic">r-x</span> (5), others get <span class="ic">r--</span> (4). The mental math is simple: <strong>r=4, w=2, x=1</strong>. Add them up for each group. Read+write = 4+2 = 6. Read+execute = 4+1 = 5. Full access = 4+2+1 = 7.</p>
+
+<div class="cm">
+<div class="cm-do"><b>✅ The four permission numbers you use 90% of the time:</b><p><span class="ic">755</span> — directories and executable scripts (owner: full, group+others: read+traverse). <span class="ic">644</span> — regular files (owner: read+write, group+others: read only). <span class="ic">700</span> — private directories (owner only). <span class="ic">600</span> — private files like SSH keys (owner read+write only).</p></div>
+<div class="cm-x"><b>❌ Permission mistakes that break things:</b><p><span class="ic">777</span> on anything — everyone can read, write, and execute. This is a security disaster. SSH keys at <span class="ic">644</span> — SSH refuses to use keys that are group/other readable (requires <span class="ic">600</span>). Scripts without <span class="ic">x</span> — "permission denied" when trying to run them.</p></div>
+</div>
+
+<div class="qz"><div class="qz-q">🧪 A file has permissions <span class="ic">-rw-r-----</span>. What is this in octal notation?</div>
+<div class="qo" onclick="ck(this,false)">654</div>
+<div class="qo" onclick="ck(this,true)">640 — owner: rw- = 4+2+0 = 6, group: r-- = 4+0+0 = 4, others: --- = 0</div>
+<div class="qo" onclick="ck(this,false)">740</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 2: chmod                               -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s1"><small>ARCH-CMD03.2 of 6 · ⏱ ~10 min</small></div>
+<h2>ARCH-CMD03.2 — chmod: Changing Permissions</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p><span class="ic">chmod</span> (change mode) modifies a file's permission bits. You can use it in two ways: <strong>octal mode</strong> where you specify the complete permission set as a three-digit number (<span class="ic">chmod 755 file</span>), or <strong>symbolic mode</strong> where you add or remove specific permissions (<span class="ic">chmod +x file</span> adds execute permission). Octal mode is precise and unambiguous — you set all nine permission bits at once. Symbolic mode is more readable for simple changes like "make this script executable" without changing anything else.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Symbolic mode syntax: <span class="ic">chmod [ugoa][+-=][rwxXst] file</span>. The first letter selects who: <span class="ic">u</span> (owner), <span class="ic">g</span> (group), <span class="ic">o</span> (others), <span class="ic">a</span> (all three). The operator: <span class="ic">+</span> (add permission), <span class="ic">-</span> (remove), <span class="ic">=</span> (set exactly). The permission letters: <span class="ic">r</span>, <span class="ic">w</span>, <span class="ic">x</span>, plus <span class="ic">X</span> (execute only if it is a directory or already has execute for someone — useful for recursive chmod that should make directories traversable without making all files executable), <span class="ic">s</span> (setuid/setgid), <span class="ic">t</span> (sticky bit). The <span class="ic">-R</span> flag applies recursively. The <span class="ic">chmod</span> command calls the <span class="ic">chmod()</span> syscall which modifies the inode's <span class="ic">i_mode</span> field directly. Only the file owner and root can change permissions.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ Octal Mode (set ALL permissions at once) ═══</span>
+
+<span class="g">chmod</span> <span class="y">755</span> <span class="b">script.sh</span>         <span class="c"># rwxr-xr-x (standard for scripts/programs)</span>
+<span class="g">chmod</span> <span class="y">644</span> <span class="b">readme.md</span>         <span class="c"># rw-r--r-- (standard for regular files)</span>
+<span class="g">chmod</span> <span class="y">700</span> <span class="b">~/.ssh</span>             <span class="c"># rwx------ (private — only owner)</span>
+<span class="g">chmod</span> <span class="y">600</span> <span class="b">~/.ssh/id_ed25519</span>  <span class="c"># rw------- (SSH keys MUST be 600)</span>
+<span class="g">chmod</span> <span class="y">400</span> <span class="b">secret.key</span>         <span class="c"># r-------- (read-only, even for owner)</span>
+
+<span class="c"># ═══ Symbolic Mode (add/remove specific permissions) ═══</span>
+
+<span class="g">chmod</span> <span class="o">+x</span> <span class="b">script.sh</span>          <span class="c"># add execute for everyone</span>
+<span class="g">chmod</span> <span class="o">u+x</span> <span class="b">script.sh</span>         <span class="c"># add execute for owner only</span>
+<span class="g">chmod</span> <span class="o">go-w</span> <span class="b">config.yaml</span>      <span class="c"># remove write from group and others</span>
+<span class="g">chmod</span> <span class="o">a+r</span> <span class="b">public.html</span>       <span class="c"># add read for all (a = ugo)</span>
+<span class="g">chmod</span> <span class="o">o=</span> <span class="b">private.txt</span>        <span class="c"># remove ALL permissions for others</span>
+<span class="g">chmod</span> <span class="o">u=rwx,g=rx,o=</span> <span class="b">app</span>    <span class="c"># set specific permissions for each</span>
+
+<span class="c"># ═══ Recursive — Apply to Directory Trees ═══</span>
+
+<span class="c"># Make all files in a project readable</span>
+<span class="g">chmod</span> <span class="o">-R</span> <span class="y">644</span> <span class="b">project/</span>       <span class="c"># ⚠️ BAD — this removes execute from directories!</span>
+
+<span class="c"># CORRECT way: different permissions for files and directories</span>
+<span class="g">find</span> <span class="b">project/</span> <span class="o">-type f</span> <span class="o">-exec</span> <span class="g">chmod</span> <span class="y">644</span> {} +    <span class="c"># files: rw-r--r--</span>
+<span class="g">find</span> <span class="b">project/</span> <span class="o">-type d</span> <span class="o">-exec</span> <span class="g">chmod</span> <span class="y">755</span> {} +    <span class="c"># dirs:  rwxr-xr-x</span>
+
+<span class="c"># OR use the clever X permission (capital X):</span>
+<span class="g">chmod</span> <span class="o">-R</span> <span class="o">u=rwX,g=rX,o=rX</span> <span class="b">project/</span>
+<span class="c"># X = execute ONLY if it's a directory or already has execute</span>
+<span class="c"># This correctly sets dirs to 755 and files to 644 in one command!</span></pre>
+<div class="out"><div class="outl">Key Takeaway</div><pre>Files:       chmod 644 (rw-r--r--)  — readable by all, writable by owner
+Scripts:     chmod 755 (rwxr-xr-x)  — executable by all, writable by owner
+Private:     chmod 600 (rw-------)  — owner only (SSH keys, secrets)
+Directories: chmod 755 (rwxr-xr-x)  — traversable by all, writable by owner</pre></div></div>
+
+<div class="qz"><div class="qz-q">🧪 Why is <span class="ic">chmod -R 644 project/</span> a mistake?</div>
+<div class="qo" onclick="ck(this,true)">Because it removes execute permission from directories — without x on a directory, nobody can cd into it or access its contents, effectively locking you out of the entire tree</div>
+<div class="qo" onclick="ck(this,false)">Because 644 is not a valid permission number</div>
+<div class="qo" onclick="ck(this,false)">Because -R doesn't work with octal notation</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 3: chown                               -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s2"><small>ARCH-CMD03.3 of 6 · ⏱ ~8 min</small></div>
+<h2>ARCH-CMD03.3 — chown: Changing Ownership</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p><span class="ic">chown</span> (change owner) changes who owns a file and which group it belongs to. This matters because permission checks are always relative to the owner and group. If you download a file and it is owned by root, you cannot edit it even if you have permission on the directory — you need to change its ownership to yourself first. The command requires root privileges (sudo) because allowing any user to change ownership would break the entire permission model.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Syntax: <span class="ic">chown [owner][:group] file</span>. Variations: <span class="ic">chown mari file</span> (change owner only), <span class="ic">chown mari:developers file</span> (change both), <span class="ic">chown :developers file</span> (change group only — same as <span class="ic">chgrp</span>), <span class="ic">chown mari: file</span> (change owner and set group to owner's primary group). The <span class="ic">-R</span> flag applies recursively. The <span class="ic">chown()</span> syscall modifies the inode's <span class="ic">i_uid</span> and <span class="ic">i_gid</span> fields. On Linux, only root (CAP_CHOWN capability) can change the owner of a file. This is a security requirement — if users could give away ownership, they could escape disk quotas and attribution.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ chown — Change Ownership ═══</span>
+
+<span class="c"># Take ownership of a file (requires sudo)</span>
+<span class="g">sudo</span> <span class="g">chown</span> <span class="y">mari</span> <span class="b">file.txt</span>
+
+<span class="c"># Change owner AND group</span>
+<span class="g">sudo</span> <span class="g">chown</span> <span class="y">mari:developers</span> <span class="b">project/</span>
+
+<span class="c"># Change group only (colon with no owner name)</span>
+<span class="g">sudo</span> <span class="g">chown</span> <span class="y">:docker</span> <span class="b">/var/run/docker.sock</span>
+
+<span class="c"># Recursive — take ownership of entire directory tree</span>
+<span class="g">sudo</span> <span class="g">chown</span> <span class="o">-R</span> <span class="y">mari:mari</span> <span class="b">~/projects/</span>
+
+<span class="c"># ═══ Common Real-World Scenarios ═══</span>
+
+<span class="c"># After extracting a tarball created by another user/system:</span>
+<span class="g">sudo</span> <span class="g">chown</span> <span class="o">-R</span> <span class="y">mari:mari</span> <span class="b">extracted_folder/</span>
+
+<span class="c"># Fix web server document root ownership:</span>
+<span class="g">sudo</span> <span class="g">chown</span> <span class="o">-R</span> <span class="y">http:http</span> <span class="b">/srv/http/</span>
+
+<span class="c"># Docker socket access (Part 3 of the Arch Guide):</span>
+<span class="g">sudo</span> <span class="g">usermod</span> <span class="o">-aG</span> <span class="y">docker</span> <span class="y">mari</span>   <span class="c"># add user to docker group instead of chown</span>
+
+<span class="c"># Verify ownership</span>
+<span class="g">ls</span> <span class="o">-la</span> <span class="b">file.txt</span>
+<span class="c"># -rw-r--r-- 1 mari developers 1234 Mar 15 16:00 file.txt</span>
+<span class="c">#              ↑    ↑</span>
+<span class="c">#              owner group</span></pre></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 4: umask                               -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s3"><small>ARCH-CMD03.4 of 6 · ⏱ ~8 min</small></div>
+<h2>ARCH-CMD03.4 — umask: Default Permissions for New Files</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+<button class="tab" onclick="sw(this,'de')">⚙️ Deep</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>Every time you create a new file or directory, Linux applies default permissions. But where do these defaults come from? The answer is the <span class="ic">umask</span> — a "permission mask" that REMOVES certain permissions from new files. Think of it as a filter. The system starts with maximum permissions (666 for files, 777 for directories), then the umask blocks certain bits from getting through. A umask of 022 blocks write permission for group and others, resulting in 644 for files and 755 for directories. This is the standard umask on most Linux systems, including your Arch installation.</p>
+<p>The math is: <strong>new file permissions = base permissions AND NOT umask</strong>. For files: 666 minus 022 = 644. For directories: 777 minus 022 = 755. (It is technically a bitwise AND with the complement, not subtraction, but the subtraction shortcut works for common umask values.)</p>
+</div>
+<div class="pan te" data-l="te">
+<p>The umask is a per-process attribute inherited from the parent. It is set with the <span class="ic">umask</span> builtin and applies to all subsequent file creation operations (<span class="ic">open()</span> with <span class="ic">O_CREAT</span>, <span class="ic">mkdir()</span>, <span class="ic">mkfifo()</span>). The kernel computes the actual permission as <span class="ic">mode & ~umask</span>. Base modes: <span class="ic">open()</span> typically requests 0666 (rw-rw-rw-), <span class="ic">mkdir()</span> requests 0777 (rwxrwxrwx). With umask 022: files get 0666 & ~0022 = 0644, directories get 0777 & ~0022 = 0755. Common umask values: 022 (standard — group/others read only), 027 (restrictive — others get nothing), 077 (private — only owner). Set permanently in <span class="ic">~/.bashrc</span>, <span class="ic">~/.zshrc</span>, or <span class="ic">/etc/profile</span>.</p>
+</div>
+<div class="pan de" data-l="de">
+<p>The umask is stored in the process's <span class="ic">fs_struct</span> (field <span class="ic">umask</span>), shared with threads via <span class="ic">CLONE_FS</span>. When <span class="ic">do_sys_open()</span> is called with <span class="ic">O_CREAT</span>, the VFS layer applies <span class="ic">mode &= ~current->fs->umask</span> before passing the mode to the filesystem's <span class="ic">create</span> inode operation. The <span class="ic">umask()</span> syscall atomically sets the new umask and returns the old one (which is why <span class="ic">umask</span> with no arguments displays the current value). Note that the umask only affects the initial creation mode — it does not affect subsequent <span class="ic">chmod()</span> calls, which set permissions directly. Programs that need specific permissions (like SSH writing key files at 0600) call <span class="ic">open()</span> with mode 0600 and then immediately <span class="ic">fchmod()</span> to ensure the correct mode regardless of umask.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ Check Your Current umask ═══</span>
+<span class="g">umask</span>                        <span class="c"># 0022 (typical default)</span>
+<span class="g">umask</span> <span class="o">-S</span>                     <span class="c"># u=rwx,g=rx,o=rx (symbolic format)</span>
+
+<span class="c"># ═══ See the Effect ═══</span>
+<span class="g">touch</span> <span class="b">testfile.txt</span>
+<span class="g">mkdir</span> <span class="b">testdir</span>
+<span class="g">ls</span> <span class="o">-la</span> <span class="b">testfile.txt</span> <span class="b">testdir</span>
+<span class="c"># -rw-r--r-- testfile.txt    ← 666 minus 022 = 644</span>
+<span class="c"># drwxr-xr-x testdir         ← 777 minus 022 = 755</span>
+
+<span class="c"># ═══ Make It More Restrictive ═══</span>
+<span class="g">umask</span> <span class="y">077</span>                    <span class="c"># only owner gets permissions</span>
+<span class="g">touch</span> <span class="b">private.txt</span>
+<span class="g">ls</span> <span class="o">-l</span> <span class="b">private.txt</span>
+<span class="c"># -rw------- private.txt     ← 666 minus 077 = 600</span>
+
+<span class="c"># Reset to default</span>
+<span class="g">umask</span> <span class="y">022</span>
+
+<span class="c"># ═══ Common umask Values ═══</span>
+<span class="c"># 022 = standard (files: 644, dirs: 755)</span>
+<span class="c"># 027 = restrictive (files: 640, dirs: 750) — others get nothing</span>
+<span class="c"># 077 = private (files: 600, dirs: 700) — only owner</span>
+<span class="c"># 002 = collaborative (files: 664, dirs: 775) — group can write</span></pre></div>
+
+<div class="qz"><div class="qz-q">🧪 With umask 027, what permissions will a new directory get?</div>
+<div class="qo" onclick="ck(this,false)">777</div>
+<div class="qo" onclick="ck(this,true)">750 (rwxr-x---) — the base 777 minus umask 027 = 750, meaning others get no access at all</div>
+<div class="qo" onclick="ck(this,false)">027</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 5: sudo & User Management              -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s4"><small>ARCH-CMD03.5 of 6 · ⏱ ~10 min</small></div>
+<h2>ARCH-CMD03.5 — sudo, su, and User Management</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p><span class="ic">sudo</span> (superuser do) lets you run a single command with root privileges. Instead of logging in as root (dangerous — every typo has nuclear consequences), you stay as your normal user and temporarily elevate permissions when needed. This is the principle of least privilege — you have minimal permissions by default and only escalate when necessary. On your Arch system (from Part 1 of the guide), you configured sudo access for your user via the <span class="ic">wheel</span> group.</p>
+<p>User management commands let you create accounts, manage groups, and control who has access to what. Groups are the primary mechanism for shared access — instead of making files world-readable, you put collaborators in a shared group and give group access.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>The <span class="ic">sudo</span> binary is setuid root (<span class="ic">-rwsr-xr-x</span>) — when any user executes it, it runs with root's effective UID. Sudo reads <span class="ic">/etc/sudoers</span> (edited only via <span class="ic">visudo</span> which validates syntax before saving) to check if the calling user is authorized. The <span class="ic">wheel</span> group convention: the line <span class="ic">%wheel ALL=(ALL:ALL) ALL</span> grants all members of the wheel group full sudo access. User management: <span class="ic">useradd -m -G wheel,docker username</span> (create user with home dir and group memberships), <span class="ic">usermod -aG group user</span> (add user to group — <span class="ic">-a</span> is critical, without it you REPLACE all groups), <span class="ic">passwd user</span> (set password), <span class="ic">userdel -r user</span> (delete user and home dir), <span class="ic">groups user</span> (list groups), <span class="ic">id user</span> (show UID/GID/groups).</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ sudo — Temporary Root Access ═══</span>
+
+<span class="c"># Run a single command as root</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-Syu</span>              <span class="c"># system update (needs root)</span>
+<span class="g">sudo</span> <span class="g">systemctl</span> <span class="o">restart</span> <span class="y">nginx</span>  <span class="c"># restart a service</span>
+<span class="g">sudo</span> <span class="g">vim</span> <span class="b">/etc/pacman.conf</span>     <span class="c"># edit a system config file</span>
+
+<span class="c"># Open a root shell (use sparingly!)</span>
+<span class="g">sudo</span> <span class="o">-i</span>                        <span class="c"># root login shell</span>
+<span class="g">sudo</span> <span class="o">-s</span>                        <span class="c"># root shell (keeps your env)</span>
+
+<span class="c"># Run as a different user (not root)</span>
+<span class="g">sudo</span> <span class="o">-u</span> <span class="y">postgres</span> <span class="g">psql</span>         <span class="c"># run psql as the postgres user</span>
+
+<span class="c"># Repeat last command with sudo (⚠️ know what you're running!)</span>
+<span class="g">sudo</span> <span class="y">!!</span>
+
+<span class="c"># ═══ User & Group Management ═══</span>
+
+<span class="c"># See your identity</span>
+<span class="g">whoami</span>                         <span class="c"># mari</span>
+<span class="g">id</span>                             <span class="c"># uid=1000(mari) gid=1000(mari) groups=1000(mari),998(wheel),997(docker)</span>
+<span class="g">groups</span>                         <span class="c"># mari wheel docker</span>
+
+<span class="c"># Add user to a group (ALWAYS use -a to APPEND!)</span>
+<span class="g">sudo</span> <span class="g">usermod</span> <span class="o">-aG</span> <span class="y">wireshark</span> <span class="y">mari</span>    <span class="c"># add to wireshark group</span>
+<span class="c"># ⚠️ Without -a: usermod -G wireshark mari REMOVES you from ALL other groups!</span>
+
+<span class="c"># Create a new group</span>
+<span class="g">sudo</span> <span class="g">groupadd</span> <span class="y">developers</span>
+
+<span class="c"># Create a new user (if you needed another account)</span>
+<span class="g">sudo</span> <span class="g">useradd</span> <span class="o">-m</span> <span class="o">-G</span> <span class="y">wheel,docker,developers</span> <span class="o">-s</span> <span class="b">/bin/zsh</span> <span class="y">luna</span>
+<span class="g">sudo</span> <span class="g">passwd</span> <span class="y">luna</span>               <span class="c"># set password</span>
+
+<span class="c"># List all users on the system</span>
+<span class="g">cut</span> <span class="o">-d:</span> <span class="o">-f1</span> <span class="b">/etc/passwd</span> | <span class="g">sort</span>
+
+<span class="c"># List all groups</span>
+<span class="g">cut</span> <span class="o">-d:</span> <span class="o">-f1</span> <span class="b">/etc/group</span> | <span class="g">sort</span></pre></div>
+
+<div class="note dn">
+<b>⚠️ CRITICAL: The -a flag in usermod</b>
+<p>When adding a user to a group, ALWAYS use <span class="ic">usermod -aG group user</span> (with <span class="ic">-a</span> for append). Without <span class="ic">-a</span>, the command REPLACES all existing group memberships with only the specified group. Running <span class="ic">sudo usermod -G docker mari</span> without <span class="ic">-a</span> would remove you from the wheel group — locking you out of sudo entirely. This is one of the most dangerous mistakes in Linux user management.</p>
+</div>
+
+<div class="qz"><div class="qz-q">🧪 What happens if you run <span class="ic">sudo usermod -G docker mari</span> (without -a)?</div>
+<div class="qo" onclick="ck(this,false)">It adds mari to the docker group</div>
+<div class="qo" onclick="ck(this,true)">It REPLACES all of mari's supplementary groups with ONLY docker — removing her from wheel, wireshark, and every other group. She loses sudo access and can't fix it without root password or recovery boot.</div>
+<div class="qo" onclick="ck(this,false)">It fails because -a is required</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 6: Practice                            -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s5"><small>ARCH-CMD03.6 of 6 · ⏱ ~15 min</small></div>
+<h2>ARCH-CMD03.6 — Practice Exercises</h2>
+
+<h3>Exercise 1 (Easy) — Permission Calculator</h3>
+<p>Convert the following between symbolic and octal notation. Do the math in your head, then verify with <span class="ic">stat -c %a file</span>.</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">quiz</span></div>
+<pre><span class="c"># Convert symbolic → octal:</span>
+rwxr-xr-x  = ?     <span class="c"># Answer: 755</span>
+rw-r-----  = ?     <span class="c"># Answer: 640</span>
+rwx------  = ?     <span class="c"># Answer: 700</span>
+rw-rw-r--  = ?     <span class="c"># Answer: 664</span>
+
+<span class="c"># Convert octal → symbolic:</span>
+644  = ?            <span class="c"># Answer: rw-r--r--</span>
+750  = ?            <span class="c"># Answer: rwxr-x---</span>
+600  = ?            <span class="c"># Answer: rw-------</span>
+775  = ?            <span class="c"># Answer: rwxrwxr-x</span></pre></div>
+
+<h3>Exercise 2 (Medium) — Permission Auditor Script</h3>
+<p>Write a script that scans a directory and reports files with potentially insecure permissions: files writable by others (world-writable), scripts/executables owned by root that are writable by non-root users, and SSH keys that are not 600. Use <span class="ic">find</span> with permission-based tests.</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">solution</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="g">set</span> <span class="o">-euo</span> <span class="y">pipefail</span>
+
+<span class="v">dir</span>=<span class="y">"${1:-$HOME}"</span>
+<span class="v">issues</span>=<span class="y">0</span>
+
+<span class="g">echo</span> <span class="y">"═══ Permission Audit: $dir ═══"</span>
+
+<span class="g">echo</span> <span class="y">""</span>
+<span class="g">echo</span> <span class="y">"--- World-Writable Files ---"</span>
+<span class="k">while</span> IFS= <span class="g">read</span> <span class="o">-r</span> <span class="v">f</span>; <span class="k">do</span>
+    <span class="g">echo</span> <span class="y">"  ⚠️ $f"</span>
+    <span class="p">((</span>issues++<span class="p">))</span>
+<span class="k">done</span> < <span class="p"><(</span><span class="g">find</span> <span class="y">"$dir"</span> <span class="o">-type f</span> <span class="o">-perm -002</span> 2>/dev/null<span class="p">)</span>
+
+<span class="g">echo</span> <span class="y">""</span>
+<span class="g">echo</span> <span class="y">"--- SSH Keys with Wrong Permissions ---"</span>
+<span class="k">if</span> [[ <span class="o">-d</span> <span class="y">"$HOME/.ssh"</span> ]]; <span class="k">then</span>
+    <span class="k">while</span> IFS= <span class="g">read</span> <span class="o">-r</span> <span class="v">f</span>; <span class="k">do</span>
+        <span class="k">local</span> <span class="v">perm</span>=<span class="p">$(</span><span class="g">stat</span> <span class="o">-c</span> <span class="y">%a</span> <span class="y">"$f"</span><span class="p">)</span>
+        <span class="k">if</span> [[ <span class="y">"$perm"</span> != <span class="y">"600"</span> && <span class="y">"$perm"</span> != <span class="y">"400"</span> ]]; <span class="k">then</span>
+            <span class="g">echo</span> <span class="y">"  🔑 $f has permissions $perm (should be 600)"</span>
+            <span class="p">((</span>issues++<span class="p">))</span>
+        <span class="k">fi</span>
+    <span class="k">done</span> < <span class="p"><(</span><span class="g">find</span> <span class="y">"$HOME/.ssh"</span> <span class="o">-type f</span> <span class="o">-name</span> <span class="y">"id_*"</span> <span class="o">-not -name</span> <span class="y">"*.pub"</span><span class="p">)</span>
+<span class="k">fi</span>
+
+<span class="g">echo</span> <span class="y">""</span>
+<span class="g">echo</span> <span class="y">"--- Setuid/Setgid Binaries (info only) ---"</span>
+<span class="g">find</span> <span class="y">"$dir"</span> <span class="o">-type f</span> \( <span class="o">-perm -4000</span> <span class="o">-o</span> <span class="o">-perm -2000</span> \) 2>/dev/null | <span class="g">head</span> <span class="o">-10</span> | \
+    <span class="k">while</span> IFS= <span class="g">read</span> <span class="o">-r</span> <span class="v">f</span>; <span class="k">do</span>
+        <span class="g">echo</span> <span class="y">"  🔒 $(ls -la "$f" | awk '{print $1, $9}')"</span>
+    <span class="k">done</span>
+
+<span class="g">echo</span> <span class="y">""</span>
+<span class="k">if</span> [[ <span class="v">$issues</span> <span class="o">-eq</span> <span class="y">0</span> ]]; <span class="k">then</span>
+    <span class="g">echo</span> <span class="y">"✅ No permission issues found!"</span>
+<span class="k">else</span>
+    <span class="g">echo</span> <span class="y">"⚠️ Found $issues permission issue(s)"</span>
+<span class="k">fi</span></pre></div>
+
+<h3>Exercise 3 (Hard) — Shared Project Setup Script</h3>
+<p>Write a script that creates a shared project directory for a team. It should create a group, add specified users to it, create the project directory with proper ownership and permissions (group-writable, setgid bit so new files inherit the group), create subdirectories (src, tests, docs, config), and set up a README with the project info. Validate all inputs and handle errors properly (BASH-F08 patterns).</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">solution</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="g">set</span> <span class="o">-euo</span> <span class="y">pipefail</span>
+
+<span class="c"># ═══ Shared Project Setup ═══</span>
+<span class="v">PROJECT</span>=<span class="y">"${1:?Usage: $0 <project-name> <user1> [user2] ...}"</span>
+<span class="g">shift</span>
+<span class="v">USERS</span>=(<span class="y">"$@"</span>)
+[[ <span class="y">${#USERS[@]}</span> <span class="o">-eq</span> <span class="y">0</span> ]] && { <span class="g">echo</span> <span class="y">"Need at least one user"</span> >&2; <span class="g">exit</span> <span class="y">1</span>; }
+
+<span class="v">GROUP</span>=<span class="y">"proj-${PROJECT}"</span>
+<span class="v">DIR</span>=<span class="y">"/srv/projects/${PROJECT}"</span>
+
+<span class="g">echo</span> <span class="y">"🌸 Setting up shared project: $PROJECT"</span>
+
+<span class="c"># Create group</span>
+<span class="g">sudo</span> <span class="g">groupadd</span> <span class="y">"$GROUP"</span> 2>/dev/null || <span class="g">echo</span> <span class="y">"  Group $GROUP already exists"</span>
+
+<span class="c"># Add users to group</span>
+<span class="k">for</span> <span class="v">user</span> <span class="k">in</span> <span class="y">"${USERS[@]}"</span>; <span class="k">do</span>
+    <span class="g">sudo</span> <span class="g">usermod</span> <span class="o">-aG</span> <span class="y">"$GROUP"</span> <span class="y">"$user"</span>
+    <span class="g">echo</span> <span class="y">"  ✓ Added $user to $GROUP"</span>
+<span class="k">done</span>
+
+<span class="c"># Create directory structure</span>
+<span class="g">sudo</span> <span class="g">mkdir</span> <span class="o">-p</span> <span class="y">"$DIR"</span>/<span class="b">{src,tests,docs,config}</span>
+
+<span class="c"># Set ownership and permissions</span>
+<span class="g">sudo</span> <span class="g">chown</span> <span class="o">-R</span> <span class="y">"root:${GROUP}"</span> <span class="y">"$DIR"</span>
+<span class="g">sudo</span> <span class="g">chmod</span> <span class="o">-R</span> <span class="y">2775</span> <span class="y">"$DIR"</span>    <span class="c"># 2 = setgid bit! New files inherit group</span>
+
+<span class="c"># Create README</span>
+<span class="g">sudo</span> <span class="g">tee</span> <span class="y">"$DIR/README.md"</span> > /dev/null << <span class="y">EOF</span>
+# $PROJECT
+Created: $(date +%Y-%m-%d)
+Team: ${USERS[*]}
+Group: $GROUP
+EOF
+
+<span class="g">echo</span> <span class="y">"✅ Project ready at $DIR"</span>
+<span class="g">echo</span> <span class="y">"   Group: $GROUP"</span>
+<span class="g">echo</span> <span class="y">"   Permissions: 2775 (setgid — new files inherit group)"</span>
+<span class="g">echo</span> <span class="y">"   Users: ${USERS[*]}"</span>
+<span class="g">echo</span> <span class="y">"   ⚠️ Users must log out and back in for group change to take effect"</span></pre>
+<div class="out"><div class="outl">Output (./shared-project.sh webapp mari luna)</div><pre>🌸 Setting up shared project: webapp
+  ✓ Added mari to proj-webapp
+  ✓ Added luna to proj-webapp
+✅ Project ready at /srv/projects/webapp
+   Group: proj-webapp
+   Permissions: 2775 (setgid — new files inherit group)
+   Users: mari luna
+   ⚠️ Users must log out and back in for group change to take effect</pre></div></div>
+
+<div class="note gn">
+<b>🌸 Module Complete!</b> You now understand the Linux permission system from the ground up: how to read the 10-character permission string and convert between symbolic and octal notation using the r=4, w=2, x=1 rule, how to change permissions with <span class="ic">chmod</span> (both octal and symbolic modes, including the clever <span class="ic">X</span> permission for recursive operations), how to change ownership with <span class="ic">chown</span> (always with sudo), how umask controls default permissions for new files (022 → files get 644, dirs get 755), and how to manage users and groups with <span class="ic">sudo</span>, <span class="ic">usermod -aG</span> (never forget the <span class="ic">-a</span>!), and <span class="ic">groupadd</span>. The setgid bit (2xxx) for shared directories ensures new files inherit the correct group, which is essential for team projects. This knowledge applies directly to everything from securing your SSH keys (600) to configuring Docker access (docker group) to setting up web server document roots. Next module: ARCH-CMD04 (Process Management) — controlling running programs, services, and system resources.
+</div>
+
+</div>
+<div class="sf"><button onclick="svB()">💾 Save Brick 11</button></div>
+<script>
+function sw(btn,lv){let el=btn.parentElement.nextElementSibling;while(el&&!el.classList.contains('sd')&&!el.classList.contains('qz')&&!el.classList.contains('cm')&&!el.classList.contains('cw')&&el.tagName!=='H3'&&el.tagName!=='TABLE'){if(el.classList.contains('pan'))el.classList.toggle('on',el.dataset.l===lv);el=el.nextElementSibling;}btn.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');}
+function ck(btn,ok){const box=btn.closest('.qz');box.querySelectorAll('.qo').forEach(o=>o.disabled=true);btn.classList.add(ok?'y':'n');const fb=box.querySelector('.qfb');fb.classList.add('s');fb.className=ok?'qfb s w':'qfb s l';fb.textContent=ok?'✓ Correct! +10 XP':'✗ Review the section above.';}
+function cpC(b){const pre=b.closest('.cw').querySelector('pre');navigator.clipboard.writeText(pre.textContent).then(()=>{b.textContent='✓';setTimeout(()=>b.textContent='Copy',1500);});}
+function svB(){const blob=new Blob(['<!DOCTYPE html>\n'+document.documentElement.outerHTML],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='brick11_ARCHCMD03_permissions_'+new Date().toISOString().slice(0,10)+'.html';a.click();}
+</script>
+</body>
+</html>

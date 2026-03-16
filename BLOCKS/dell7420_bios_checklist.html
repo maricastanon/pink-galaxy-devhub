@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌸 Dell 7420 → Arch Linux — Step-by-Step Action Checklist</title>
+<style>
+:root {
+  --g:#1b5e20;--gl:#2e7d32;--gll:#4caf50;--glll:#a5d6a7;--gx:#c8e6c9;
+  --pink:#e91e63;--pinkl:#f48fb1;--pinkll:#f8bbd0;
+  --bg:#0a0f0a;--bg2:#0f1a0f;--bg3:#142014;
+  --text:#d8e8d8;--text2:#a0b8a0;--muted:#607860;
+  --border:rgba(46,125,50,0.3);--border2:rgba(46,125,50,0.15);
+  --danger:#ff5252;--warn:#ffab00;--ok:#69f0ae;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Calibri,"Segoe UI",sans-serif;font-size:10.5pt;color:var(--text);background:var(--bg);padding:20px;line-height:1.6;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse at 20% 40%,rgba(46,125,50,0.08)0%,transparent 50%),
+  radial-gradient(ellipse at 80% 60%,rgba(27,94,32,0.06)0%,transparent 50%),
+  radial-gradient(ellipse at 50% 90%,rgba(233,30,99,0.04)0%,transparent 40%);}
+.w{max-width:900px;margin:0 auto;position:relative;z-index:1;}
+
+/* ═══ COVER ═══ */
+.cover{text-align:center;padding:36px 30px;margin-bottom:24px;
+  background:linear-gradient(135deg,#0a1f0a,#0d1b0d,#1a0520);
+  border:2px solid var(--gl);border-radius:14px;
+  box-shadow:0 0 40px rgba(46,125,50,0.2),0 0 80px rgba(46,125,50,0.05);}
+.cover h1{color:var(--gll);font-size:22pt;margin-bottom:4px;text-shadow:0 0 20px rgba(76,175,80,0.3);}
+.cover .sub{color:var(--text2);font-size:11pt;}
+.cover .info{color:var(--muted);font-size:8.5pt;font-family:"Courier New",monospace;margin-top:12px;
+  background:rgba(0,0,0,0.3);padding:10px;border-radius:6px;text-align:left;border:1px solid var(--border2);}
+
+/* ═══ PROGRESS BAR ═══ */
+.global-bar{position:sticky;top:0;z-index:100;background:var(--bg);padding:8px 0 6px;border-bottom:1px solid var(--border2);}
+.bar-row{display:flex;align-items:center;gap:10px;}
+.bar-label{font-size:8pt;color:var(--muted);min-width:60px;}
+.bar-track{flex:1;height:10px;background:rgba(255,255,255,0.04);border-radius:5px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:5px;transition:width 0.4s;}
+.bar-fill.done{background:linear-gradient(90deg,var(--g),var(--gll));}
+.bar-fill.recheck{background:linear-gradient(90deg,var(--pink),var(--pinkl));}
+.bar-pct{font-size:9pt;color:var(--text2);min-width:36px;text-align:right;font-family:"Courier New",monospace;}
+
+/* ═══ PHASE HEADERS ═══ */
+.phase{margin:28px 0 14px;padding:14px 18px;
+  background:linear-gradient(90deg,rgba(46,125,50,0.12),transparent);
+  border-left:4px solid var(--gl);border-radius:0 8px 8px 0;}
+.phase-num{color:var(--gll);font-size:9pt;text-transform:uppercase;letter-spacing:3px;font-weight:bold;}
+.phase-title{color:var(--glll);font-size:15pt;margin-top:2px;}
+.phase-desc{color:var(--text2);font-size:9.5pt;margin-top:4px;}
+
+/* ═══ STEP TABLE ═══ */
+table{width:100%;border-collapse:collapse;margin:8px 0 20px;font-size:9.5pt;}
+th{background:rgba(46,125,50,0.12);color:var(--glll);padding:8px 10px;text-align:left;
+  border-bottom:2px solid var(--gl);font-size:8.5pt;text-transform:uppercase;letter-spacing:1px;}
+td{padding:8px 10px;border-bottom:1px solid var(--border2);color:var(--text2);vertical-align:top;}
+tr:hover td{background:rgba(46,125,50,0.03);}
+tr.done-row td{opacity:0.5;}
+.step-num{color:var(--gll);font-weight:bold;font-family:"Courier New",monospace;font-size:10pt;text-align:center;width:36px;}
+.chk{text-align:center;width:50px;}
+.chk input[type="checkbox"]{width:18px;height:18px;cursor:pointer;}
+.chk input.done-chk{accent-color:var(--gl);}
+.chk input.re-chk{accent-color:var(--pink);}
+.action{min-width:200px;}
+.action strong{color:var(--text);}
+.action .loc{color:var(--gll);font-size:8.5pt;font-family:"Courier New",monospace;
+  display:inline-block;background:rgba(46,125,50,0.1);padding:1px 6px;border-radius:3px;margin-top:2px;}
+.action .detail{color:var(--muted);font-size:8.5pt;margin-top:3px;}
+.status-cell{width:60px;text-align:center;}
+.status-badge{display:inline-block;padding:2px 8px;border-radius:8px;font-size:7.5pt;font-weight:bold;}
+.badge-critical{background:var(--danger);color:#fff;}
+.badge-change{background:var(--warn);color:#000;}
+.badge-keep{background:rgba(105,240,174,0.15);color:var(--ok);border:1px solid rgba(105,240,174,0.3);}
+.badge-new{background:rgba(233,30,99,0.15);color:var(--pinkl);border:1px solid rgba(233,30,99,0.3);}
+.note-cell{width:140px;}
+.note-input{width:100%;background:rgba(0,0,0,0.3);border:1px solid var(--border2);border-radius:4px;
+  color:var(--text2);font-family:Calibri,sans-serif;font-size:8.5pt;padding:4px 6px;resize:none;
+  min-height:24px;overflow:hidden;}
+.note-input:focus{border-color:var(--gl);outline:none;box-shadow:0 0 6px rgba(46,125,50,0.2);}
+
+/* ═══ CALLOUTS ═══ */
+.tip{border-radius:8px;border:1px solid var(--gl);padding:10px 14px;margin:10px 0;background:rgba(46,125,50,0.05);}
+.tip-t{color:var(--gll);font-weight:bold;font-size:8.5pt;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.warn-box{border-radius:8px;border:2px solid var(--danger);padding:10px 14px;margin:10px 0;background:rgba(255,82,82,0.06);}
+.warn-box .tip-t{color:var(--danger);}
+.ic{font-family:"Courier New",monospace;font-size:9pt;background:rgba(46,125,50,0.12);padding:1px 5px;border-radius:3px;color:var(--glll);}
+
+/* ═══ SAVE BUTTON ═══ */
+.save-float{position:fixed;bottom:20px;right:20px;z-index:9999;}
+.save-btn{padding:10px 20px;background:var(--gl);color:#fff;border:none;border-radius:8px;
+  font-weight:bold;font-size:10pt;cursor:pointer;box-shadow:0 4px 16px rgba(46,125,50,0.3);
+  transition:all 0.2s;font-family:Calibri,sans-serif;}
+.save-btn:hover{background:var(--gll);transform:translateY(-2px);box-shadow:0 6px 24px rgba(46,125,50,0.4);}
+
+@media print{
+  body{background:#fff;color:#222;} .save-float{display:none;} .global-bar{display:none;}
+  th{background:#e8f5e9!important;color:#1b5e20!important;} td,p{color:#333!important;}
+  .cover{box-shadow:none;background:#f1f8e9!important;border-color:#2e7d32!important;}
+  .phase{background:#e8f5e9!important;} @page{size:A4;margin:1.5cm 1cm;}
+}
+</style>
+</head>
+<body>
+<div class="w">
+
+<div class="cover">
+  <h1>Dell 7420 → Arch Linux</h1>
+  <p class="sub">Step-by-Step Action Checklist — BIOS Setup through First Boot</p>
+  <div class="info">
+Target: Dell Inspiron 14 7420 2-in-1 • Service Tag: 487C9S3 • BIOS: 1.30.1<br>
+Current problem: RAID On mode + Dell telemetry active + HTTP Boot showing instead of OS<br>
+Goal: Anonymous clean Arch Linux install • No installer, manual component-by-component<br>
+Columns: ✅ Done = first pass complete • 🔁 Recheck = verified a second time
+  </div>
+</div>
+
+<!-- ═══ GLOBAL PROGRESS ═══ -->
+<div class="global-bar">
+  <div class="bar-row">
+    <span class="bar-label">✅ Done</span>
+    <div class="bar-track"><div class="bar-fill done" id="doneBar" style="width:0%"></div></div>
+    <span class="bar-pct" id="donePct">0%</span>
+  </div>
+  <div class="bar-row" style="margin-top:4px;">
+    <span class="bar-label">🔁 Recheck</span>
+    <div class="bar-track"><div class="bar-fill recheck" id="reBar" style="width:0%"></div></div>
+    <span class="bar-pct" id="rePct">0%</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- PHASE 1: BIOS CHANGES                                       -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="phase">
+  <div class="phase-num">Phase 1 of 5</div>
+  <div class="phase-title">BIOS Configuration</div>
+  <div class="phase-desc">Power on → press F2 repeatedly → enter BIOS Setup. Make these changes then click APPLY CHANGES at the bottom.</div>
+</div>
+
+<table>
+<tr><th>#</th><th>Done</th><th>Recheck</th><th>Action</th><th>Status</th><th>Your Notes</th></tr>
+
+<tr><td class="step-num">1.1</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Storage → SATA/NVMe Operation → AHCI/NVMe</strong>
+<span class="loc">Storage page</span>
+<div class="detail">Currently set to "RAID On". Select the middle radio button "AHCI/NVMe". This is the single most critical change — without it, Arch cannot see your SSD.</div></td>
+<td class="status-cell"><span class="status-badge badge-critical">CRITICAL</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="…" oninput="grow(this);save()"></textarea></td></tr>
+
+<tr><td class="step-num">1.2</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Storage → M.2 PCIe SSD → confirm ON</strong>
+<span class="loc">Storage page</span>
+<div class="detail">Should already be ON. Verify the toggle is blue/enabled. If it's off, your SSD is disabled at hardware level.</div></td>
+<td class="status-cell"><span class="status-badge badge-keep">VERIFY</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="…" oninput="grow(this);save()"></textarea></td></tr>
+
+<tr><td class="step-num">1.3</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Connection → UEFI Network Stack → Disabled</strong>
+<span class="loc">Connection page</span>
+<div class="detail">Currently "Enabled" (rightmost). Select "Disabled" (leftmost). This stops the firmware from loading network protocols during boot — the HTTP Boot screen you're seeing is caused by this.</div></td>
+<td class="status-cell"><span class="status-badge badge-change">CHANGE</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="…" oninput="grow(this);save()"></textarea></td></tr>
+
+<tr><td class="step-num">1.4</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Connection → HTTP(s) Boot → OFF</strong>
+<span class="loc">Connection page</span>
+<div class="detail">Toggle the switch to OFF. This eliminates the wireless network selection screen you see on boot.</div></td>
+<td class="status-cell"><span class="status-badge badge-change">CHANGE</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="…" oninput="grow(this);save()"></textarea></td></tr>
+
+<tr><td class="step-num">1.5</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Connection → WLAN + Bluetooth → confirm both checked ✓</strong>
+<span class="loc">Connection page</span>
+<div class="detail">Both checkboxes should already be checked. You need Wi-Fi for Arch install and Bluetooth for your keyboard/mouse/headset.</div></td>
+<td class="status-cell"><span class="status-badge badge-keep">VERIFY</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="…" oninput="grow(this);save()"></textarea></td></tr>
+
+<tr><td class="step-num">1.6</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Update,Recovery → BIOS Recovery from Hard Drive → OFF</strong>
+<span class="loc">Update,Recovery page (top section)</span>
+<div class="detail">Toggle OFF. We're wiping the SSD, so there will be no recovery partition. This Dell feature stores BIOS backup on the disk — useless for our purpose.</div></td>
+<td class="status-cell"><span class="status-badge badge-change">CHANGE</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="…" oninput="grow(this);save()"></textarea></td></tr>
+
+<tr><td class="step-num">1.7</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Update,Recovery → SupportAssist OS Recovery → OFF</strong>
+<span class="loc">Update,Recovery page (scroll down)</span>
+<div class="detail">Toggle OFF. This phones home to Dell's cloud servers to recover Windows — we don't want that.</div></td>
+<td class="status-cell"><span class="status-badge badge-change">CHANGE</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="…" oninput="grow(this);save()"></textarea></td></tr>
+
+<tr><td class="step-num">1.8</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Update,Recovery → BIOSConnect → OFF</strong>
+<span class="loc">Update,Recovery page</span>
+<div class="detail">Toggle OFF. BIOSConnect connects to Dell's cloud for OS/firmware recovery. Phones home. Kill it.</div></td>
+<td class="status-cell"><span class="status-badge badge-change">CHANGE</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="…" oninput="grow(this);save()"></textarea></td></tr>
+
+<tr><td class="step-num">1.9</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Update,Recovery → Dell Auto OS Recovery Threshold → Off</strong>
+<span class="loc">Update,Recovery page</span>
+<div class="detail">Currently set to "2". Select "Off" radio button. Prevents Dell from auto-launching recovery after failed boots (which will happen during install attempts).</div></td>
+<td class="status-cell"><span class="status-badge badge-change">CHANGE</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="…" oninput="grow(this);save()"></textarea></td></tr>
+
+<tr><td class="step-num">1.10</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Update,Recovery → UEFI Capsule Firmware Updates → keep ON</strong>
+<span class="loc">Update,Recovery page (top)</span>
+<div class="detail">Leave this ON! It allows <span class="ic">fwupd</span> on Linux to update your BIOS firmware — actually useful for security patches.</div></td>
+<td class="status-cell"><span class="status-badge badge-keep">KEEP ON</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="…" oninput="grow(this);save()"></textarea></td></tr>
+
+<tr><td class="step-num">1.11</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Security → Clear TPM → toggle ON, then Apply</strong>
+<span class="loc">Security page</span>
+<div class="detail">The "Clear" toggle under Intel PTT. Turn it ON and click APPLY CHANGES. This wipes any old Windows TPM keys. The toggle resets to OFF after reboot — that's normal. Keep Intel PTT itself ON.</div></td>
+<td class="status-cell"><span class="status-badge badge-change">ONCE</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="…" oninput="grow(this);save()"></textarea></td></tr>
+
+<tr><td class="step-num">1.12</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Security → SMM Security Mitigation → ON</strong>
+<span class="loc">Security page (bottom)</span>
+<div class="detail">Currently OFF. Toggle ON. Protects against System Management Mode firmware attacks. Important for a security-focused build.</div></td>
+<td class="status-cell"><span class="status-badge badge-change">CHANGE</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="…" oninput="grow(this);save()"></textarea></td></tr>
+
+<tr><td class="step-num">1.13</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Pre-boot Behavior → Warnings and Errors → "Continue on Warnings"</strong>
+<span class="loc">Pre-boot Behavior page</span>
+<div class="detail">Currently "Prompt on Warnings and Errors". Change to middle option: "Continue on Warnings". Prevents annoying boot hangs on non-critical warnings while still pausing on real errors.</div></td>
+<td class="status-cell"><span class="status-badge badge-change">CHANGE</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="…" oninput="grow(this);save()"></textarea></td></tr>
+
+<tr><td class="step-num">1.14</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Virtualization → confirm all ON (VT, VT-d, DMA Protection)</strong>
+<span class="loc">Virtualization Support page</span>
+<div class="detail">All three should already be ON from your photos. Verify: Intel VT = ON, VT for Direct I/O = ON, Pre-Boot DMA = ON, OS Kernel DMA = ON. These are needed for Docker, VMs, and security.</div></td>
+<td class="status-cell"><span class="status-badge badge-keep">VERIFY</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="…" oninput="grow(this);save()"></textarea></td></tr>
+
+<tr><td class="step-num">1.15</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>System Logs → Clear BIOS Event Log → select "Clear Log" then Apply</strong>
+<span class="loc">System Logs page</span>
+<div class="detail">Optional but recommended for a clean start. Select "Clear Log" radio button and apply. Removes old battery warnings and firmware update history.</div></td>
+<td class="status-cell"><span class="status-badge badge-new">OPTIONAL</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="…" oninput="grow(this);save()"></textarea></td></tr>
+
+<tr><td class="step-num">1.16</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Click APPLY CHANGES → counter shows number of changes → EXIT</strong>
+<span class="loc">Bottom bar</span>
+<div class="detail">The orange counter at the bottom should show your total changes (expect 8-10). Click APPLY CHANGES, then click EXIT. System will reboot.</div></td>
+<td class="status-cell"><span class="status-badge badge-critical">CRITICAL</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="…" oninput="grow(this);save()"></textarea></td></tr>
+</table>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- PHASE 2: DOWNLOAD & PREPARE USB                             -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="phase">
+  <div class="phase-num">Phase 2 of 5</div>
+  <div class="phase-title">Download Arch ISO & Create Bootable USB</div>
+  <div class="phase-desc">Do this on your current Windows computer (or any working machine) before you reboot the Dell.</div>
+</div>
+
+<table>
+<tr><th>#</th><th>Done</th><th>Recheck</th><th>Action</th><th>Status</th><th>Your Notes</th></tr>
+
+<tr><td class="step-num">2.1</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Download the Arch Linux ISO</strong>
+<span class="loc"><a href="https://archlinux.org/download/" style="color:var(--gll)">archlinux.org/download</a></span>
+<div class="detail">Scroll to your nearest mirror (Germany: fau.de, rwth-aachen.de). Download the file named <span class="ic">archlinux-2025.XX.XX-x86_64.iso</span> (≈900MB). Also download the SHA256 checksum file.</div></td>
+<td class="status-cell"><span class="status-badge badge-critical">CRITICAL</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="mirror used…" oninput="grow(this);save()"></textarea></td></tr>
+
+<tr><td class="step-num">2.2</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Verify the ISO checksum</strong>
+<div class="detail">Open PowerShell in the Downloads folder and run:<br>
+<span class="ic">certutil -hashfile archlinux-*.iso SHA256</span><br>
+Compare the output hash with the one on the download page. They must match exactly.</div></td>
+<td class="status-cell"><span class="status-badge badge-critical">CRITICAL</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="hash match? y/n" oninput="grow(this);save()"></textarea></td></tr>
+
+<tr><td class="step-num">2.3</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Download Rufus</strong>
+<span class="loc"><a href="https://rufus.ie" style="color:var(--gll)">rufus.ie</a></span>
+<div class="detail">Download Rufus (portable version is fine, no install needed). It's a ~1MB tool that writes ISOs to USB drives.</div></td>
+<td class="status-cell"><span class="status-badge badge-critical">CRITICAL</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="…" oninput="grow(this);save()"></textarea></td></tr>
+
+<tr><td class="step-num">2.4</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Insert USB stick (≥2GB) and open Rufus</strong>
+<div class="detail">⚠️ All data on the USB will be destroyed. Rufus auto-detects the USB drive. Settings: Partition scheme = <strong>GPT</strong>, Target = <strong>UEFI (non CSM)</strong>, File system = leave default.</div></td>
+<td class="status-cell"><span class="status-badge badge-critical">CRITICAL</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="USB size/brand…" oninput="grow(this);save()"></textarea></td></tr>
+
+<tr><td class="step-num">2.5</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Select the Arch ISO in Rufus → click SELECT → choose the .iso file</strong>
+<div class="detail">After selecting, Rufus may ask: "Write in ISO Image mode or DD Image mode?" Select <strong>DD Image mode</strong>. This preserves the hybrid boot layout the Arch ISO needs.</div></td>
+<td class="status-cell"><span class="status-badge badge-critical">DD MODE!</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="…" oninput="grow(this);save()"></textarea></td></tr>
+
+<tr><td class="step-num">2.6</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Click START in Rufus → wait for completion → "READY" appears</strong>
+<div class="detail">Takes 1-5 minutes. When it says READY with a green bar, the USB is bootable. Do NOT remove the USB yet.</div></td>
+<td class="status-cell"><span class="status-badge badge-critical">CRITICAL</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="time taken…" oninput="grow(this);save()"></textarea></td></tr>
+
+<tr><td class="step-num">2.7</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Safely eject the USB from Windows</strong>
+<div class="detail">Right-click the USB in File Explorer → Eject. Or use the system tray "Safely Remove Hardware" icon. Wait for the "safe to remove" message.</div></td>
+<td class="status-cell"><span class="status-badge badge-keep">SAFE</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="…" oninput="grow(this);save()"></textarea></td></tr>
+</table>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- PHASE 3: BOOT FROM USB                                      -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="phase">
+  <div class="phase-num">Phase 3 of 5</div>
+  <div class="phase-title">Boot from USB into Arch Live Environment</div>
+  <div class="phase-desc">Insert USB into the Dell → power on → get to Arch live shell.</div>
+</div>
+
+<table>
+<tr><th>#</th><th>Done</th><th>Recheck</th><th>Action</th><th>Status</th><th>Your Notes</th></tr>
+
+<tr><td class="step-num">3.1</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Insert USB into Dell → power on → press F12 repeatedly</strong>
+<div class="detail">F12 opens the one-time boot menu (not the BIOS setup — that's F2). You should see your USB listed as "UEFI: [USB name]". Select it and press Enter.</div></td>
+<td class="status-cell"><span class="status-badge badge-critical">CRITICAL</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="…" oninput="grow(this);save()"></textarea></td></tr>
+
+<tr><td class="step-num">3.2</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Arch boot menu appears → select first entry "Arch Linux install medium"</strong>
+<div class="detail">Press Enter. Text will scroll for ~10 seconds as the kernel loads. You'll end up at a prompt: <span class="ic">root@archiso ~ #</span></div></td>
+<td class="status-cell"><span class="status-badge badge-critical">CRITICAL</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="…" oninput="grow(this);save()"></textarea></td></tr>
+
+<tr><td class="step-num">3.3</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Verify UEFI mode: <span class="ic">ls /sys/firmware/efi/efivars</span></strong>
+<div class="detail">If you see a list of files → you are in UEFI mode ✓. If "No such file or directory" → reboot, enter BIOS (F2), disable CSM/Legacy, try again.</div></td>
+<td class="status-cell"><span class="status-badge badge-critical">VERIFY</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="files shown? y/n" oninput="grow(this);save()"></textarea></td></tr>
+
+<tr><td class="step-num">3.4</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Set keyboard: <span class="ic">loadkeys de-latin1</span></strong>
+<div class="detail">Switches to German keyboard layout. Then set a readable font: <span class="ic">setfont ter-128b</span></div></td>
+<td class="status-cell"><span class="status-badge badge-keep">DO</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="…" oninput="grow(this);save()"></textarea></td></tr>
+
+<tr><td class="step-num">3.5</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Connect to Wi-Fi: <span class="ic">iwctl</span></strong>
+<div class="detail">Inside iwctl type: <span class="ic">station wlan0 connect "FRITZ!Box Fon WLAN 7360"</span> → enter your Wi-Fi password → type <span class="ic">exit</span> → then <span class="ic">ping -c 3 archlinux.org</span> to confirm.</div></td>
+<td class="status-cell"><span class="status-badge badge-critical">CRITICAL</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="ping OK? y/n" oninput="grow(this);save()"></textarea></td></tr>
+
+<tr><td class="step-num">3.6</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Sync clock: <span class="ic">timedatectl set-ntp true</span></strong>
+<div class="detail">Ensures accurate time for package signing verification. Verify with <span class="ic">timedatectl status</span> — should show "System clock synchronized: yes".</div></td>
+<td class="status-cell"><span class="status-badge badge-keep">DO</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="…" oninput="grow(this);save()"></textarea></td></tr>
+</table>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- PHASE 4: WIPE DISK                                          -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="phase">
+  <div class="phase-num">Phase 4 of 5</div>
+  <div class="phase-title">Secure Disk Wipe</div>
+  <div class="phase-desc">You said you already cleaned the SSD but aren't 100% sure. We verify and do a final clean pass.</div>
+</div>
+
+<div class="warn-box">
+  <div class="tip-t">⚠️ POINT OF NO RETURN</div>
+  <p>After this phase, everything on the SSD is permanently gone. Make absolutely sure you have no data you need on this laptop.</p>
+</div>
+
+<table>
+<tr><th>#</th><th>Done</th><th>Recheck</th><th>Action</th><th>Status</th><th>Your Notes</th></tr>
+
+<tr><td class="step-num">4.1</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Identify your SSD: <span class="ic">lsblk</span></strong>
+<div class="detail">You should see <span class="ic">nvme0n1</span> (your NVMe SSD) and <span class="ic">sda</span> (your USB stick). Note the SSD size — it should match your drive (likely 256GB or 512GB). NEVER run wipe commands on the USB device!</div></td>
+<td class="status-cell"><span class="status-badge badge-critical">IDENTIFY</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="SSD device name + size…" oninput="grow(this);save()"></textarea></td></tr>
+
+<tr><td class="step-num">4.2</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>NVMe Secure Erase: <span class="ic">nvme format /dev/nvme0n1 --ses=1</span></strong>
+<div class="detail">This is the fastest and most thorough method. The SSD controller erases all NAND blocks internally, including over-provisioned areas that dd can't touch. Takes seconds. If it says "Format NVM not supported", fall back to: <span class="ic">blkdiscard --force /dev/nvme0n1</span></div></td>
+<td class="status-cell"><span class="status-badge badge-critical">WIPE</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="success? output…" oninput="grow(this);save()"></textarea></td></tr>
+
+<tr><td class="step-num">4.3</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Verify wipe: <span class="ic">dd if=/dev/nvme0n1 bs=1M count=1 | hexdump -C | head -5</span></strong>
+<div class="detail">Should show all zeros: <span class="ic">00000000  00 00 00 00...</span> followed by <span class="ic">*</span>. Also run <span class="ic">fdisk -l /dev/nvme0n1</span> — should say "no partition table found".</div></td>
+<td class="status-cell"><span class="status-badge badge-critical">VERIFY</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="all zeros? y/n" oninput="grow(this);save()"></textarea></td></tr>
+</table>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- PHASE 5: READY TO INSTALL                                   -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="phase">
+  <div class="phase-num">Phase 5 of 5</div>
+  <div class="phase-title">Ready for Installation</div>
+  <div class="phase-desc">All prerequisites are met. You can now follow the main guide (Part 1) starting from Chapter 4: Partitioning.</div>
+</div>
+
+<table>
+<tr><th>#</th><th>Done</th><th>Recheck</th><th>Action</th><th>Status</th><th>Your Notes</th></tr>
+
+<tr><td class="step-num">5.1</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Final pre-flight check — confirm all of these:</strong>
+<div class="detail">☐ UEFI mode confirmed (efivars exist)<br>☐ Internet connected (ping works)<br>☐ Clock synced (NTP active)<br>☐ SSD wiped and verified (all zeros, no partition table)<br>☐ SSD device name noted (nvme0n1)</div></td>
+<td class="status-cell"><span class="status-badge badge-critical">GO/NO-GO</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="all good? GO!" oninput="grow(this);save()"></textarea></td></tr>
+
+<tr><td class="step-num">5.2</td>
+<td class="chk"><input type="checkbox" class="done-chk" onchange="recalc()"></td>
+<td class="chk"><input type="checkbox" class="re-chk" onchange="recalc()"></td>
+<td class="action"><strong>Open Part 1 guide on your phone/tablet → start Chapter 4: Partitioning</strong>
+<div class="detail">From here you follow the main guide. The hard part is done — you have a clean, anonymous, UEFI-booted Arch live environment with internet. Everything from here is software configuration.</div></td>
+<td class="status-cell"><span class="status-badge badge-keep">🚀 GO!</span></td>
+<td class="note-cell"><textarea class="note-input" placeholder="…" oninput="grow(this);save()"></textarea></td></tr>
+</table>
+
+<div class="tip" style="margin-top:24px;">
+  <div class="tip-t">🌸 You're doing great</div>
+  <p>Once all phases are green, you have a fully prepared, Dell-anonymized machine ready for Arch Linux. The HTTP Boot screen is gone, the SSD is clean, the firmware is hardened, and you're booted into the live environment with internet access. From here, it's just following commands from the main guide. You've got this.</p>
+</div>
+
+</div><!-- end .w -->
+
+<!-- SAVE BUTTON -->
+<div class="save-float">
+  <button class="save-btn" onclick="saveFile()">💾 Save Progress</button>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  const KEY='dell7420_checklist_v1';
+  function load(){try{return JSON.parse(localStorage.getItem(KEY))||{};}catch{return {};}}
+  function persist(s){try{localStorage.setItem(KEY,JSON.stringify(s));}catch{}}
+  let st=load();
+
+  // Restore checkboxes and notes
+  document.querySelectorAll('input[type="checkbox"]').forEach((cb,i)=>{
+    if(st['c'+i])cb.checked=true;
+  });
+  document.querySelectorAll('.note-input').forEach((n,i)=>{
+    if(st['n'+i])n.value=st['n'+i];
+  });
+
+  window.recalc=function(){
+    const doneAll=document.querySelectorAll('.done-chk');
+    const reAll=document.querySelectorAll('.re-chk');
+    let dT=doneAll.length,dC=0,rT=reAll.length,rC=0;
+    doneAll.forEach(c=>{if(c.checked)dC++;});
+    reAll.forEach(c=>{if(c.checked)rC++;});
+    const dP=Math.round(dC/dT*100),rP=Math.round(rC/rT*100);
+    document.getElementById('doneBar').style.width=dP+'%';
+    document.getElementById('donePct').textContent=dP+'%';
+    document.getElementById('reBar').style.width=rP+'%';
+    document.getElementById('rePct').textContent=rP+'%';
+    // Dim completed rows
+    document.querySelectorAll('tr').forEach(tr=>{
+      const d=tr.querySelector('.done-chk');
+      const r=tr.querySelector('.re-chk');
+      if(d&&r&&d.checked&&r.checked)tr.classList.add('done-row');
+      else if(tr.classList.contains('done-row'))tr.classList.remove('done-row');
+    });
+    save();
+  };
+  window.save=function(){
+    const s={};
+    document.querySelectorAll('input[type="checkbox"]').forEach((cb,i)=>{s['c'+i]=cb.checked;});
+    document.querySelectorAll('.note-input').forEach((n,i)=>{if(n.value)s['n'+i]=n.value;});
+    persist(s);
+  };
+  window.grow=function(el){el.style.height='auto';el.style.height=el.scrollHeight+'px';};
+  window.saveFile=function(){
+    save();
+    const blob=new Blob(['<!DOCTYPE html>\n<html lang="en">\n'+document.documentElement.innerHTML+'</html>'],{type:'text/html'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download='dell7420_checklist_SAVED_'+new Date().toISOString().slice(0,10)+'.html';a.click();
+    const btn=document.querySelector('.save-btn');
+    btn.textContent='✓ Saved!';setTimeout(()=>{btn.textContent='💾 Save Progress';},2000);
+  };
+  recalc();
+  // Auto-grow all note inputs that have content
+  document.querySelectorAll('.note-input').forEach(n=>{if(n.value)grow(n);});
+})();
+</script>
+</body>
+</html>

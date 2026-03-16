@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧱 Brick 13 — ARCH-CMD05: Networking</title>
+<style>
+:root{--p:#e91e63;--pl:#f8bbd0;--g:#2e7d32;--gl:#a5d6a7;--bg:#0a0a12;--s2:#1a1a2e;--tx:#e8e6f0;--t2:#a8a6b8;--mt:#6c6a7e;--bd:rgba(233,30,99,.18);--bdg:rgba(46,125,50,.2);--purple:#9c27b0;--mono:"Courier New",monospace;--dn:#ff5252;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Calibri,"Segoe UI",sans-serif;background:var(--bg);color:var(--tx);font-size:11pt;line-height:1.65;padding:20px;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 20% 50%,rgba(233,30,99,.05),transparent 50%);}
+.w{max-width:900px;margin:0 auto;position:relative;z-index:1;}
+h1{color:var(--p);font-size:20pt;margin:30px 0 12px;border-bottom:2px solid var(--p);padding-bottom:8px;}
+h2{color:var(--g);font-size:15pt;margin:28px 0 10px;border-left:4px solid var(--g);padding-left:12px;}
+h3{color:var(--p);font-size:12pt;margin:20px 0 8px;}
+p{margin:8px 0;text-align:justify;}
+.ic{font-family:var(--mono);font-size:9pt;background:rgba(233,30,99,.08);padding:1px 5px;border-radius:3px;color:var(--pl);}
+.note{background:var(--s2);border-left:3px solid var(--p);padding:12px;border-radius:0 8px 8px 0;margin:14px 0;font-size:9.5pt;}.note b{color:var(--p);}.note.gn{border-left-color:var(--g);}.note.gn b{color:var(--gl);}
+.tabs{display:flex;gap:2px;margin:14px 0 6px;}
+.tab{padding:5px 12px;border-radius:6px 6px 0 0;border:1px solid transparent;background:none;color:var(--mt);cursor:pointer;font-size:8.5pt;font-family:inherit;}.tab.on{background:var(--s2);color:var(--p);border-color:var(--bd);border-bottom-color:var(--s2);}
+.pan{display:none;background:var(--s2);border:1px solid var(--bd);border-radius:0 8px 8px 8px;padding:14px;font-size:10pt;}.pan.on{display:block;}.pan.si{border-left:3px solid var(--gl);}.pan.te{border-left:3px solid var(--p);}.pan.de{border-left:3px solid var(--purple);}
+.cw{margin:10px 0;border:1px solid var(--bdg);border-radius:8px;overflow:hidden;background:#10101c;}
+.cwt{display:flex;justify-content:space-between;align-items:center;padding:3px 10px;background:rgba(46,125,50,.1);border-bottom:1px solid var(--bdg);font-size:7pt;}
+.cwl{color:var(--g);font-family:var(--mono);font-weight:bold;text-transform:uppercase;letter-spacing:1px;}
+.cwb{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--t2);padding:2px 7px;border-radius:4px;cursor:pointer;font-size:7pt;font-family:var(--mono);}.cwb:hover{background:var(--p);color:#fff;}
+pre{font-family:var(--mono);font-size:9.5pt;padding:10px;overflow-x:auto;white-space:pre;line-height:1.5;margin:0;color:var(--tx);background:#10101c;}
+pre .c{color:#555;font-style:italic;}pre .g{color:#a5d6a7;}pre .y{color:#fff59d;}pre .b{color:#90caf9;}pre .o{color:#ffcc80;}pre .p{color:#f48fb1;}pre .v{color:#ce93d8;}
+.out{background:rgba(46,125,50,.05);border-top:2px solid var(--g);padding:6px 10px;font-family:var(--mono);font-size:8.5pt;color:#a5d6a7;}
+.outl{color:var(--g);font-weight:bold;font-size:7pt;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;}
+.cm{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;}.cm>div{border-radius:8px;padding:10px;font-size:9pt;}
+.cm-do{background:rgba(46,125,50,.05);border:1px solid var(--bdg);}.cm-do b{color:var(--gl);}
+.cm-x{background:rgba(233,30,99,.04);border:1px solid var(--bd);}.cm-x b{color:var(--pl);}
+.cm p{margin:3px 0;color:var(--t2);}
+.qz{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:12px;margin:12px 0;}.qz-q{color:var(--tx);font-size:10pt;margin-bottom:8px;}
+.qo{padding:7px 12px;border:1px solid var(--bd);border-radius:8px;cursor:pointer;font-size:9pt;color:var(--t2);background:none;font-family:inherit;width:100%;text-align:left;transition:all .15s;display:block;margin-bottom:5px;}.qo:hover:not(:disabled){border-color:var(--p);color:var(--pl);}.qo.y{border-color:var(--g);background:rgba(46,125,50,.1);color:var(--gl);}.qo.n{border-color:var(--dn);background:rgba(255,82,82,.06);color:var(--dn);}
+.qfb{margin-top:6px;font-size:9pt;padding:8px;border-radius:6px;display:none;}.qfb.s{display:block;}.qfb.w{background:rgba(46,125,50,.08);color:var(--gl);border:1px solid var(--bdg);}.qfb.l{background:rgba(255,82,82,.05);color:var(--dn);border:1px solid rgba(255,82,82,.15);}
+.sd{margin:40px 0 0;padding:16px 0 8px;border-top:1px solid rgba(233,30,99,.1);}.sd small{color:var(--mt);font-size:8pt;text-transform:uppercase;letter-spacing:2px;}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:9.5pt;}
+th{background:rgba(233,30,99,.1);color:var(--pl);padding:8px 10px;text-align:left;border-bottom:2px solid var(--p);}
+td{padding:6px 10px;border-bottom:1px solid var(--bd);color:var(--t2);}
+td code{font-family:var(--mono);font-size:9pt;color:var(--pl);background:rgba(233,30,99,.06);padding:1px 4px;border-radius:2px;}
+.sf{position:fixed;bottom:14px;right:14px;z-index:9999;}.sf button{padding:8px 16px;background:var(--g);color:#fff;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(0,0,0,.3);}
+.cover{text-align:center;padding:30px;margin-bottom:20px;background:linear-gradient(135deg,#1a0533,#0d1b2a);border:2px solid #c62828;border-radius:14px;position:relative;overflow:hidden;}.cover h1{border:none;color:#ef9a9a;font-size:16pt;margin:0;}.cover p{color:var(--t2);font-size:10pt;}.cover::after{content:'🌐';position:absolute;font-size:80pt;opacity:0.04;right:10px;top:-10px;}
+@media print{body{background:#fff;color:#333;}h1{color:#e91e63!important;}h2{color:#2e7d32!important;}pre{background:#f5f5f5!important;color:#333;}.sf{display:none;}@page{size:A4;margin:1.5cm 1cm;}}
+</style>
+</head>
+<body>
+<div class="w">
+
+<div class="cover">
+<h1>🧱 Brick 13 — ARCH-CMD05: Networking</h1>
+<p>Seeing, diagnosing, and controlling every connection: ip, ss, curl, ssh, dig, nmcli</p>
+<p style="font-size:8pt;color:var(--mt);margin-top:6px;">🐧 ARCH Commands Track · 7 sections · From your FRITZ!Box to the cloud</p>
+</div>
+
+<div class="note">
+<b>🎯 Why this matters:</b> Your Dell 7420 connects through your FRITZ!Box 7360 router to the internet, and from there to GitHub, AWS, Docker Hub, Arch mirrors, and everything else you depend on. When any link in that chain breaks — Wi-Fi drops, DNS fails, a server is unreachable, SSH hangs — you need to diagnose the problem in seconds, not minutes. The commands in this module give you X-ray vision into every layer of your network stack: physical connection, IP addressing, DNS resolution, routing, open ports, and HTTP communication.
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 1: ip — Network Interfaces             -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s0"><small>ARCH-CMD05.1 of 7 · ⏱ ~12 min</small></div>
+<h2>ARCH-CMD05.1 — ip: Your Network Identity</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+<button class="tab" onclick="sw(this,'de')">⚙️ Deep</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>The <span class="ic">ip</span> command is the modern Swiss Army knife for network configuration on Linux. It replaces the older <span class="ic">ifconfig</span>, <span class="ic">route</span>, and <span class="ic">arp</span> commands (which you might see in old tutorials but should not use anymore). With <span class="ic">ip</span>, you can see your IP addresses, check which network interfaces are active, view the routing table (how your machine decides where to send packets), and manage network connections. On your Arch system, NetworkManager handles most configuration automatically, but <span class="ic">ip</span> is how you inspect and troubleshoot the results.</p>
+<p>Think of your computer as a house. Each network interface (Wi-Fi card, Ethernet port, VPN tunnel) is a different door. Each door has an address (IP address) written on it. The routing table is your GPS — it tells your computer which door to use to reach any destination on the internet.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>The <span class="ic">ip</span> command (from the <span class="ic">iproute2</span> package) communicates with the kernel's networking stack via Netlink sockets — a special socket family (<span class="ic">AF_NETLINK</span>) for kernel-userspace communication. Subcommands: <span class="ic">ip addr</span> (show/modify IP addresses on interfaces), <span class="ic">ip link</span> (show/modify interface state: up/down, MTU, MAC address), <span class="ic">ip route</span> (show/modify the routing table), <span class="ic">ip neigh</span> (show the ARP/NDP neighbor table — maps IP addresses to MAC addresses on the local network). Interface naming on Arch follows the Predictable Network Interface Names scheme: <span class="ic">wlan0</span> or <span class="ic">wlp0s20f3</span> for Wi-Fi (your Intel Wi-Fi card), <span class="ic">enp2s0</span> for Ethernet, <span class="ic">lo</span> for loopback (127.0.0.1), <span class="ic">docker0</span> for the Docker bridge network. The <span class="ic">-c</span> flag enables colorized output; <span class="ic">-br</span> gives a brief, human-readable format.</p>
+</div>
+<div class="pan de" data-l="de">
+<p>The <span class="ic">ip</span> command opens a Netlink socket (<span class="ic">socket(AF_NETLINK, SOCK_DGRAM, NETLINK_ROUTE)</span>), constructs a request message containing a Netlink header (<span class="ic">struct nlmsghdr</span>) and a payload specifying the operation (e.g., <span class="ic">RTM_GETADDR</span> to list addresses), sends it to the kernel via <span class="ic">sendmsg()</span>, and receives the response via <span class="ic">recvmsg()</span>. The kernel's networking stack processes the request in <span class="ic">net/core/rtnetlink.c</span>, iterates through the appropriate data structures (the network device list for <span class="ic">ip link</span>, the FIB table for <span class="ic">ip route</span>, the neighbor table for <span class="ic">ip neigh</span>), and sends back response messages containing the requested information as Netlink attributes (type-length-value encoded). This is much more efficient than the old <span class="ic">ioctl()</span>-based interface used by ifconfig, because Netlink supports multipart messages, notification subscriptions (RTNLGRP_LINK for link state changes), and atomic batch operations.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ ip addr — See Your IP Addresses ═══</span>
+
+<span class="c"># Show all interfaces and their IPs (the most common command)</span>
+<span class="g">ip</span> <span class="o">addr</span>                                <span class="c"># full output</span>
+<span class="g">ip</span> <span class="o">-br</span> <span class="o">-c</span> <span class="o">addr</span>                        <span class="c"># brief + colorized (much cleaner!)</span>
+
+<span class="c"># Show only IPv4 addresses</span>
+<span class="g">ip</span> <span class="o">-4</span> <span class="o">addr</span>
+
+<span class="c"># Show a specific interface</span>
+<span class="g">ip</span> <span class="o">addr show</span> <span class="y">wlan0</span>                    <span class="c"># your Wi-Fi interface</span>
+
+<span class="c"># Just get your IP (for scripts)</span>
+<span class="g">ip</span> <span class="o">-4</span> <span class="o">-br</span> <span class="o">addr</span> | <span class="g">awk</span> <span class="y">'/wlan/ {print $3}'</span>
+
+<span class="c"># ═══ ip link — Interface Status ═══</span>
+
+<span class="g">ip</span> <span class="o">-br</span> <span class="o">-c</span> <span class="o">link</span>                        <span class="c"># shows UP/DOWN state of each interface</span>
+
+<span class="c"># ═══ ip route — Where Do Packets Go? ═══</span>
+
+<span class="g">ip</span> <span class="o">route</span>                               <span class="c"># show routing table</span>
+<span class="c"># Key line: "default via 192.168.178.1 dev wlan0" ← your FRITZ!Box gateway</span>
+
+<span class="c"># How would the system reach a specific IP?</span>
+<span class="g">ip</span> <span class="o">route get</span> <span class="y">8.8.8.8</span>                  <span class="c"># shows which interface and gateway it would use</span>
+
+<span class="c"># ═══ ip neigh — Who Else is on the Local Network? ═══</span>
+
+<span class="g">ip</span> <span class="o">neigh</span>                               <span class="c"># ARP table: IP → MAC address mappings</span>
+<span class="c"># Shows your FRITZ!Box, other devices on the same Wi-Fi network</span>
+
+<span class="c"># ═══ Quick Network Summary (one-liner) ═══</span>
+<span class="g">echo</span> <span class="y">"IP: $(ip -4 -br addr | awk '/wlan/{print $3}') GW: $(ip route | awk '/default/{print $3}') DNS: $(resolvectl status | awk '/DNS Server/{print $NF}' | head -1)"</span></pre>
+<div class="out"><div class="outl">Expected Output (ip -br -c addr)</div><pre>lo               UNKNOWN        127.0.0.1/8
+wlan0            UP             192.168.178.42/24
+docker0          DOWN           172.17.0.1/16
+br-a1b2c3d4      UP             172.18.0.1/16</pre></div></div>
+
+<div class="qz"><div class="qz-q">🧪 Your <span class="ic">ip -br link</span> shows <span class="ic">wlan0 DOWN</span>. What does this mean?</div>
+<div class="qo" onclick="ck(this,true)">Your Wi-Fi interface is not active — either the hardware is disabled, the driver is not loaded, or NetworkManager has not connected it to a network. Check with "nmcli device status" or "nmcli radio wifi".</div>
+<div class="qo" onclick="ck(this,false)">Your internet is too slow</div>
+<div class="qo" onclick="ck(this,false)">Your IP address has expired</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 2: ss — Open Ports & Connections       -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s1"><small>ARCH-CMD05.2 of 7 · ⏱ ~10 min</small></div>
+<h2>ARCH-CMD05.2 — ss: Open Ports &amp; Active Connections</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p><span class="ic">ss</span> (socket statistics) shows you every network connection on your system — which programs are listening for incoming connections, which are actively communicating with remote servers, and on which ports. This is essential for security (checking what services are exposed to the network), debugging (is my web server actually listening on port 8080?), and troubleshooting (why is "port already in use" when I try to start my application?). It replaces the older <span class="ic">netstat</span> command which is slower and less capable.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>The <span class="ic">ss</span> command reads socket information directly from kernel Netlink interfaces (<span class="ic">NETLINK_SOCK_DIAG</span>), which is significantly faster than netstat (which parses <span class="ic">/proc/net/tcp</span> text files). Key flags: <span class="ic">-t</span> (TCP only), <span class="ic">-u</span> (UDP only), <span class="ic">-l</span> (listening sockets — services waiting for connections), <span class="ic">-n</span> (numeric — do not resolve hostnames, much faster), <span class="ic">-p</span> (show process name/PID — requires root or matching UID), <span class="ic">-a</span> (all sockets including non-listening). The most useful combination is <span class="ic">ss -tlnp</span> (TCP listening sockets with numeric addresses and process info), which answers "what services are listening on my machine and on which ports?" Socket states: <span class="ic">LISTEN</span> (waiting for connections), <span class="ic">ESTAB</span> (active connection), <span class="ic">TIME-WAIT</span> (connection recently closed, waiting for straggler packets), <span class="ic">CLOSE-WAIT</span> (remote closed, local has not yet closed — can indicate a bug).</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ ss — What's Listening? (THE command for port troubleshooting) ═══</span>
+
+<span class="c"># Show all TCP listening sockets with process info</span>
+<span class="g">sudo</span> <span class="g">ss</span> <span class="o">-tlnp</span>
+<span class="c"># t=TCP, l=listening, n=numeric, p=process</span>
+<span class="c"># This answers: "What services are exposed on my machine?"</span>
+
+<span class="c"># Show all active TCP connections</span>
+<span class="g">ss</span> <span class="o">-tn</span>
+
+<span class="c"># Check if a specific port is in use</span>
+<span class="g">ss</span> <span class="o">-tlnp</span> | <span class="g">grep</span> <span class="y">":22"</span>              <span class="c"># is SSH listening?</span>
+<span class="g">ss</span> <span class="o">-tlnp</span> | <span class="g">grep</span> <span class="y">":8080"</span>            <span class="c"># is something on port 8080?</span>
+
+<span class="c"># What process is using port 5432? (PostgreSQL)</span>
+<span class="g">sudo</span> <span class="g">ss</span> <span class="o">-tlnp</span> | <span class="g">grep</span> <span class="y">":5432"</span>
+<span class="c"># Output: LISTEN  0  128  *:5432  *:*  users:(("postgres",pid=890,fd=7))</span>
+
+<span class="c"># ═══ Useful Combinations ═══</span>
+
+<span class="c"># All connections to a specific remote host</span>
+<span class="g">ss</span> <span class="o">-tn</span> <span class="o">dst</span> <span class="y">140.82.121.4</span>            <span class="c"># connections to GitHub</span>
+
+<span class="c"># Count connections by state</span>
+<span class="g">ss</span> <span class="o">-t</span> | <span class="g">awk</span> <span class="y">'NR>1 {print $1}'</span> | <span class="g">sort</span> | <span class="g">uniq</span> <span class="o">-c</span> | <span class="g">sort</span> <span class="o">-rn</span>
+
+<span class="c"># All UDP listeners (DNS, DHCP, etc.)</span>
+<span class="g">sudo</span> <span class="g">ss</span> <span class="o">-ulnp</span></pre>
+<div class="out"><div class="outl">Expected Output (sudo ss -tlnp)</div><pre>State    Recv-Q  Send-Q  Local Address:Port   Peer Address:Port  Process
+LISTEN   0       128     0.0.0.0:22           0.0.0.0:*          users:(("sshd",pid=432,fd=3))
+LISTEN   0       128     127.0.0.1:5432       0.0.0.0:*          users:(("postgres",pid=890,fd=7))
+LISTEN   0       4096    0.0.0.0:6379         0.0.0.0:*          users:(("redis-server",pid=901,fd=6))
+LISTEN   0       4096    127.0.0.1:631        0.0.0.0:*          users:(("cupsd",pid=445,fd=8))</pre></div></div>
+
+<div class="cm">
+<div class="cm-do"><b>✅ Reading ss output for security:</b><p><span class="ic">0.0.0.0:22</span> means SSH is listening on ALL interfaces (accessible from the network). <span class="ic">127.0.0.1:5432</span> means PostgreSQL is listening only on localhost (not accessible from the network — correct for a dev setup). If you see an unexpected service on <span class="ic">0.0.0.0</span>, it is exposed to your network and potentially the internet.</p></div>
+<div class="cm-x"><b>❌ "Address already in use" error:</b><p>When starting a service and getting this error, run <span class="ic">sudo ss -tlnp | grep :PORT</span> to find what is already using that port. Either stop the conflicting service, or configure your application to use a different port. A common cause is a crashed process that left a socket in TIME-WAIT state — wait 60 seconds or set <span class="ic">SO_REUSEADDR</span> in the application.</p></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 3: ping / traceroute / mtr             -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s2"><small>ARCH-CMD05.3 of 7 · ⏱ ~8 min</small></div>
+<h2>ARCH-CMD05.3 — ping, traceroute, mtr: Connectivity Testing</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p><span class="ic">ping</span> is the most basic network test — it sends a tiny packet to a destination and measures how long the reply takes. If ping works, the destination is reachable and the round-trip time tells you how fast the connection is. If ping fails, something between you and the destination is broken. <span class="ic">traceroute</span> (or its modern replacement <span class="ic">mtr</span>) shows you every hop your packets take on the way to the destination, so you can see exactly WHERE a problem is occurring — is it your Wi-Fi, your FRITZ!Box, your ISP, or the destination server?</p>
+</div>
+<div class="pan te" data-l="te">
+<p>The <span class="ic">ping</span> command sends ICMP Echo Request packets and measures the ICMP Echo Reply. Key flags: <span class="ic">-c N</span> (send exactly N packets then stop — without this, ping runs forever), <span class="ic">-W N</span> (timeout in seconds), <span class="ic">-i N</span> (interval between packets). The <span class="ic">traceroute</span> command sends packets with incrementing TTL (Time-To-Live) values starting from 1. Each router along the path decrements TTL by 1 and sends back a "TTL exceeded" ICMP message when it hits 0 — this reveals that router's IP address. The <span class="ic">mtr</span> command (My TraceRoute, install with <span class="ic">pacman -S mtr</span>) combines ping and traceroute into a single live display, showing each hop with continuous ping statistics (packet loss, latency, jitter). This is the professional tool for diagnosing routing problems.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ ping — Is It Reachable? ═══</span>
+
+<span class="c"># Test connectivity (Ctrl+C to stop)</span>
+<span class="g">ping</span> <span class="y">google.com</span>                      <span class="c"># runs until you stop it</span>
+<span class="g">ping</span> <span class="o">-c 4</span> <span class="y">google.com</span>                 <span class="c"># send exactly 4 pings then stop</span>
+<span class="g">ping</span> <span class="o">-c 1</span> <span class="o">-W 2</span> <span class="y">192.168.178.1</span>        <span class="c"># ping FRITZ!Box, 2s timeout</span>
+
+<span class="c"># The diagnostic ladder (test each layer):</span>
+<span class="g">ping</span> <span class="o">-c 1</span> <span class="y">127.0.0.1</span>                  <span class="c"># 1. Loopback (your own machine)</span>
+<span class="g">ping</span> <span class="o">-c 1</span> <span class="y">192.168.178.1</span>              <span class="c"># 2. FRITZ!Box gateway</span>
+<span class="g">ping</span> <span class="o">-c 1</span> <span class="y">8.8.8.8</span>                    <span class="c"># 3. External IP (Google DNS)</span>
+<span class="g">ping</span> <span class="o">-c 1</span> <span class="y">google.com</span>                  <span class="c"># 4. DNS name (tests DNS resolution too)</span>
+<span class="c"># If step 3 works but step 4 fails → DNS problem</span>
+<span class="c"># If step 2 works but step 3 fails → ISP/routing problem</span>
+<span class="c"># If step 1 works but step 2 fails → local network/Wi-Fi problem</span>
+
+<span class="c"># ═══ traceroute / mtr — WHERE is the Problem? ═══</span>
+
+<span class="g">traceroute</span> <span class="y">google.com</span>                 <span class="c"># show every hop to Google</span>
+<span class="g">mtr</span> <span class="y">google.com</span>                        <span class="c"># live traceroute + ping combined (best tool)</span>
+<span class="g">mtr</span> <span class="o">-r</span> <span class="o">-c 10</span> <span class="y">github.com</span>              <span class="c"># report mode: 10 pings per hop, then exit</span></pre>
+<div class="out"><div class="outl">Expected Output (ping -c 4 google.com)</div><pre>PING google.com (142.250.186.78) 56(84) bytes of data.
+64 bytes from fra16s52-in-f14.1e100.net: icmp_seq=1 ttl=118 time=12.3 ms
+64 bytes from fra16s52-in-f14.1e100.net: icmp_seq=2 ttl=118 time=11.8 ms
+64 bytes from fra16s52-in-f14.1e100.net: icmp_seq=3 ttl=118 time=12.1 ms
+64 bytes from fra16s52-in-f14.1e100.net: icmp_seq=4 ttl=118 time=11.9 ms
+
+--- google.com ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3004ms
+rtt min/avg/max/mdev = 11.800/12.025/12.300/0.183 ms</pre></div></div>
+
+<div class="qz"><div class="qz-q">🧪 <span class="ic">ping 8.8.8.8</span> works but <span class="ic">ping google.com</span> fails with "Temporary failure in name resolution." What layer is broken?</div>
+<div class="qo" onclick="ck(this,false)">Your internet connection is down</div>
+<div class="qo" onclick="ck(this,false)">Google's servers are offline</div>
+<div class="qo" onclick="ck(this,true)">DNS resolution is broken — your machine can reach the internet by IP but cannot translate domain names to IP addresses. Check /etc/resolv.conf or run "resolvectl status"</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 4: curl / wget                         -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s3"><small>ARCH-CMD05.4 of 7 · ⏱ ~12 min</small></div>
+<h2>ARCH-CMD05.4 — curl &amp; wget: HTTP from the Command Line</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p><span class="ic">curl</span> lets you make HTTP requests from the terminal — the same requests your web browser makes, but visible and scriptable. You can download files, call APIs, submit forms, test web servers, and debug HTTP communication. It supports dozens of protocols (HTTP, HTTPS, FTP, SFTP, SCP, etc.) and is the universal tool for interacting with web services from scripts. <span class="ic">wget</span> is simpler and focused on downloading files (it can resume interrupted downloads and mirror entire websites). Use curl for API interaction and debugging, wget for bulk downloads.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>The <span class="ic">curl</span> command uses libcurl to perform URL transfers. Key flags: <span class="ic">-o file</span> (save output to file), <span class="ic">-O</span> (save with server's filename), <span class="ic">-L</span> (follow HTTP redirects — essential for most URLs), <span class="ic">-s</span> (silent — no progress bar), <span class="ic">-S</span> (show errors even in silent mode), <span class="ic">-I</span> (HEAD request — show only headers), <span class="ic">-v</span> (verbose — show the entire HTTP conversation including headers and TLS handshake), <span class="ic">-X METHOD</span> (set HTTP method: GET, POST, PUT, DELETE), <span class="ic">-H "Header: value"</span> (add custom headers), <span class="ic">-d "data"</span> (send POST data), <span class="ic">-u user:pass</span> (HTTP basic auth), <span class="ic">-k</span> (skip TLS certificate verification — use only for testing). For API work, <span class="ic">-H "Content-Type: application/json" -d '{"key":"value"}'</span> is the standard pattern for sending JSON.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ curl — HTTP Swiss Army Knife ═══</span>
+
+<span class="c"># Fetch a web page (output to terminal)</span>
+<span class="g">curl</span> <span class="y">https://archlinux.org</span>
+
+<span class="c"># Download a file</span>
+<span class="g">curl</span> <span class="o">-LO</span> <span class="y">https://github.com/user/repo/archive/main.tar.gz</span>
+<span class="c"># -L follows redirects, -O saves with the original filename</span>
+
+<span class="c"># See HTTP headers only (check if a server is responding)</span>
+<span class="g">curl</span> <span class="o">-sI</span> <span class="y">https://github.com</span> | <span class="g">head</span> <span class="o">-10</span>
+
+<span class="c"># Get your public IP address</span>
+<span class="g">curl</span> <span class="o">-s</span> <span class="y">https://ifconfig.me</span>
+
+<span class="c"># Test API endpoint (GET request with JSON response)</span>
+<span class="g">curl</span> <span class="o">-sS</span> <span class="y">https://api.github.com/users/torvalds</span> | <span class="g">jq</span> <span class="y">'.name, .bio'</span>
+
+<span class="c"># POST request with JSON body</span>
+<span class="g">curl</span> <span class="o">-sS</span> <span class="o">-X POST</span> \
+  <span class="o">-H</span> <span class="y">"Content-Type: application/json"</span> \
+  <span class="o">-d</span> <span class="y">'{"title": "Test", "body": "Hello from curl"}'</span> \
+  <span class="y">https://httpbin.org/post</span> | <span class="g">jq</span> <span class="y">'.json'</span>
+
+<span class="c"># Verbose mode — debug the entire HTTP conversation</span>
+<span class="g">curl</span> <span class="o">-v</span> <span class="y">https://google.com</span> 2>&1 | <span class="g">head</span> <span class="o">-30</span>
+<span class="c"># Shows: DNS resolution, TCP connect, TLS handshake, HTTP request/response</span>
+
+<span class="c"># ═══ wget — Download Specialist ═══</span>
+
+<span class="c"># Download a file (resume-capable by default)</span>
+<span class="g">wget</span> <span class="y">https://archlinux.org/iso/latest/archlinux-x86_64.iso</span>
+
+<span class="c"># Resume an interrupted download</span>
+<span class="g">wget</span> <span class="o">-c</span> <span class="y">https://example.com/largefile.iso</span>
+
+<span class="c"># Download quietly (for scripts)</span>
+<span class="g">wget</span> <span class="o">-q</span> <span class="o">-O</span> <span class="b">/tmp/data.json</span> <span class="y">https://api.example.com/data</span></pre>
+<div class="out"><div class="outl">Expected Output (curl -sI https://github.com | head -5)</div><pre>HTTP/2 200
+server: GitHub.com
+date: Sat, 15 Mar 2026 15:42:00 GMT
+content-type: text/html; charset=utf-8
+x-frame-options: DENY</pre></div></div>
+
+<div class="cm">
+<div class="cm-do"><b>✅ curl for daily use:</b><p><span class="ic">curl -sS</span> (silent + show errors) is the standard for scripts. <span class="ic">curl -v</span> is your debugging tool when an API is not behaving as expected. Always pipe JSON responses through <span class="ic">jq</span> for readable output. Always use <span class="ic">-L</span> for web URLs (most sites redirect HTTP→HTTPS).</p></div>
+<div class="cm-x"><b>❌ curl vs wget:</b><p>Do not use <span class="ic">wget</span> for API interaction — it is designed for downloading files, not HTTP debugging. Do not use <span class="ic">curl</span> for mirroring websites — wget has <span class="ic">--mirror</span> mode designed for that. Use the right tool for the right job.</p></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 5: ssh                                 -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s4"><small>ARCH-CMD05.5 of 7 · ⏱ ~12 min</small></div>
+<h2>ARCH-CMD05.5 — ssh: Secure Remote Access</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p><span class="ic">ssh</span> (Secure Shell) lets you log into another computer's terminal over the network, as if you were sitting at its keyboard. All communication is encrypted, so nobody between you and the server can see what you are typing (including passwords, code, and commands). Beyond remote shells, SSH also does port forwarding (tunneling other protocols through the encrypted connection), file transfers (via <span class="ic">scp</span> and <span class="ic">sftp</span>), and serves as the transport layer for Git operations with GitHub. In Part 1 of your Arch guide, you configured the SSH server and set up key-based authentication — this section shows you how to use the client side effectively.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>SSH key authentication uses asymmetric cryptography: you generated a key pair (ed25519) in Part 3 — the private key (<span class="ic">~/.ssh/id_ed25519</span>, permissions 600) stays on your machine, the public key (<span class="ic">~/.ssh/id_ed25519.pub</span>) is placed on remote servers. During authentication, the server sends a challenge, your SSH client signs it with the private key, and the server verifies the signature against the stored public key. No password ever crosses the network. The <span class="ic">~/.ssh/config</span> file lets you define named connections with preconfigured hostnames, usernames, ports, and key files — so you can type <span class="ic">ssh myserver</span> instead of <span class="ic">ssh -i ~/.ssh/special_key -p 2222 mari@192.168.178.100</span>. Port forwarding: <span class="ic">-L localport:remotehost:remoteport</span> (local forward — access a remote service through a local port) and <span class="ic">-R remoteport:localhost:localport</span> (remote forward — expose a local service to the remote network).</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ ssh — Connect to a Remote Machine ═══</span>
+
+<span class="c"># Basic connection</span>
+<span class="g">ssh</span> <span class="y">mari@192.168.178.100</span>
+<span class="g">ssh</span> <span class="y">user@example.com</span>
+
+<span class="c"># Specify a port (if not default 22)</span>
+<span class="g">ssh</span> <span class="o">-p</span> <span class="y">2222</span> <span class="y">mari@server.com</span>
+
+<span class="c"># Run a single command remotely (no interactive shell)</span>
+<span class="g">ssh</span> <span class="y">mari@server</span> <span class="y">"df -h && free -h"</span>
+
+<span class="c"># ═══ ~/.ssh/config — Named Connections (THE pro move) ═══</span>
+<span class="c"># Create/edit ~/.ssh/config:</span>
+<span class="c"># Host myserver</span>
+<span class="c">#     HostName 192.168.178.100</span>
+<span class="c">#     User mari</span>
+<span class="c">#     Port 22</span>
+<span class="c">#     IdentityFile ~/.ssh/id_ed25519</span>
+<span class="c">#</span>
+<span class="c"># Host github</span>
+<span class="c">#     HostName github.com</span>
+<span class="c">#     User git</span>
+<span class="c">#     IdentityFile ~/.ssh/github_ed25519</span>
+
+<span class="c"># Now you can just type:</span>
+<span class="g">ssh</span> <span class="y">myserver</span>                          <span class="c"># connects with all the right settings</span>
+
+<span class="c"># ═══ scp / sftp — File Transfer ═══</span>
+
+<span class="c"># Copy file TO a remote machine</span>
+<span class="g">scp</span> <span class="b">report.pdf</span> <span class="y">mari@server:/home/mari/Documents/</span>
+
+<span class="c"># Copy file FROM a remote machine</span>
+<span class="g">scp</span> <span class="y">mari@server:/var/log/app.log</span> <span class="b">./</span>
+
+<span class="c"># Copy entire directory recursively</span>
+<span class="g">scp</span> <span class="o">-r</span> <span class="b">project/</span> <span class="y">mari@server:~/projects/</span>
+
+<span class="c"># Interactive file browser (sftp — like FTP but encrypted)</span>
+<span class="g">sftp</span> <span class="y">mari@server</span>
+
+<span class="c"># ═══ Port Forwarding — SSH Tunnels ═══</span>
+
+<span class="c"># Access remote PostgreSQL (port 5432) through local port 5433</span>
+<span class="g">ssh</span> <span class="o">-L</span> <span class="y">5433:localhost:5432</span> <span class="y">mari@server</span>
+<span class="c"># Now: psql -h localhost -p 5433 → connects to the REMOTE database</span>
+
+<span class="c"># Access remote web app (port 8080) locally</span>
+<span class="g">ssh</span> <span class="o">-L</span> <span class="y">8080:localhost:8080</span> <span class="y">mari@server</span>
+<span class="c"># Now: open http://localhost:8080 in your browser → shows remote app</span></pre></div>
+
+<div class="qz"><div class="qz-q">🧪 You need to access a PostgreSQL database running on a remote server (only listening on localhost:5432) from your local machine. How?</div>
+<div class="qo" onclick="ck(this,true)">SSH port forwarding: ssh -L 5433:localhost:5432 user@server — this creates an encrypted tunnel, and connecting to localhost:5433 on your machine reaches the remote PostgreSQL on port 5432</div>
+<div class="qo" onclick="ck(this,false)">Configure PostgreSQL to listen on 0.0.0.0 (dangerous — exposes it to the internet)</div>
+<div class="qo" onclick="ck(this,false)">It is not possible to access services only listening on localhost</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 6: dig / DNS                           -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s5"><small>ARCH-CMD05.6 of 7 · ⏱ ~8 min</small></div>
+<h2>ARCH-CMD05.6 — dig &amp; DNS: Name Resolution</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>DNS (Domain Name System) is the phone book of the internet — it translates human-readable names like <span class="ic">github.com</span> into machine-readable IP addresses like <span class="ic">140.82.121.4</span>. Every time you visit a website, run <span class="ic">pacman -Syu</span>, or push to Git, your system performs a DNS lookup first. The <span class="ic">dig</span> command (Domain Information Groper) lets you perform DNS lookups manually and see exactly what is happening — which server answered, what records were returned, and how long it took. When websites are not loading but you can ping IP addresses directly, DNS is almost always the problem, and <span class="ic">dig</span> is how you diagnose it.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>DNS record types you will encounter: <span class="ic">A</span> (IPv4 address for a hostname), <span class="ic">AAAA</span> (IPv6 address), <span class="ic">CNAME</span> (alias — one name pointing to another name), <span class="ic">MX</span> (mail server for a domain), <span class="ic">NS</span> (nameservers for a domain), <span class="ic">TXT</span> (arbitrary text — used for SPF, DKIM, domain verification). The <span class="ic">dig</span> command queries DNS servers directly using UDP port 53 (or TCP for large responses). On your Arch system, <span class="ic">systemd-resolved</span> handles DNS with the configuration visible via <span class="ic">resolvectl status</span>. Your FRITZ!Box likely provides DNS via DHCP (usually forwarding to your ISP's DNS or to its own recursive resolver). For faster and more private DNS, you can configure systemd-resolved to use DNS-over-TLS with providers like Cloudflare (1.1.1.1) or Quad9 (9.9.9.9).</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ dig — DNS Debugging ═══</span>
+
+<span class="c"># Basic lookup (A record — the IP address)</span>
+<span class="g">dig</span> <span class="y">github.com</span>
+
+<span class="c"># Short answer only (for scripts)</span>
+<span class="g">dig</span> <span class="o">+short</span> <span class="y">github.com</span>                <span class="c"># just the IP address</span>
+
+<span class="c"># Specific record types</span>
+<span class="g">dig</span> <span class="y">github.com</span> <span class="y">MX</span>                   <span class="c"># mail servers</span>
+<span class="g">dig</span> <span class="y">github.com</span> <span class="y">NS</span>                   <span class="c"># nameservers</span>
+<span class="g">dig</span> <span class="y">github.com</span> <span class="y">TXT</span>                  <span class="c"># TXT records (SPF, verification)</span>
+<span class="g">dig</span> <span class="y">github.com</span> <span class="y">AAAA</span>                 <span class="c"># IPv6 address</span>
+
+<span class="c"># Query a specific DNS server (bypass your local resolver)</span>
+<span class="g">dig</span> <span class="y">@1.1.1.1</span> <span class="y">github.com</span>             <span class="c"># ask Cloudflare's DNS</span>
+<span class="g">dig</span> <span class="y">@8.8.8.8</span> <span class="y">github.com</span>             <span class="c"># ask Google's DNS</span>
+
+<span class="c"># Reverse lookup (IP → hostname)</span>
+<span class="g">dig</span> <span class="o">-x</span> <span class="y">140.82.121.4</span>
+
+<span class="c"># ═══ Simpler Alternative: host ═══</span>
+<span class="g">host</span> <span class="y">github.com</span>                       <span class="c"># quick and human-readable</span>
+<span class="g">host</span> <span class="y">140.82.121.4</span>                     <span class="c"># reverse lookup</span>
+
+<span class="c"># ═══ Check Your DNS Configuration ═══</span>
+<span class="g">resolvectl</span> <span class="o">status</span>                     <span class="c"># systemd-resolved config</span>
+<span class="g">cat</span> <span class="b">/etc/resolv.conf</span>                  <span class="c"># the classic DNS config file</span></pre>
+<div class="out"><div class="outl">Expected Output (dig +short github.com)</div><pre>140.82.121.4</pre></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 7: Practice                            -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s6"><small>ARCH-CMD05.7 of 7 · ⏱ ~15 min</small></div>
+<h2>ARCH-CMD05.7 — Practice Exercises</h2>
+
+<h3>Exercise 1 (Easy) — Network Status Report</h3>
+<p>Write a script that prints a clean network status report: your hostname, your Wi-Fi IP, your public IP (via curl), your default gateway, your DNS server, and the latency to google.com.</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">solution</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="g">set</span> <span class="o">-euo</span> <span class="y">pipefail</span>
+
+<span class="g">printf</span> <span class="y">"═══ 🌸 Network Status ═══\n\n"</span>
+<span class="g">printf</span> <span class="y">"  %-16s %s\n"</span> <span class="y">"Hostname:"</span> <span class="y">"$(hostname)"</span>
+<span class="g">printf</span> <span class="y">"  %-16s %s\n"</span> <span class="y">"Local IP:"</span> <span class="y">"$(ip -4 -br addr | awk '/wlan/{print $3}')"</span>
+<span class="g">printf</span> <span class="y">"  %-16s %s\n"</span> <span class="y">"Public IP:"</span> <span class="y">"$(curl -sS --max-time 3 https://ifconfig.me || echo 'unreachable')"</span>
+<span class="g">printf</span> <span class="y">"  %-16s %s\n"</span> <span class="y">"Gateway:"</span> <span class="y">"$(ip route | awk '/default/{print $3}')"</span>
+<span class="g">printf</span> <span class="y">"  %-16s %s\n"</span> <span class="y">"DNS:"</span> <span class="y">"$(resolvectl status 2>/dev/null | awk '/DNS Servers/{print $NF; exit}' || awk '/nameserver/{print $2; exit}' /etc/resolv.conf)"</span>
+
+<span class="v">latency</span>=<span class="p">$(</span><span class="g">ping</span> <span class="o">-c 1</span> <span class="o">-W 2</span> <span class="y">google.com</span> 2>/dev/null | <span class="g">awk</span> <span class="o">-F</span><span class="y">'[=/]'</span> <span class="y">'/avg/{printf "%.1f ms", $5}'</span><span class="p">)</span> || <span class="v">latency</span>=<span class="y">"timeout"</span>
+<span class="g">printf</span> <span class="y">"  %-16s %s\n"</span> <span class="y">"Latency:"</span> <span class="y">"$latency"</span></pre>
+<div class="out"><div class="outl">Output</div><pre>═══ 🌸 Network Status ═══
+
+  Hostname:        pinkgalaxy
+  Local IP:        192.168.178.42/24
+  Public IP:       85.214.xxx.xxx
+  Gateway:         192.168.178.1
+  DNS:             192.168.178.1
+  Latency:         12.1 ms</pre></div></div>
+
+<h3>Exercise 2 (Medium) — Port Scanner</h3>
+<p>Write a script that scans a given host for common service ports (22, 80, 443, 3000, 5432, 6379, 8080, 8443, 9090) using bash's built-in <span class="ic">/dev/tcp</span> feature (from BASH-F05). Report which are open and which are closed, with a summary count. Add a timeout so closed ports do not hang the script.</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">solution</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="g">set</span> <span class="o">-euo</span> <span class="y">pipefail</span>
+
+<span class="v">host</span>=<span class="y">"${1:-localhost}"</span>
+<span class="v">ports</span>=(<span class="y">22</span> <span class="y">80</span> <span class="y">443</span> <span class="y">3000</span> <span class="y">5432</span> <span class="y">6379</span> <span class="y">8080</span> <span class="y">8443</span> <span class="y">9090</span>)
+<span class="v">open</span>=<span class="y">0</span> <span class="v">closed</span>=<span class="y">0</span>
+
+<span class="g">printf</span> <span class="y">"Scanning %s...\n\n"</span> <span class="y">"$host"</span>
+<span class="g">printf</span> <span class="y">"%-8s  %-8s  %s\n"</span> <span class="y">"PORT"</span> <span class="y">"STATE"</span> <span class="y">"SERVICE"</span>
+<span class="g">printf</span> <span class="y">"%-8s  %-8s  %s\n"</span> <span class="y">"────"</span> <span class="y">"─────"</span> <span class="y">"───────"</span>
+
+<span class="c"># Simple service name lookup</span>
+<span class="g">svc_name</span>() {
+    <span class="k">case</span> <span class="y">"$1"</span> <span class="k">in</span>
+        22) <span class="g">echo</span> <span class="y">"ssh"</span>;;       80) <span class="g">echo</span> <span class="y">"http"</span>;;
+        443) <span class="g">echo</span> <span class="y">"https"</span>;;    3000) <span class="g">echo</span> <span class="y">"dev-server"</span>;;
+        5432) <span class="g">echo</span> <span class="y">"postgres"</span>;; 6379) <span class="g">echo</span> <span class="y">"redis"</span>;;
+        8080) <span class="g">echo</span> <span class="y">"http-alt"</span>;; 8443) <span class="g">echo</span> <span class="y">"https-alt"</span>;;
+        9090) <span class="g">echo</span> <span class="y">"prometheus"</span>;; *) <span class="g">echo</span> <span class="y">"unknown"</span>;;
+    <span class="k">esac</span>
+}
+
+<span class="k">for</span> <span class="v">port</span> <span class="k">in</span> <span class="y">"${ports[@]}"</span>; <span class="k">do</span>
+    <span class="k">if</span> (echo >/dev/tcp/<span class="v">$host</span>/<span class="v">$port</span>) 2>/dev/null; <span class="k">then</span>
+        <span class="g">printf</span> <span class="y">"%-8s  \033[32m%-8s\033[0m  %s\n"</span> <span class="y">"$port"</span> <span class="y">"OPEN"</span> <span class="y">"$(svc_name "$port")"</span>
+        <span class="p">((</span>open++<span class="p">))</span>
+    <span class="k">else</span>
+        <span class="g">printf</span> <span class="y">"%-8s  %-8s  %s\n"</span> <span class="y">"$port"</span> <span class="y">"closed"</span> <span class="y">"$(svc_name "$port")"</span>
+        <span class="p">((</span>closed++<span class="p">))</span>
+    <span class="k">fi</span>
+<span class="k">done</span>
+
+<span class="g">printf</span> <span class="y">"\n%d open, %d closed (of %d scanned)\n"</span> <span class="y">"$open"</span> <span class="y">"$closed"</span> <span class="y">"${#ports[@]}"</span></pre>
+<div class="out"><div class="outl">Output (./portscan.sh localhost)</div><pre>Scanning localhost...
+
+PORT      STATE     SERVICE
+────      ─────     ───────
+22        OPEN      ssh
+80        closed    http
+443       closed    https
+3000      closed    dev-server
+5432      OPEN      postgres
+6379      OPEN      redis
+8080      closed    http-alt
+8443      closed    https-alt
+9090      closed    prometheus
+
+3 open, 6 closed (of 9 scanned)</pre></div></div>
+
+<h3>Exercise 3 (Hard) — Network Diagnostic Ladder</h3>
+<p>Write a comprehensive network diagnostic script that runs the diagnostic ladder from Section 3 (loopback → gateway → external IP → DNS) automatically, tests specific services (GitHub, Arch mirrors, Docker Hub), checks for DNS resolution speed, tests download speed with a small file, and produces a color-coded report with pass/fail for each test. Use the production script template from BASH-F08.</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">solution</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="g">set</span> <span class="o">-euo</span> <span class="y">pipefail</span>
+<span class="v">G</span>=<span class="y">'\033[32m'</span> <span class="v">R</span>=<span class="y">'\033[31m'</span> <span class="v">Y</span>=<span class="y">'\033[33m'</span> <span class="v">N</span>=<span class="y">'\033[0m'</span>
+<span class="v">pass</span>=<span class="y">0</span> <span class="v">fail</span>=<span class="y">0</span>
+
+<span class="g">check</span>() {
+    <span class="k">local</span> <span class="v">label</span>=<span class="y">"$1"</span>; <span class="g">shift</span>
+    <span class="g">printf</span> <span class="y">"  %-30s"</span> <span class="y">"$label"</span>
+    <span class="k">if</span> <span class="y">"$@"</span> &>/dev/null; <span class="k">then</span>
+        <span class="g">printf</span> <span class="y">"${G}✓ PASS${N}\n"</span>; <span class="p">((</span>pass++<span class="p">))</span>
+    <span class="k">else</span>
+        <span class="g">printf</span> <span class="y">"${R}✗ FAIL${N}\n"</span>; <span class="p">((</span>fail++<span class="p">))</span>
+    <span class="k">fi</span>
+}
+
+<span class="g">echo</span> <span class="y">"═══ 🌸 Network Diagnostic ═══"</span>
+<span class="g">echo</span> <span class="y">""</span>
+<span class="g">echo</span> <span class="y">"--- Layer 1: Connectivity ---"</span>
+<span class="g">check</span> <span class="y">"Loopback"</span>            <span class="g">ping</span> <span class="o">-c1 -W1</span> <span class="y">127.0.0.1</span>
+<span class="g">check</span> <span class="y">"Gateway (FRITZ!Box)"</span>  <span class="g">ping</span> <span class="o">-c1 -W2</span> <span class="p">$(</span><span class="g">ip</span> <span class="o">route</span> | <span class="g">awk</span> <span class="y">'/default/{print $3}'</span><span class="p">)</span>
+<span class="g">check</span> <span class="y">"External IP (8.8.8.8)"</span> <span class="g">ping</span> <span class="o">-c1 -W3</span> <span class="y">8.8.8.8</span>
+<span class="g">check</span> <span class="y">"DNS Resolution"</span>      <span class="g">dig</span> <span class="o">+short</span> <span class="y">google.com</span>
+
+<span class="g">echo</span> <span class="y">""</span>
+<span class="g">echo</span> <span class="y">"--- Layer 2: Services ---"</span>
+<span class="g">check</span> <span class="y">"GitHub"</span>              <span class="g">curl</span> <span class="o">-sS --max-time 5</span> <span class="y">https://github.com</span>
+<span class="g">check</span> <span class="y">"Arch Mirrors"</span>        <span class="g">curl</span> <span class="o">-sS --max-time 5</span> <span class="y">https://archlinux.org</span>
+<span class="g">check</span> <span class="y">"Docker Hub"</span>          <span class="g">curl</span> <span class="o">-sS --max-time 5</span> <span class="y">https://hub.docker.com</span>
+<span class="g">check</span> <span class="y">"PyPI"</span>               <span class="g">curl</span> <span class="o">-sS --max-time 5</span> <span class="y">https://pypi.org</span>
+
+<span class="g">echo</span> <span class="y">""</span>
+<span class="g">echo</span> <span class="y">"--- Layer 3: Performance ---"</span>
+<span class="v">dns_ms</span>=<span class="p">$(</span><span class="g">dig</span> <span class="y">github.com</span> | <span class="g">awk</span> <span class="y">'/Query time/{print $4}'</span><span class="p">)</span>
+<span class="g">printf</span> <span class="y">"  %-30s %s ms\n"</span> <span class="y">"DNS lookup time:"</span> <span class="y">"${dns_ms:-?}"</span>
+
+<span class="v">dl_speed</span>=<span class="p">$(</span><span class="g">curl</span> <span class="o">-sS -o /dev/null -w</span> <span class="y">'%{speed_download}'</span> <span class="o">--max-time 10</span> <span class="y">https://speed.cloudflare.com/__down?bytes=1000000</span> 2>/dev/null<span class="p">)</span> || <span class="v">dl_speed</span>=<span class="y">0</span>
+<span class="v">dl_mbps</span>=<span class="p">$(</span><span class="g">echo</span> <span class="y">"$dl_speed"</span> | <span class="g">awk</span> <span class="y">'{printf "%.1f", $1/125000}'</span><span class="p">)</span>
+<span class="g">printf</span> <span class="y">"  %-30s %s Mbps\n"</span> <span class="y">"Download speed:"</span> <span class="y">"$dl_mbps"</span>
+
+<span class="g">echo</span> <span class="y">""</span>
+<span class="g">printf</span> <span class="y">"═══ Result: ${G}%d passed${N}, ${R}%d failed${N} ═══\n"</span> <span class="y">"$pass"</span> <span class="y">"$fail"</span></pre>
+<div class="out"><div class="outl">Output</div><pre>═══ 🌸 Network Diagnostic ═══
+
+--- Layer 1: Connectivity ---
+  Loopback                       ✓ PASS
+  Gateway (FRITZ!Box)            ✓ PASS
+  External IP (8.8.8.8)          ✓ PASS
+  DNS Resolution                 ✓ PASS
+
+--- Layer 2: Services ---
+  GitHub                         ✓ PASS
+  Arch Mirrors                   ✓ PASS
+  Docker Hub                     ✓ PASS
+  PyPI                           ✓ PASS
+
+--- Layer 3: Performance ---
+  DNS lookup time:               4 ms
+  Download speed:                48.3 Mbps
+
+═══ Result: 8 passed, 0 failed ═══</pre></div></div>
+
+<div class="note gn">
+<b>🌸 Module Complete!</b> You now have full visibility and control over your network. You can see your IP addresses and routing table with <span class="ic">ip</span>, inspect every open port and active connection with <span class="ic">ss</span>, test connectivity layer by layer with <span class="ic">ping</span> and the diagnostic ladder (loopback → gateway → external → DNS), make HTTP requests and debug APIs with <span class="ic">curl</span>, connect to remote machines and tunnel services through encrypted SSH connections, and resolve DNS queries with <span class="ic">dig</span>. The diagnostic ladder pattern — testing each network layer in sequence to isolate where a failure occurs — is the professional approach to network troubleshooting that will serve you throughout your career. This completes five modules of the ARCH-CMD track. 🌸
+</div>
+
+</div>
+<div class="sf"><button onclick="svB()">💾 Save Brick 13</button></div>
+<script>
+function sw(btn,lv){let el=btn.parentElement.nextElementSibling;while(el&&!el.classList.contains('sd')&&!el.classList.contains('qz')&&!el.classList.contains('cm')&&!el.classList.contains('cw')&&el.tagName!=='H3'&&el.tagName!=='TABLE'){if(el.classList.contains('pan'))el.classList.toggle('on',el.dataset.l===lv);el=el.nextElementSibling;}btn.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');}
+function ck(btn,ok){const box=btn.closest('.qz');box.querySelectorAll('.qo').forEach(o=>o.disabled=true);btn.classList.add(ok?'y':'n');const fb=box.querySelector('.qfb');fb.classList.add('s');fb.className=ok?'qfb s w':'qfb s l';fb.textContent=ok?'✓ Correct! +10 XP':'✗ Review the section above.';}
+function cpC(b){const pre=b.closest('.cw').querySelector('pre');navigator.clipboard.writeText(pre.textContent).then(()=>{b.textContent='✓';setTimeout(()=>b.textContent='Copy',1500);});}
+function svB(){const blob=new Blob(['<!DOCTYPE html>\n'+document.documentElement.outerHTML],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='brick13_ARCHCMD05_networking_'+new Date().toISOString().slice(0,10)+'.html';a.click();}
+</script>
+</body>
+</html>

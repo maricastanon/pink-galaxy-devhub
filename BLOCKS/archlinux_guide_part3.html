@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arch Linux — Pink Galaxy Guide — Part 3: Developer Environment, Cloud & BlackArch</title>
+<style>
+:root{--pink:#e91e63;--pl:#f8bbd0;--pd:#880e4f;--pg:rgba(233,30,99,0.3);--green:#2e7d32;--gl:#c8e6c9;--gd:#1b5e20;--bg:#0a0a12;--bg2:rgba(15,15,30,0.85);--bgc:#1a1a2e;--tx:#e8e6f0;--tx2:#a8a6b8;--mt:#6c6a7e;--bd:rgba(233,30,99,0.2);--bdg:rgba(46,125,50,0.3);--cg:#a5d6a7;--cp:#f48fb1;--cy:#fff59d;--cb:#90caf9;--co:#ffcc80;--cc:#6a6a8a;--cs:#c5e1a5;--cv:#ce93d8;--ok:#4caf50;--wn:#ff9800;--dn:#ff5252;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Calibri,"Segoe UI",sans-serif;font-size:11pt;color:var(--tx);background:var(--bg);line-height:1.7;padding:20px 30px 80px;padding-right:70px;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 20% 50%,rgba(233,30,99,0.07)0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(103,58,183,0.05)0%,transparent 50%);}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background-image:radial-gradient(1px 1px at 10% 20%,rgba(255,255,255,0.35),transparent),radial-gradient(1px 1px at 50% 10%,rgba(233,30,99,0.4),transparent),radial-gradient(1.5px 1.5px at 45% 45%,rgba(255,255,255,0.45),transparent),radial-gradient(1px 1px at 85% 70%,rgba(233,30,99,0.3),transparent);animation:tw 8s ease-in-out infinite alternate;}
+@keyframes tw{0%{opacity:.6}50%{opacity:1}100%{opacity:.7}}
+.w{max-width:1100px;margin:0 auto;position:relative;z-index:1;}
+h1{color:var(--pink);font-size:24pt;margin:40px 0 16px;text-shadow:0 0 30px var(--pg);border-bottom:2px solid var(--pink);padding-bottom:10px;}
+h2{color:var(--green);font-size:18pt;margin:32px 0 14px;border-left:4px solid var(--green);padding-left:14px;}
+h3{color:var(--pink);font-size:14pt;margin:24px 0 10px;}
+h4{color:var(--green);font-size:12pt;margin:18px 0 8px;}
+p{color:var(--tx);margin:10px 0;text-align:justify;}
+a{color:var(--pink);text-decoration:none;}a:hover{color:var(--pl);}
+.ic{font-family:"Courier New",monospace;font-size:9.5pt;background:rgba(233,30,99,0.1);padding:1px 6px;border-radius:4px;color:var(--cp);}
+.cover{text-align:center;padding:50px 40px;margin-bottom:36px;background:linear-gradient(135deg,#1a0533,#0d1b2a,#1b0a2e);border:2px solid var(--pink);border-radius:16px;box-shadow:0 0 60px var(--pg);position:relative;overflow:hidden;}
+.cover::before{content:'🌸';position:absolute;font-size:160pt;opacity:0.04;top:-30px;right:-10px;transform:rotate(-15deg);}
+.cover h1{border:none;font-size:30pt;background:linear-gradient(90deg,var(--pink),#f48fb1,var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.cover .sub{color:var(--tx2);font-size:13pt;margin:6px 0;}
+.cover .part{display:inline-block;background:var(--pink);color:#fff;padding:5px 22px;border-radius:18px;font-size:10pt;font-weight:bold;margin:14px 0;letter-spacing:2px;text-transform:uppercase;}
+.cover .info{color:var(--mt);font-size:8.5pt;font-family:"Courier New",monospace;text-align:left;background:rgba(0,0,0,0.3);padding:10px;border-radius:8px;border:1px solid var(--bd);margin-top:16px;}
+.cw{margin:14px 0;border:1px solid var(--bdg);border-radius:10px;overflow:hidden;background:var(--bgc);}
+.ch{display:flex;justify-content:space-between;align-items:center;padding:5px 12px;background:rgba(46,125,50,0.14);border-bottom:1px solid var(--bdg);font-size:8.5pt;}
+.cl{color:var(--green);font-family:"Courier New",monospace;font-weight:bold;text-transform:uppercase;letter-spacing:1px;}
+.cpb{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:var(--tx2);padding:2px 9px;border-radius:4px;cursor:pointer;font-size:8pt;font-family:"Courier New",monospace;}
+.cpb:hover{background:var(--pink);color:#fff;border-color:var(--pink);}
+.cpb.ok{background:var(--green);color:#fff;}
+pre{font-family:"Courier New",monospace;font-size:10pt;background:var(--bgc);padding:14px;overflow-x:auto;white-space:pre;line-height:1.5;margin:0;color:var(--tx);}
+pre .c{color:var(--cc);font-style:italic;}pre .g{color:var(--cg);}pre .p{color:var(--cp);}pre .y{color:var(--cy);}pre .b{color:var(--cb);}pre .o{color:var(--co);}pre .v{color:var(--cv);}pre .s{color:var(--cs);}
+.co{background:rgba(46,125,50,0.07);border-top:2px solid var(--green);padding:10px 14px;font-family:"Courier New",monospace;font-size:9pt;color:var(--cg);}
+.col{color:var(--green);font-weight:bold;font-size:8pt;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;}
+.pv{background:rgba(233,30,99,0.06);border-left:3px solid var(--pink);padding:9px 13px;margin:10px 0 3px;font-size:10pt;border-radius:0 6px 6px 0;}
+.pv .l{color:var(--pink);font-weight:bold;font-size:8.5pt;text-transform:uppercase;letter-spacing:1px;}
+.dt{background:rgba(46,125,50,0.06);border-left:3px solid var(--green);padding:9px 13px;margin:3px 0;font-size:10pt;border-radius:0 6px 6px 0;}
+.dt .l{color:var(--green);font-weight:bold;font-size:8.5pt;text-transform:uppercase;letter-spacing:1px;}
+.cal{border-radius:10px;border:2px solid var(--pink);padding:14px 18px;margin:14px 0;background:rgba(233,30,99,0.04);break-inside:avoid;}
+.cal.g{border-color:var(--green);background:rgba(46,125,50,0.04);}
+.cal.w{border-color:var(--wn);background:rgba(255,152,0,0.04);}
+.cal.d{border-color:var(--dn);background:rgba(255,82,82,0.04);}
+.ct{font-weight:bold;font-size:9.5pt;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.cal:not(.g):not(.w):not(.d) .ct{color:var(--pink);}
+.cal.g .ct{color:var(--green);}
+.cal.w .ct{color:var(--wn);}
+.cal.d .ct{color:var(--dn);}
+.cd{text-align:center;margin:44px 0 28px;position:relative;}
+.cd::before{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:linear-gradient(90deg,transparent,var(--pink),transparent);}
+.cn{display:inline-block;background:var(--bg);padding:0 18px;position:relative;color:var(--pink);font-size:10pt;text-transform:uppercase;letter-spacing:4px;font-weight:bold;}
+.btt{display:flex;align-items:center;gap:4px;color:var(--mt);font-size:9pt;margin:14px 0;cursor:pointer;}
+.btt:hover{color:var(--pink);}
+.pb{page-break-before:always;}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:10pt;}
+th{background:rgba(233,30,99,0.12);color:var(--pl);padding:9px 12px;text-align:left;border-bottom:2px solid var(--pink);}
+td{padding:7px 12px;border-bottom:1px solid var(--bd);color:var(--tx2);vertical-align:top;}
+.sc{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:10px 0;padding:9px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--bd);}
+.cbi{display:flex;align-items:center;gap:4px;cursor:pointer;font-size:9pt;color:var(--tx2);user-select:none;}
+.cbi input{accent-color:var(--pink);width:15px;height:15px;cursor:pointer;}
+.nt{font-size:9pt;color:var(--mt);cursor:pointer;}
+.nt:hover{color:var(--pink);}
+.na{display:none;margin:6px 0;padding:8px;background:rgba(0,0,0,0.2);border:1px solid var(--bd);border-radius:6px;}
+.na.vis{display:block;}
+.na textarea{width:100%;min-height:50px;background:rgba(0,0,0,0.3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:Calibri,sans-serif;font-size:10pt;padding:6px;resize:vertical;}
+.gp{position:sticky;top:0;z-index:100;background:var(--bg);padding:6px 0;border-bottom:1px solid var(--bd);margin-bottom:18px;}
+.gp-t{display:flex;justify-content:space-between;font-size:8pt;color:var(--mt);}
+.pc{width:100%;height:4px;background:rgba(255,255,255,0.05);border-radius:2px;overflow:hidden;}
+.pf{height:100%;background:linear-gradient(90deg,var(--pink),var(--green));border-radius:2px;transition:width .4s;width:0%;}
+.sf{position:fixed;bottom:16px;right:16px;z-index:9999;}
+.sb{padding:8px 16px;background:var(--green);color:#fff;border:none;border-radius:8px;font-weight:bold;font-size:9.5pt;cursor:pointer;box-shadow:0 4px 16px rgba(46,125,50,0.3);font-family:Calibri,sans-serif;}
+.sb:hover{background:var(--ok);transform:translateY(-1px);}
+hr{border:none;height:1px;background:linear-gradient(90deg,transparent,var(--bd),transparent);margin:28px 0;}
+@media print{body{background:#fff;color:#2c3e50;padding-right:0!important;}body::before,body::after{display:none;}h1{color:#e91e63!important;text-shadow:none;}h2{color:#2e7d32!important;}pre{background:#f8f9fa!important;color:#2c3e50;border:1px solid #ddd;}.cover{box-shadow:none;}p,td{color:#2c3e50!important;}.sf,.gp,.sc,.na{display:none!important;}@page{size:A4;margin:1.5cm 1cm;}.pb{page-break-before:always;}}
+</style>
+</head>
+<body>
+<div class="w">
+
+<div class="cover" id="top">
+  <div class="part">Part 3 — Developer & Cloud & Security</div>
+  <h1>🌸 Arch Linux: The Pink Galaxy Guide</h1>
+  <p class="sub">Python • Docker • VS Code • Claude Code • AWS • Azure • Databricks • BlackArch</p>
+  <div class="info">
+Confirmed scope: Part 3 — Developer Environment, Cloud Tools &amp; BlackArch Security Repository<br>
+Prerequisites: Parts 1+2 complete (Hyprland running, Kitty/Zsh configured, audio/BT working)<br>
+Target: Dell Inspiron 14 7420 2-in-1 • Arch Linux • Hyprland<br>
+Covers: Ch 11 (Dev Environment) → Ch 12 (Cloud &amp; Data) → Ch 13 (BlackArch &amp; Security)<br>
+Part 4: Full Pink Galaxy rice, system hardening, maintenance
+  </div>
+</div>
+
+<div class="gp"><div class="gp-t"><span>Part 3 Progress</span><span id="gPct">0%</span></div><div class="pc"><div class="pf" id="gBar"></div></div></div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--               CHAPTER 11: DEVELOPER ENVIRONMENT             -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="cd" id="ch11"><span class="cn">Chapter 11</span></div>
+<h1>Developer Environment</h1>
+
+<div class="sc" data-section="ch11">
+  <div style="display:flex;gap:12px;flex-wrap:wrap;">
+    <label class="cbi"><input type="checkbox" data-type="read" onchange="rc()"> Read</label>
+    <label class="cbi"><input type="checkbox" data-type="applied" onchange="rc()"> Applied</label>
+    <label class="cbi"><input type="checkbox" data-type="memorized" onchange="rc()"> Memorized</label>
+    <label class="cbi"><input type="checkbox" data-type="implemented" onchange="rc()"> Implemented</label>
+  </div>
+  <span class="nt" onclick="this.nextElementSibling.classList.toggle('vis')">📝 Notes</span>
+</div>
+<div class="na"><textarea placeholder="Chapter 11 notes…"></textarea></div>
+
+<h2 id="s11-1">11.1 Python Ecosystem (pyenv + Poetry)</h2>
+
+<p><strong>Layman version:</strong> Python comes pre-installed on Arch, but for development you need more control — different projects may need different Python versions, and you want isolated environments so one project's dependencies don't break another. Pyenv lets you install and switch between any Python version (3.10, 3.11, 3.12, etc.), and Poetry manages your project's dependencies in a clean, reproducible way — like npm for Python, but better.</p>
+
+<p><strong>Technical detail:</strong> Pyenv works by inserting shim executables into your <span class="ic">$PATH</span> (at <span class="ic">~/.pyenv/shims/</span>) that intercept calls to <span class="ic">python</span>, <span class="ic">pip</span>, etc. When you run <span class="ic">python</span>, the shim checks the <span class="ic">.python-version</span> file in the current directory (or the global setting) to determine which actual Python binary to delegate to. Each Python version is compiled from source and installed in <span class="ic">~/.pyenv/versions/</span>. Poetry creates a <span class="ic">pyproject.toml</span> manifest and a <span class="ic">poetry.lock</span> file that pins exact dependency versions with SHA-256 hashes, ensuring deterministic builds — the same lockfile produces the same environment on any machine.</p>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># Install Python build dependencies (pyenv compiles Python from source)</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="s">python python-pip tk</span>
+
+<span class="c"># Install pyenv via paru</span>
+<span class="g">paru</span> <span class="o">-S</span> <span class="s">pyenv</span>
+
+<span class="c"># Add pyenv to your .zshrc (put these BEFORE the starship init line)</span>
+<span class="g">cat</span> >> <span class="b">~/.zshrc</span> << <span class="s">'EOF'</span>
+# Pyenv
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+EOF
+
+<span class="c"># Reload shell</span>
+<span class="g">exec</span> <span class="s">zsh</span>
+
+<span class="c"># Install Python 3.12 (takes 2-5 minutes — compiling from source)</span>
+<span class="g">pyenv</span> <span class="o">install</span> <span class="y">3.12</span>
+<span class="g">pyenv</span> <span class="o">global</span> <span class="y">3.12</span>
+
+<span class="c"># Verify</span>
+<span class="g">python</span> <span class="o">--version</span>
+
+<span class="c"># Install Poetry</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="s">python-poetry</span>
+
+<span class="c"># Configure Poetry to create virtualenvs inside project directories</span>
+<span class="c"># (so .venv lives next to your code — VS Code detects it automatically)</span>
+<span class="g">poetry</span> <span class="o">config</span> <span class="y">virtualenvs.in-project</span> <span class="y">true</span>
+
+<span class="c"># Example: start a new Python project</span>
+<span class="g">mkdir</span> <span class="b">~/projects/my-etl-pipeline</span> && <span class="g">cd</span> <span class="b">~/projects/my-etl-pipeline</span>
+<span class="g">poetry</span> <span class="o">init</span> <span class="o">--no-interaction</span>      <span class="c"># creates pyproject.toml</span>
+<span class="g">poetry</span> <span class="o">add</span> <span class="s">polars pandas boto3</span>     <span class="c"># add your core libraries</span>
+<span class="g">poetry</span> <span class="o">shell</span>                        <span class="c"># activate the virtualenv</span></pre>
+<div class="co"><div class="col">Expected Output</div><pre>Python 3.12.x
+Creating virtualenv my-etl-pipeline in /home/mari/projects/my-etl-pipeline/.venv
+Using python3.12 (3.12.x)
+Spawning shell within .venv</pre></div></div>
+
+<p>With this setup, every project gets its own isolated <span class="ic">.venv</span> directory containing its own Python binary and installed packages. VS Code automatically detects <span class="ic">.venv</span> in the project root and activates it when you open a terminal or run Python files. The <span class="ic">pyproject.toml</span> file is the modern replacement for <span class="ic">setup.py</span> and <span class="ic">requirements.txt</span> — it declares your project metadata, dependencies, build system, and tool configuration (Black, Ruff, pytest) all in one place.</p>
+
+<h2 id="s11-2">11.2 Node.js (nvm) + Rust</h2>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ NODE.JS via nvm ═══</span>
+<span class="g">paru</span> <span class="o">-S</span> <span class="s">nvm</span>
+
+<span class="c"># Add to .zshrc (before starship init):</span>
+<span class="g">echo</span> <span class="y">'source /usr/share/nvm/init-nvm.sh'</span> >> <span class="b">~/.zshrc</span>
+<span class="g">exec</span> <span class="s">zsh</span>
+
+<span class="c"># Install latest LTS Node.js</span>
+<span class="g">nvm</span> <span class="o">install</span> <span class="o">--lts</span>
+<span class="g">nvm</span> <span class="o">use</span> <span class="o">--lts</span>
+
+<span class="c"># Verify</span>
+<span class="g">node</span> <span class="o">--version</span>    <span class="c"># v20.x or v22.x</span>
+<span class="g">npm</span> <span class="o">--version</span>     <span class="c"># 10.x</span>
+
+<span class="c"># ═══ RUST via rustup ═══</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="s">rustup</span>
+<span class="g">rustup</span> <span class="o">default</span> <span class="s">stable</span>
+
+<span class="c"># Verify</span>
+<span class="g">rustc</span> <span class="o">--version</span>   <span class="c"># rustc 1.7x</span>
+<span class="g">cargo</span> <span class="o">--version</span>   <span class="c"># cargo 1.7x</span></pre>
+<div class="co"><div class="col">Expected Output</div><pre>Now using node v22.x.x (npm v10.x.x)
+rustc 1.7x.0 (xxxxx 2025-xx-xx)
+cargo 1.7x.0 (xxxxx 2025-xx-xx)</pre></div></div>
+
+<p>Node.js is needed for Claude Code (which is an npm global package), AWS CDK, Amplify CLI, and many development tools. Rust is needed because several tools you'll install (ripgrep, bat, eza, fd, starship, paru itself) are written in Rust, and having the toolchain available means you can compile AUR packages that require it. Rustup manages the Rust toolchain similarly to how nvm manages Node — you can install stable, nightly, and specific versions side by side.</p>
+
+<h2 id="s11-3">11.3 Docker & Docker Compose</h2>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># Install Docker</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="s">docker docker-compose docker-buildx</span>
+
+<span class="c"># Enable and start Docker daemon</span>
+<span class="g">sudo</span> <span class="g">systemctl</span> <span class="o">enable</span> <span class="o">--now</span> <span class="s">docker</span>
+
+<span class="c"># Add your user to the docker group (avoids needing sudo for every docker command)</span>
+<span class="g">sudo</span> <span class="g">usermod</span> <span class="o">-aG</span> <span class="s">docker</span> <span class="y">mari</span>
+
+<span class="c"># IMPORTANT: log out and back in for group change to take effect</span>
+<span class="c"># Or run: newgrp docker</span>
+
+<span class="c"># Verify Docker works without sudo</span>
+<span class="g">docker</span> <span class="o">run</span> <span class="s">hello-world</span>
+
+<span class="c"># Verify Docker Compose</span>
+<span class="g">docker</span> <span class="o">compose</span> <span class="o">version</span></pre>
+<div class="co"><div class="col">Expected Output</div><pre>Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+Docker Compose version v2.x.x</pre></div></div>
+
+<p><strong>Technical detail:</strong> Docker uses Linux kernel namespaces (pid, net, mnt, uts, ipc, user) to isolate containers from the host and from each other. Each container gets its own PID namespace (PID 1 inside the container is actually a child process of the Docker daemon on the host), its own network namespace (with its own IP address via a virtual Ethernet bridge), and its own mount namespace (sees only its own filesystem layers, built from the image's overlayfs). Cgroups (control groups) enforce resource limits — CPU, memory, I/O bandwidth. Your Dell 7420's Intel VT + VT-d (which we confirmed are enabled in BIOS) provide hardware virtualization acceleration that Docker can leverage for better performance in certain workloads.</p>
+
+<h2 id="s11-4">11.4 VS Code</h2>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># Install VS Code (official Microsoft build from AUR)</span>
+<span class="g">paru</span> <span class="o">-S</span> <span class="s">visual-studio-code-bin</span>
+
+<span class="c"># Launch VS Code (it will run natively on Wayland thanks to the</span>
+<span class="c"># ELECTRON_OZONE_PLATFORM_HINT=wayland env var we set in hyprland.conf)</span>
+<span class="g">code</span>
+
+<span class="c"># Install essential extensions from the command line:</span>
+<span class="g">code</span> <span class="o">--install-extension</span> <span class="s">ms-python.python</span>              <span class="c"># Python support</span>
+<span class="g">code</span> <span class="o">--install-extension</span> <span class="s">ms-python.vscode-pylance</span>       <span class="c"># Type checking (strict mode!)</span>
+<span class="g">code</span> <span class="o">--install-extension</span> <span class="s">charliermarsh.ruff</span>             <span class="c"># Fast Python linter</span>
+<span class="g">code</span> <span class="o">--install-extension</span> <span class="s">ms-azuretools.vscode-docker</span>    <span class="c"># Docker integration</span>
+<span class="g">code</span> <span class="o">--install-extension</span> <span class="s">hashicorp.terraform</span>            <span class="c"># Terraform</span>
+<span class="g">code</span> <span class="o">--install-extension</span> <span class="s">ms-vscode-remote.remote-ssh</span>    <span class="c"># Remote SSH development</span>
+<span class="g">code</span> <span class="o">--install-extension</span> <span class="s">github.copilot</span>                 <span class="c"># GitHub Copilot</span>
+<span class="g">code</span> <span class="o">--install-extension</span> <span class="s">esbenp.prettier-vscode</span>         <span class="c"># Code formatter</span>
+<span class="g">code</span> <span class="o">--install-extension</span> <span class="s">eamodio.gitlens</span>                <span class="c"># Git superpowers</span>
+<span class="g">code</span> <span class="o">--install-extension</span> <span class="s">catppuccin.catppuccin-vsc</span>      <span class="c"># Pink-compatible theme</span></pre>
+<div class="co"><div class="col">Expected Output</div><pre>Installing extension 'ms-python.python'...
+Extension 'ms-python.python' v2025.x.x was successfully installed.</pre></div></div>
+
+<h2 id="s11-5">11.5 Claude Code</h2>
+
+<p><strong>Layman version:</strong> Claude Code is Anthropic's command-line tool that lets you work with Claude directly from your terminal. You can ask it to write code, debug errors, refactor files, run tests, and manage your git workflow — all without leaving the terminal. It understands your project's file structure and can make multi-file changes.</p>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># Claude Code requires Node.js (which we installed via nvm)</span>
+<span class="g">npm</span> <span class="o">install</span> <span class="o">-g</span> <span class="s">@anthropic-ai/claude-code</span>
+
+<span class="c"># Launch Claude Code and authenticate</span>
+<span class="g">claude</span>
+
+<span class="c"># On first run, it will open a browser to authenticate with your Anthropic account.</span>
+<span class="c"># After authentication, you can use it from any project directory:</span>
+<span class="g">cd</span> <span class="b">~/projects/my-etl-pipeline</span>
+<span class="g">claude</span>   <span class="c"># starts an interactive session with context of your project files</span>
+
+<span class="c"># Quick one-shot usage:</span>
+<span class="g">claude</span> <span class="y">"add error handling to the data_loader.py file"</span>
+<span class="g">claude</span> <span class="y">"write tests for the transform module"</span>
+<span class="g">claude</span> <span class="y">"explain what this function does"</span> <span class="o">-f</span> <span class="b">src/pipeline.py</span></pre>
+<div class="co"><div class="col">Expected Output</div><pre>╭──────────────────────────────────────╮
+│ ✻ Welcome to Claude Code!           │
+│                                      │
+│ /help for commands, /exit to leave   │
+╰──────────────────────────────────────╯
+mari@pinkgalaxy ~/projects/my-etl-pipeline
+❯</pre></div></div>
+
+<h2 id="s11-6">11.6 GitHub CLI + SSH Keys</h2>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># Install GitHub CLI</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="s">github-cli</span>
+
+<span class="c"># Authenticate (opens browser)</span>
+<span class="g">gh</span> <span class="o">auth</span> <span class="o">login</span>
+<span class="c"># Select: GitHub.com → SSH → Generate new SSH key → your passphrase</span>
+
+<span class="c"># Verify authentication</span>
+<span class="g">gh</span> <span class="o">auth</span> <span class="o">status</span>
+
+<span class="c"># Configure git identity</span>
+<span class="g">git</span> <span class="o">config</span> <span class="o">--global</span> <span class="y">user.name</span> <span class="y">"Mari"</span>
+<span class="g">git</span> <span class="o">config</span> <span class="o">--global</span> <span class="y">user.email</span> <span class="y">"your@email.com"</span>
+<span class="g">git</span> <span class="o">config</span> <span class="o">--global</span> <span class="y">init.defaultBranch</span> <span class="y">main</span>
+<span class="g">git</span> <span class="o">config</span> <span class="o">--global</span> <span class="y">pull.rebase</span> <span class="y">true</span></pre>
+<div class="co"><div class="col">Expected Output</div><pre>✓ Logged in to github.com as YourUsername (ssh)
+✓ Git operations for github.com configured to use ssh protocol.</pre></div></div>
+
+<h2 id="s11-7">11.7 Neovim + LazyVim</h2>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># Install Neovim</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="s">neovim</span>
+
+<span class="c"># Install LazyVim (pre-configured Neovim IDE setup)</span>
+<span class="c"># Back up existing config first (if any)</span>
+<span class="g">mv</span> <span class="b">~/.config/nvim</span> <span class="b">~/.config/nvim.bak</span> 2>/dev/null
+
+<span class="c"># Clone LazyVim starter</span>
+<span class="g">git</span> <span class="o">clone</span> <span class="b">https://github.com/LazyVim/starter</span> <span class="b">~/.config/nvim</span>
+<span class="g">rm</span> <span class="o">-rf</span> <span class="b">~/.config/nvim/.git</span>
+
+<span class="c"># Launch Neovim — LazyVim auto-installs plugins on first run</span>
+<span class="g">nvim</span></pre>
+<div class="co"><div class="col">Expected Output</div><pre>(Neovim opens, shows LazyVim dashboard)
+(Plugins auto-install: LSP servers, treesitter parsers, telescope, etc.)
+(Takes 1-2 minutes on first launch)</pre></div></div>
+
+<h2 id="s11-8">11.8 Databases (PostgreSQL + Redis)</h2>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># Install PostgreSQL and Redis</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="s">postgresql redis</span>
+
+<span class="c"># ═══ PostgreSQL Setup ═══</span>
+<span class="c"># Initialize the database cluster</span>
+<span class="g">sudo</span> <span class="o">-u</span> <span class="y">postgres</span> <span class="g">initdb</span> <span class="o">-D</span> <span class="b">/var/lib/postgres/data</span>
+
+<span class="c"># Start and enable PostgreSQL</span>
+<span class="g">sudo</span> <span class="g">systemctl</span> <span class="o">enable</span> <span class="o">--now</span> <span class="s">postgresql</span>
+
+<span class="c"># Create your user as a superuser (for development — not production!)</span>
+<span class="g">sudo</span> <span class="o">-u</span> <span class="y">postgres</span> <span class="g">createuser</span> <span class="o">-s</span> <span class="y">mari</span>
+<span class="g">sudo</span> <span class="o">-u</span> <span class="y">postgres</span> <span class="g">createdb</span> <span class="y">mari</span>   <span class="c"># default db matching your username</span>
+
+<span class="c"># Test it</span>
+<span class="g">psql</span> <span class="o">-c</span> <span class="y">"SELECT version();"</span>
+
+<span class="c"># ═══ Redis Setup ═══</span>
+<span class="g">sudo</span> <span class="g">systemctl</span> <span class="o">enable</span> <span class="o">--now</span> <span class="s">redis</span>
+<span class="g">redis-cli</span> <span class="y">ping</span>                    <span class="c"># should respond: PONG</span>
+
+<span class="c"># ═══ Database GUI (optional but nice) ═══</span>
+<span class="g">paru</span> <span class="o">-S</span> <span class="s">dbeaver</span></pre>
+<div class="co"><div class="col">Expected Output</div><pre>                                         version
+---------------------------------------------------------------------------
+ PostgreSQL 16.x on x86_64-pc-linux-gnu, compiled by gcc 14.x, 64-bit
+
+PONG</pre></div></div>
+
+<h2 id="s11-9">11.9 Productivity Tools</h2>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># Obsidian — knowledge base and notes</span>
+<span class="g">paru</span> <span class="o">-S</span> <span class="s">obsidian</span>
+
+<span class="c"># Draw.io — diagramming (flowcharts, architecture, UML)</span>
+<span class="g">paru</span> <span class="o">-S</span> <span class="s">drawio-desktop</span>
+
+<span class="c"># Freeplane — mind mapping</span>
+<span class="g">paru</span> <span class="o">-S</span> <span class="s">freeplane</span>
+
+<span class="c"># Browsers</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="s">firefox chromium</span>
+
+<span class="c"># LibreOffice</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="s">libreoffice-fresh</span>
+
+<span class="c"># PDF viewer with vim keybindings</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="s">zathura zathura-pdf-mupdf</span>
+
+<span class="c"># Media player and image viewer</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="s">mpv imv</span></pre></div>
+
+<a class="btt" href="#top">↑ Back to top</a>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--               CHAPTER 12: CLOUD & DATA ENGINEERING          -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="pb"></div>
+<div class="cd" id="ch12"><span class="cn">Chapter 12</span></div>
+<h1>Cloud & Data Engineering — AWS, Azure, Databricks</h1>
+
+<div class="sc" data-section="ch12">
+  <div style="display:flex;gap:12px;flex-wrap:wrap;">
+    <label class="cbi"><input type="checkbox" data-type="read" onchange="rc()"> Read</label>
+    <label class="cbi"><input type="checkbox" data-type="applied" onchange="rc()"> Applied</label>
+    <label class="cbi"><input type="checkbox" data-type="memorized" onchange="rc()"> Memorized</label>
+    <label class="cbi"><input type="checkbox" data-type="implemented" onchange="rc()"> Implemented</label>
+  </div>
+  <span class="nt" onclick="this.nextElementSibling.classList.toggle('vis')">📝 Notes</span>
+</div>
+<div class="na"><textarea placeholder="Chapter 12 notes…"></textarea></div>
+
+<h2 id="s12-1">12.1 AWS CLI + Serverless + Amplify</h2>
+
+<p>Your future deployment plan involves Amplify with S3, Lambda, and DynamoDB. Let's install the full AWS toolchain so you can develop, test locally, and deploy from your Arch machine.</p>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># AWS CLI v2</span>
+<span class="g">paru</span> <span class="o">-S</span> <span class="s">aws-cli-v2</span>
+
+<span class="c"># Configure credentials (you'll need your AWS Access Key ID and Secret)</span>
+<span class="g">aws</span> <span class="o">configure</span>
+<span class="c"># It will ask for:</span>
+<span class="c"># AWS Access Key ID: AKIA...</span>
+<span class="c"># AWS Secret Access Key: xxxxx...</span>
+<span class="c"># Default region name: eu-central-1  (Frankfurt — closest to Germany)</span>
+<span class="c"># Default output format: json</span>
+
+<span class="c"># Verify</span>
+<span class="g">aws</span> <span class="o">sts</span> <span class="o">get-caller-identity</span>
+
+<span class="c"># AWS SAM (Serverless Application Model) — local Lambda testing</span>
+<span class="g">paru</span> <span class="o">-S</span> <span class="s">aws-sam-cli</span>
+
+<span class="c"># AWS CDK (Cloud Development Kit) — infrastructure as code</span>
+<span class="g">npm</span> <span class="o">install</span> <span class="o">-g</span> <span class="s">aws-cdk</span>
+
+<span class="c"># AWS Amplify CLI — full-stack deployment (S3 + Lambda + DynamoDB + API Gateway)</span>
+<span class="g">npm</span> <span class="o">install</span> <span class="o">-g</span> <span class="s">@aws-amplify/cli</span>
+
+<span class="c"># Initialize Amplify in a project</span>
+<span class="c"># amplify init    (interactive setup)</span>
+<span class="c"># amplify add api (add REST/GraphQL API backed by Lambda + DynamoDB)</span>
+<span class="c"># amplify push    (deploy to cloud)</span>
+
+<span class="c"># Terraform — multi-cloud infrastructure as code</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="s">terraform</span></pre>
+<div class="co"><div class="col">Expected Output (aws sts get-caller-identity)</div><pre>{
+    "UserId": "AIDAXXXXXXXXXXXXXXXX",
+    "Account": "123456789012",
+    "Arn": "arn:aws:iam::123456789012:user/mari"
+}</pre></div></div>
+
+<h2 id="s12-2">12.2 Azure CLI</h2>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># Install Azure CLI</span>
+<span class="g">paru</span> <span class="o">-S</span> <span class="s">azure-cli</span>
+
+<span class="c"># Login (opens browser for Microsoft SSO)</span>
+<span class="g">az</span> <span class="o">login</span>
+
+<span class="c"># Verify</span>
+<span class="g">az</span> <span class="o">account</span> <span class="o">show</span> <span class="o">-o</span> <span class="y">table</span>
+
+<span class="c"># Install Azure Functions tools (for local development)</span>
+<span class="g">paru</span> <span class="o">-S</span> <span class="s">azure-functions-core-tools-bin</span>
+
+<span class="c"># Azure Python SDK (for programmatic access)</span>
+<span class="g">pip</span> <span class="o">install</span> <span class="s">azure-identity azure-storage-blob azure-mgmt-resource</span></pre>
+<div class="co"><div class="col">Expected Output</div><pre>Name            CloudName    SubscriptionId    State    IsDefault
+--------------  -----------  ----------------  -------  ---------
+Your-Sub-Name   AzureCloud   xxxx-xxxx-xxxx    Enabled  True</pre></div></div>
+
+<h2 id="s12-3">12.3 Databricks CLI + PySpark + Polars</h2>
+
+<p>This is your bread and butter for work. The Databricks CLI lets you manage clusters, jobs, notebooks, and DBFS from the terminal. PySpark connects to Databricks clusters for distributed processing. Polars is your local high-performance DataFrame library.</p>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># Java JDK — required by PySpark and Databricks Connect</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="s">jdk-openjdk</span>
+
+<span class="c"># Set JAVA_HOME</span>
+<span class="g">echo</span> <span class="y">'export JAVA_HOME=/usr/lib/jvm/default'</span> >> <span class="b">~/.zshrc</span>
+
+<span class="c"># Databricks CLI (new unified CLI)</span>
+<span class="g">pip</span> <span class="o">install</span> <span class="s">databricks-cli</span>
+
+<span class="c"># Configure — you need your workspace URL and a personal access token</span>
+<span class="g">databricks</span> <span class="o">configure</span> <span class="o">--token</span>
+<span class="c"># Host: https://adb-xxxxx.azuredatabricks.net (your Azure Databricks workspace)</span>
+<span class="c"># Token: dapi-xxxxx (generate in Workspace → User Settings → Access Tokens)</span>
+
+<span class="c"># Verify</span>
+<span class="g">databricks</span> <span class="o">workspace</span> <span class="o">ls</span> <span class="b">/Users/</span>
+
+<span class="c"># Databricks SDK (programmatic access to Unity Catalog, jobs, etc.)</span>
+<span class="g">pip</span> <span class="o">install</span> <span class="s">databricks-sdk</span>
+
+<span class="c"># Databricks Connect (run Spark code locally, execute on remote cluster)</span>
+<span class="g">pip</span> <span class="o">install</span> <span class="s">databricks-connect</span>
+
+<span class="c"># PySpark (for local Spark development and testing)</span>
+<span class="g">pip</span> <span class="o">install</span> <span class="s">pyspark delta-spark</span>
+
+<span class="c"># Polars — your fast local DataFrame library</span>
+<span class="g">pip</span> <span class="o">install</span> <span class="s">polars</span>
+
+<span class="c"># Also useful: pandas (for legacy code / API compatibility)</span>
+<span class="g">pip</span> <span class="o">install</span> <span class="s">pandas pyarrow</span>
+
+<span class="c"># Kubernetes tools (for managing AKS/EKS clusters)</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="s">kubectl helm</span></pre>
+<div class="co"><div class="col">Expected Output (databricks workspace ls)</div><pre>/Users/mari@company.com
+/Users/colleague@company.com
+/Shared</pre></div></div>
+
+<p>The <span class="ic">databricks-connect</span> package is particularly powerful for your workflow: you write PySpark code locally in VS Code with full IDE support (autocomplete, type checking, debugging), but when you call <span class="ic">spark.sql()</span> or <span class="ic">spark.read</span>, the computation is transparently shipped to your Databricks cluster for execution. The results stream back to your local machine. This means you get the development experience of a local IDE with the processing power of a multi-node Spark cluster, which is ideal for ETL pipeline development. The connection uses the <span class="ic">databricks-connect</span> library's Spark Connect protocol (gRPC-based), which sends serialized Spark plans to the cluster rather than raw data.</p>
+
+<a class="btt" href="#top">↑ Back to top</a>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--               CHAPTER 13: BLACKARCH & SECURITY              -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="pb"></div>
+<div class="cd" id="ch13"><span class="cn">Chapter 13</span></div>
+<h1>BlackArch Repository & Security Arsenal</h1>
+
+<div class="sc" data-section="ch13">
+  <div style="display:flex;gap:12px;flex-wrap:wrap;">
+    <label class="cbi"><input type="checkbox" data-type="read" onchange="rc()"> Read</label>
+    <label class="cbi"><input type="checkbox" data-type="applied" onchange="rc()"> Applied</label>
+    <label class="cbi"><input type="checkbox" data-type="memorized" onchange="rc()"> Memorized</label>
+    <label class="cbi"><input type="checkbox" data-type="implemented" onchange="rc()"> Implemented</label>
+  </div>
+  <span class="nt" onclick="this.nextElementSibling.classList.toggle('vis')">📝 Notes</span>
+</div>
+<div class="na"><textarea placeholder="Chapter 13 notes…"></textarea></div>
+
+<h2 id="s13-1">13.1 Adding the BlackArch Repository</h2>
+
+<p><strong>Layman version:</strong> BlackArch is not a separate Linux distribution — it is an additional software repository that layers on top of your existing Arch Linux installation. Think of it like adding a new aisle to your grocery store: the store (pacman) stays the same, but now it has 2800+ new products (security tools) available on the shelves. You install BlackArch tools exactly the same way you install any other Arch package — with <span class="ic">pacman -S</span>. The difference is that these tools are specifically curated for penetration testing, forensics, reverse engineering, and security research.</p>
+
+<p><strong>Technical detail:</strong> The BlackArch bootstrap script (<span class="ic">strap.sh</span>) does three things: downloads the BlackArch GPG signing key and imports it into pacman's keyring (so pacman can verify package signatures), adds the <span class="ic">[blackarch]</span> repository section to <span class="ic">/etc/pacman.conf</span> with the mirror URL, and synchronizes the package database. After this, pacman's dependency resolver treats BlackArch packages identically to official Arch packages — they can depend on official packages and vice versa, and updates flow through the normal <span class="ic">pacman -Syu</span> process.</p>
+
+<div class="cal d">
+  <div class="ct">⚠️ LEGAL DISCLAIMER</div>
+  <p>These tools are intended for <strong>authorized security testing only</strong>. Using them against systems you do not own or have explicit written permission to test is illegal in most jurisdictions, including under German law (§202a-c StGB — Computer Crime). Always get written authorization before performing any penetration testing. Use these tools for CTF competitions, your own lab environments, and authorized professional engagements.</p>
+</div>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># Step 1: Download the BlackArch bootstrap script</span>
+<span class="g">curl</span> <span class="o">-O</span> <span class="b">https://blackarch.org/strap.sh</span>
+
+<span class="c"># Step 2: Verify the script's SHA1 hash (ALWAYS verify downloaded scripts!)</span>
+<span class="c"># Check the expected hash at https://blackarch.org/downloads.html</span>
+<span class="g">sha1sum</span> <span class="b">strap.sh</span>
+
+<span class="c"># Step 3: Make it executable and run it</span>
+<span class="g">chmod</span> <span class="y">+x</span> <span class="b">strap.sh</span>
+<span class="g">sudo</span> <span class="b">./strap.sh</span>
+
+<span class="c"># Step 4: Sync the new repository</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-Sy</span></pre>
+<div class="co"><div class="col">Expected Output</div><pre>[+] installing blackarch keyring...
+[+] installing blackarch mirrorlist...
+[+] BlackArch Linux is ready!
+:: Synchronizing package databases...
+ core          ...
+ extra         ...
+ blackarch     ...   (this is the new one — ~60MB database)</pre></div></div>
+
+<p>After the sync completes, you have access to 2800+ security tools. You do not need to install all of them — the full collection is approximately 70 GB. Instead, BlackArch organizes tools into themed groups that you can install selectively based on your needs.</p>
+
+<h2 id="s13-2">13.2 BlackArch Tool Groups</h2>
+
+<p>BlackArch categorizes its tools into groups. Each group is a pacman package group — you can install an entire group with one command, or cherry-pick individual tools. Here is a practical guide to the most useful groups for a developer doing white-hat security work.</p>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ List all available BlackArch groups ═══</span>
+<span class="g">pacman</span> <span class="o">-Sg</span> | <span class="g">grep</span> <span class="y">blackarch</span>
+
+<span class="c"># ═══ See how many tools are in each group ═══</span>
+<span class="g">pacman</span> <span class="o">-Sg</span> <span class="y">blackarch-webapp</span> | <span class="g">wc</span> <span class="o">-l</span>
+
+<span class="c"># ═══ RECOMMENDED INSTALL ORDER ═══</span>
+
+<span class="c"># 1. Web Application Testing (~120 tools, ~2GB)</span>
+<span class="c">#    Covers: SQL injection, XSS, CSRF, directory brute-forcing,</span>
+<span class="c">#    CMS scanning, API testing, fuzzing</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="s">blackarch-webapp</span>
+
+<span class="c"># 2. Network Scanning (~100 tools, ~1.5GB)</span>
+<span class="c">#    Covers: port scanning, service enumeration, network mapping,</span>
+<span class="c">#    vulnerability scanning, SNMP tools</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="s">blackarch-scanner</span>
+
+<span class="c"># 3. Exploitation Frameworks (~80 tools, ~3GB)</span>
+<span class="c">#    Covers: Metasploit, exploit databases, payload generators,</span>
+<span class="c">#    shellcode tools, post-exploitation</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="s">blackarch-exploitation</span>
+
+<span class="c"># 4. Cryptography & Password Tools (~50 tools, ~1GB)</span>
+<span class="c">#    Covers: hashcat, john, password generation, crypto analysis</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="s">blackarch-crypto</span>
+
+<span class="c"># 5. Digital Forensics (~70 tools, ~2GB)</span>
+<span class="c">#    Covers: disk imaging, memory analysis, file carving,</span>
+<span class="c">#    timeline analysis, evidence collection</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="s">blackarch-forensic</span>
+
+<span class="c"># 6. Wireless Security (~40 tools, ~500MB)</span>
+<span class="c">#    Covers: Wi-Fi auditing, Bluetooth scanning, SDR tools</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="s">blackarch-wireless</span>
+
+<span class="c"># 7. Reverse Engineering (~60 tools, ~2GB)</span>
+<span class="c">#    Covers: disassemblers, decompilers, debuggers, binary analysis</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="s">blackarch-reversing</span>
+
+<span class="c"># ═══ INDIVIDUAL MUST-HAVES (if you don't want full groups) ═══</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> \
+  <span class="s">nmap</span>                  <span class="c"># network scanner (the king of reconnaissance)</span> \
+  <span class="s">wireshark-qt</span>          <span class="c"># packet analyzer (see every byte on the wire)</span> \
+  <span class="s">burpsuite</span>             <span class="c"># web proxy/scanner (intercept and modify HTTP)</span> \
+  <span class="s">metasploit</span>            <span class="c"># exploitation framework</span> \
+  <span class="s">sqlmap</span>                <span class="c"># SQL injection automation</span> \
+  <span class="s">gobuster</span>              <span class="c"># directory/DNS brute-forcer</span> \
+  <span class="s">john</span>                  <span class="c"># password cracker</span> \
+  <span class="s">hashcat</span>               <span class="c"># GPU password cracker</span> \
+  <span class="s">aircrack-ng</span>           <span class="c"># Wi-Fi security suite</span> \
+  <span class="s">ghidra</span>                <span class="c"># reverse engineering (NSA's disassembler)</span> \
+  <span class="s">radare2</span>               <span class="c"># binary analysis framework</span> \
+  <span class="s">seclists</span>              <span class="c"># collection of wordlists for fuzzing/bruting</span> \
+  <span class="s">nikto</span>                 <span class="c"># web server scanner</span> \
+  <span class="s">dirb</span>                  <span class="c"># web content scanner</span> \
+  <span class="s">hydra</span>                 <span class="c"># network login brute-forcer</span> \
+  <span class="s">responder</span>             <span class="c"># LLMNR/NBT-NS/MDNS poisoner (Windows AD attacks)</span> \
+  <span class="s">evil-winrm</span>            <span class="c"># Windows Remote Management shell</span> \
+  <span class="s">crackmapexec</span>          <span class="c"># Active Directory swiss army knife</span> \
+  <span class="s">impacket</span>              <span class="c"># Python tools for Windows protocols (SMB, MSRPC, etc.)</span> \
+  <span class="s">bloodhound</span>            <span class="c"># Active Directory attack path visualization</span> \
+  <span class="s">lynis</span>                 <span class="c"># system security auditor (audit YOUR OWN system)</span></pre>
+<div class="co"><div class="col">Expected Output</div><pre>resolving dependencies...
+:: There are 120 members in group blackarch-webapp:
+...
+Total Download Size:    ~800 MiB
+Total Installed Size:   ~2500 MiB
+:: Proceed? [Y/n]</pre></div></div>
+
+<h2 id="s13-3">13.3 Setting Up a Security Lab</h2>
+
+<p>For practicing with these tools legally and safely, set up local vulnerable targets using Docker. These are intentionally broken applications designed for learning penetration testing.</p>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ Vulnerable Web Applications (Docker-based) ═══</span>
+
+<span class="c"># DVWA — Damn Vulnerable Web Application (classic beginner target)</span>
+<span class="g">docker</span> <span class="o">run</span> <span class="o">-d</span> <span class="o">-p</span> <span class="y">80:80</span> <span class="o">--name</span> <span class="y">dvwa</span> <span class="s">vulnerables/web-dvwa</span>
+<span class="c"># Open http://localhost in Firefox → login: admin/password</span>
+
+<span class="c"># Juice Shop — OWASP's modern vulnerable app (covers OWASP Top 10)</span>
+<span class="g">docker</span> <span class="o">run</span> <span class="o">-d</span> <span class="o">-p</span> <span class="y">3000:3000</span> <span class="o">--name</span> <span class="y">juice</span> <span class="s">bkimminich/juice-shop</span>
+<span class="c"># Open http://localhost:3000</span>
+
+<span class="c"># WebGoat — OWASP interactive security lessons</span>
+<span class="g">docker</span> <span class="o">run</span> <span class="o">-d</span> <span class="o">-p</span> <span class="y">8080:8080</span> <span class="o">--name</span> <span class="y">webgoat</span> <span class="s">webgoat/webgoat</span>
+<span class="c"># Open http://localhost:8080/WebGoat</span>
+
+<span class="c"># Metasploitable 3 (full vulnerable OS — requires more setup)</span>
+<span class="c"># See: https://github.com/rapid7/metasploitable3</span>
+
+<span class="c"># ═══ Quick Security Audit of Your Own System ═══</span>
+<span class="g">sudo</span> <span class="g">lynis</span> <span class="o">audit</span> <span class="y">system</span>
+<span class="c"># Generates a detailed report with hardening recommendations</span></pre>
+<div class="co"><div class="col">Expected Output</div><pre>(Docker containers start in background)
+(Access vulnerable apps via browser to practice attacks safely)</pre></div></div>
+
+<p>These Docker containers run isolated vulnerable applications on your local machine. You can practice SQL injection against DVWA, explore XSS and CSRF on Juice Shop, and work through structured security lessons on WebGoat — all without touching any real system. When you are done, <span class="ic">docker stop dvwa juice webgoat && docker rm dvwa juice webgoat</span> cleans everything up. For CTF competitions, platforms like HackTheBox, TryHackMe, and OverTheWire provide additional remote targets with varying difficulty levels.</p>
+
+<h2 id="s13-4">13.4 Wireshark Group Permission</h2>
+
+<p>Wireshark needs raw network access to capture packets. Instead of running it as root (dangerous), add your user to the <span class="ic">wireshark</span> group which grants capture privileges through a setuid helper.</p>
+
+<div class="cw">
+<div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># Add your user to the wireshark group</span>
+<span class="g">sudo</span> <span class="g">usermod</span> <span class="o">-aG</span> <span class="s">wireshark</span> <span class="y">mari</span>
+
+<span class="c"># Log out and back in, then launch</span>
+<span class="g">wireshark</span>
+
+<span class="c"># Or capture from terminal:</span>
+<span class="g">tshark</span> <span class="o">-i</span> <span class="y">wlan0</span> <span class="o">-c</span> <span class="y">100</span>   <span class="c"># capture 100 packets on Wi-Fi interface</span></pre></div>
+
+<a class="btt" href="#top">↑ Back to top</a>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--               PLANNER Z.0                                   -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="pb"></div>
+<div data-nonindex="true">
+<h1 style="color:var(--wn);">Planner Z.0 — Continuation (DO NOT INDEX)</h1>
+<h2>Part 4 Topics</h2>
+<table>
+<tr><th>#</th><th>Topic</th></tr>
+<tr><td>1</td><td>Complete Pink Galaxy Rice: Waybar config (modules, colors, animations), Wofi theme, GTK/Qt theming with Catppuccin, swww animated wallpapers, cursor theme, lock screen customization</td></tr>
+<tr><td>2</td><td>System Hardening: AppArmor/SELinux profiles, fail2ban, USB lockdown, disk encryption (LUKS), Secure Boot with custom keys (sbctl)</td></tr>
+<tr><td>3</td><td>Backup Strategy: Timeshift for system snapshots, Borg for data backup, automated backup schedule</td></tr>
+<tr><td>4</td><td>Maintenance: pacman cache cleanup, orphan removal, kernel update procedure, BIOS update via fwupd, SSD TRIM automation</td></tr>
+<tr><td>5</td><td>Advanced Hyprland: per-monitor workspaces, window rules for specific apps, animation tuning, plugin system</td></tr>
+</table>
+</div>
+
+</div><!-- end .w -->
+
+<div class="sf"><button class="sb" onclick="saveF()">💾 Save</button></div>
+
+<script>
+(function(){
+  'use strict';
+  const K='archguide_p3_v1';
+  function ld(){try{return JSON.parse(localStorage.getItem(K))||{};}catch{return {};}}
+  function sv(s){try{localStorage.setItem(K,JSON.stringify(s));}catch{}}
+  window.cpC=function(b){const pre=b.closest('.cw').querySelector('pre');navigator.clipboard.writeText(pre.textContent).then(()=>{b.textContent='✓';b.classList.add('ok');setTimeout(()=>{b.textContent='Copy';b.classList.remove('ok');},1500);});};
+  window.rc=function(){
+    const all=document.querySelectorAll('.sc input[type="checkbox"]');
+    let t=all.length,c=0;all.forEach(cb=>{if(cb.checked)c++;});
+    const pct=t>0?Math.round(c/t*100):0;
+    document.getElementById('gBar').style.width=pct+'%';
+    document.getElementById('gPct').textContent=pct+'%';
+    const s={};all.forEach((cb,i)=>{s['c'+i]=cb.checked;});
+    document.querySelectorAll('.na textarea').forEach((ta,i)=>{if(ta.value)s['n'+i]=ta.value;});
+    sv(s);
+  };
+  const saved=ld();
+  document.querySelectorAll('.sc input[type="checkbox"]').forEach((cb,i)=>{if(saved['c'+i])cb.checked=true;});
+  document.querySelectorAll('.na textarea').forEach((ta,i)=>{if(saved['n'+i])ta.value=saved['n'+i];});
+  rc();
+  window.saveF=function(){rc();const blob=new Blob(['<!DOCTYPE html>\n'+document.documentElement.outerHTML],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='archlinux_guide_part3_SAVED_'+new Date().toISOString().slice(0,10)+'.html';a.click();const b=document.querySelector('.sb');b.textContent='✓ Saved!';setTimeout(()=>{b.textContent='💾 Save';},2000);};
+})();
+</script>
+</body>
+</html>

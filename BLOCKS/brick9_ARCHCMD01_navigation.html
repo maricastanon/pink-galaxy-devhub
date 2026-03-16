@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧱 Brick 9 — ARCH-CMD01: Navigation & Files</title>
+<style>
+:root{--p:#e91e63;--pl:#f8bbd0;--g:#2e7d32;--gl:#a5d6a7;--bg:#0a0a12;--s2:#1a1a2e;--tx:#e8e6f0;--t2:#a8a6b8;--mt:#6c6a7e;--bd:rgba(233,30,99,.18);--bdg:rgba(46,125,50,.2);--purple:#9c27b0;--mono:"Courier New",monospace;--dn:#ff5252;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Calibri,"Segoe UI",sans-serif;background:var(--bg);color:var(--tx);font-size:11pt;line-height:1.65;padding:20px;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 20% 50%,rgba(233,30,99,.05),transparent 50%);}
+.w{max-width:900px;margin:0 auto;position:relative;z-index:1;}
+h1{color:var(--p);font-size:20pt;margin:30px 0 12px;border-bottom:2px solid var(--p);padding-bottom:8px;}
+h2{color:var(--g);font-size:15pt;margin:28px 0 10px;border-left:4px solid var(--g);padding-left:12px;}
+h3{color:var(--p);font-size:12pt;margin:20px 0 8px;}
+p{margin:8px 0;text-align:justify;}
+.ic{font-family:var(--mono);font-size:9pt;background:rgba(233,30,99,.08);padding:1px 5px;border-radius:3px;color:var(--pl);}
+.note{background:var(--s2);border-left:3px solid var(--p);padding:12px;border-radius:0 8px 8px 0;margin:14px 0;font-size:9.5pt;}.note b{color:var(--p);}.note.gn{border-left-color:var(--g);}.note.gn b{color:var(--gl);}.note.dn{border-left-color:var(--dn);}.note.dn b{color:var(--dn);}
+.tabs{display:flex;gap:2px;margin:14px 0 6px;}
+.tab{padding:5px 12px;border-radius:6px 6px 0 0;border:1px solid transparent;background:none;color:var(--mt);cursor:pointer;font-size:8.5pt;font-family:inherit;}.tab.on{background:var(--s2);color:var(--p);border-color:var(--bd);border-bottom-color:var(--s2);}
+.pan{display:none;background:var(--s2);border:1px solid var(--bd);border-radius:0 8px 8px 8px;padding:14px;font-size:10pt;}.pan.on{display:block;}.pan.si{border-left:3px solid var(--gl);}.pan.te{border-left:3px solid var(--p);}.pan.de{border-left:3px solid var(--purple);}
+.cw{margin:10px 0;border:1px solid var(--bdg);border-radius:8px;overflow:hidden;background:#10101c;}
+.cwt{display:flex;justify-content:space-between;align-items:center;padding:3px 10px;background:rgba(46,125,50,.1);border-bottom:1px solid var(--bdg);font-size:7pt;}
+.cwl{color:var(--g);font-family:var(--mono);font-weight:bold;text-transform:uppercase;letter-spacing:1px;}
+.cwb{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--t2);padding:2px 7px;border-radius:4px;cursor:pointer;font-size:7pt;font-family:var(--mono);}.cwb:hover{background:var(--p);color:#fff;}
+pre{font-family:var(--mono);font-size:9.5pt;padding:10px;overflow-x:auto;white-space:pre;line-height:1.5;margin:0;color:var(--tx);background:#10101c;}
+pre .c{color:#555;font-style:italic;}pre .g{color:#a5d6a7;}pre .y{color:#fff59d;}pre .b{color:#90caf9;}pre .o{color:#ffcc80;}pre .p{color:#f48fb1;}pre .v{color:#ce93d8;}pre .k{color:#80cbc4;}
+.out{background:rgba(46,125,50,.05);border-top:2px solid var(--g);padding:6px 10px;font-family:var(--mono);font-size:8.5pt;color:#a5d6a7;}
+.outl{color:var(--g);font-weight:bold;font-size:7pt;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;}
+.cm{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;}.cm>div{border-radius:8px;padding:10px;font-size:9pt;}
+.cm-do{background:rgba(46,125,50,.05);border:1px solid var(--bdg);}.cm-do b{color:var(--gl);}
+.cm-x{background:rgba(233,30,99,.04);border:1px solid var(--bd);}.cm-x b{color:var(--pl);}
+.cm p{margin:3px 0;color:var(--t2);}
+.qz{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:12px;margin:12px 0;}.qz-q{color:var(--tx);font-size:10pt;margin-bottom:8px;}
+.qo{padding:7px 12px;border:1px solid var(--bd);border-radius:8px;cursor:pointer;font-size:9pt;color:var(--t2);background:none;font-family:inherit;width:100%;text-align:left;transition:all .15s;display:block;margin-bottom:5px;}.qo:hover:not(:disabled){border-color:var(--p);color:var(--pl);}.qo.y{border-color:var(--g);background:rgba(46,125,50,.1);color:var(--gl);}.qo.n{border-color:var(--dn);background:rgba(255,82,82,.06);color:var(--dn);}
+.qfb{margin-top:6px;font-size:9pt;padding:8px;border-radius:6px;display:none;}.qfb.s{display:block;}.qfb.w{background:rgba(46,125,50,.08);color:var(--gl);border:1px solid var(--bdg);}.qfb.l{background:rgba(255,82,82,.05);color:var(--dn);border:1px solid rgba(255,82,82,.15);}
+.sd{margin:40px 0 0;padding:16px 0 8px;border-top:1px solid rgba(233,30,99,.1);}.sd small{color:var(--mt);font-size:8pt;text-transform:uppercase;letter-spacing:2px;}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:9.5pt;}
+th{background:rgba(233,30,99,.1);color:var(--pl);padding:8px 10px;text-align:left;border-bottom:2px solid var(--p);}
+td{padding:6px 10px;border-bottom:1px solid var(--bd);color:var(--t2);}
+td code{font-family:var(--mono);font-size:9pt;color:var(--pl);background:rgba(233,30,99,.06);padding:1px 4px;border-radius:2px;}
+.sf{position:fixed;bottom:14px;right:14px;z-index:9999;}.sf button{padding:8px 16px;background:var(--g);color:#fff;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(0,0,0,.3);}
+.cover{text-align:center;padding:30px;margin-bottom:20px;background:linear-gradient(135deg,#1a0533,#0d1b2a);border:2px solid #c62828;border-radius:14px;position:relative;overflow:hidden;}.cover h1{border:none;color:#ef9a9a;font-size:16pt;margin:0;}.cover p{color:var(--t2);font-size:10pt;}.cover::after{content:'🐧';position:absolute;font-size:80pt;opacity:0.04;right:10px;top:-10px;}
+@media print{body{background:#fff;color:#333;}h1{color:#e91e63!important;}h2{color:#2e7d32!important;}pre{background:#f5f5f5!important;color:#333;}.sf{display:none;}@page{size:A4;margin:1.5cm 1cm;}}
+</style>
+</head>
+<body>
+<div class="w">
+
+<div class="cover">
+<h1>🧱 Brick 9 — ARCH-CMD01: Navigation & File Operations</h1>
+<p>The commands you will use 100 times a day: pwd, cd, ls, mkdir, cp, mv, rm, ln, find</p>
+<p style="font-size:8pt;color:var(--mt);margin-top:6px;">🐧 ARCH Linux Commands Track · 7 sections · Modern replacements included (eza, fd, zoxide)</p>
+</div>
+
+<div class="note gn">
+<b>🔗 Prerequisites:</b> This module assumes you completed the Bash Fundamentals track (Bricks 1-8). You understand variables, quoting, pipelines, and basic scripting. Now we apply those skills to real system administration commands — with modern Rust-based replacements that are faster and more user-friendly installed alongside the classic tools.
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 1: pwd / cd / ls                       -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s0"><small>ARCH-CMD01.1 of 7 · ⏱ ~10 min</small></div>
+<h2>ARCH-CMD01.1 — pwd, cd, ls (and eza, zoxide)</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+<button class="tab" onclick="sw(this,'de')">⚙️ Deep</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>These three commands are your eyes and legs in the terminal. <span class="ic">pwd</span> (print working directory) tells you where you are. <span class="ic">cd</span> (change directory) moves you somewhere else. <span class="ic">ls</span> (list) shows what is in the current location. You will type these commands hundreds of times per day — they become muscle memory within a week. On your Arch system, we also installed two modern replacements: <span class="ic">eza</span> (a Rust-based ls with icons and colors) and <span class="ic">zoxide</span> (a smart cd that remembers your most-visited directories and lets you jump to them with fuzzy matching).</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Every process has a current working directory (CWD) stored as an inode reference in the kernel's <span class="ic">task_struct</span>. The <span class="ic">pwd</span> command reads <span class="ic">/proc/self/cwd</span> (a symlink the kernel maintains). The <span class="ic">cd</span> builtin calls the <span class="ic">chdir()</span> syscall, which resolves the path through the VFS layer, validates permission to traverse each directory component (execute permission on directories), and updates the process's CWD inode reference. The <span class="ic">ls</span> command calls <span class="ic">opendir()</span> then iterates with <span class="ic">readdir()</span>, reading directory entries (dentries) from the filesystem. With <span class="ic">-l</span>, it calls <span class="ic">stat()</span> on each entry to get the inode metadata (permissions, owner, size, timestamps). Note: <span class="ic">cd</span> must be a shell builtin (not an external program) because a child process cannot change the parent shell's CWD — the chdir() call only affects the calling process.</p>
+</div>
+<div class="pan de" data-l="de">
+<p>Path resolution for <span class="ic">cd /home/mari/projects</span> follows this algorithm in the VFS layer (<span class="ic">fs/namei.c</span>): (1) Start at the root inode (inode 2 on ext4). (2) Look up "home" in root's directory data blocks — each directory is a list of <span class="ic">(inode_number, name_length, name)</span> tuples. (3) Get home's inode, check execute (x) permission for the calling process's UID/GID against the inode's mode bits. (4) Look up "mari" in home's directory blocks. (5) Check permissions. (6) Look up "projects" in mari's directory blocks. (7) Check permissions. (8) Update <span class="ic">current->fs->pwd</span> to point to the projects dentry/inode. Each step involves a dentry cache lookup (hash table keyed by parent-inode + name) before hitting the disk. On modern systems with warm caches, all lookups hit the dentry cache (O(1) hash lookup) rather than reading from the SSD. The <span class="ic">ls -la</span> command triggers one <span class="ic">stat()</span> syscall per entry, each returning a 128-byte <span class="ic">struct stat</span> containing the inode number, mode (permissions + file type), link count, uid, gid, size, and three timestamps (access, modify, change).</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ pwd — Where Am I? ═══</span>
+<span class="g">pwd</span>                             <span class="c"># /home/mari</span>
+
+<span class="c"># ═══ cd — Move Around ═══</span>
+<span class="g">cd</span> <span class="b">/etc</span>                        <span class="c"># absolute path</span>
+<span class="g">cd</span> <span class="b">pacman.d</span>                    <span class="c"># relative (into subdirectory)</span>
+<span class="g">cd</span> <span class="b">..</span>                          <span class="c"># go UP one level → /etc</span>
+<span class="g">cd</span> <span class="b">../..</span>                       <span class="c"># go UP two levels → /</span>
+<span class="g">cd</span> <span class="b">~</span>                           <span class="c"># go HOME → /home/mari</span>
+<span class="g">cd</span>                             <span class="c"># no argument = go HOME (same as cd ~)</span>
+<span class="g">cd</span> <span class="b">-</span>                           <span class="c"># toggle to PREVIOUS directory</span>
+<span class="g">cd</span> <span class="b">~/projects/pink-galaxy</span>     <span class="c"># tilde expands to your home</span>
+
+<span class="c"># ═══ ls — What's Here? ═══</span>
+<span class="g">ls</span>                             <span class="c"># basic listing</span>
+<span class="g">ls</span> <span class="o">-l</span>                         <span class="c"># long format: permissions, owner, size, date</span>
+<span class="g">ls</span> <span class="o">-la</span>                        <span class="c"># long + hidden files (starting with .)</span>
+<span class="g">ls</span> <span class="o">-lah</span>                       <span class="c"># + human-readable sizes (4.2K instead of 4096)</span>
+<span class="g">ls</span> <span class="o">-lt</span>                        <span class="c"># sort by modification time (newest first)</span>
+<span class="g">ls</span> <span class="o">-lS</span>                        <span class="c"># sort by size (largest first)</span>
+<span class="g">ls</span> <span class="o">-lR</span>                        <span class="c"># recursive (all subdirectories)</span>
+<span class="g">ls</span> <span class="o">-d</span> <span class="b">*/</span>                     <span class="c"># list only directories</span>
+
+<span class="c"># ═══ MODERN REPLACEMENTS (installed on your Arch system) ═══</span>
+
+<span class="c"># eza — colorized ls with icons, git status, tree view</span>
+<span class="g">eza</span> <span class="o">-la</span> <span class="o">--icons</span>              <span class="c"># beautiful listing with file type icons</span>
+<span class="g">eza</span> <span class="o">--tree</span> <span class="o">-L</span> <span class="y">3</span>            <span class="c"># tree view, 3 levels deep</span>
+<span class="g">eza</span> <span class="o">-la</span> <span class="o">--git</span>               <span class="c"># show git status for each file</span>
+<span class="g">eza</span> <span class="o">--sort=modified</span>          <span class="c"># sort by modification time</span>
+
+<span class="c"># zoxide — smart cd that learns your habits</span>
+<span class="g">z</span> <span class="b">proj</span>                        <span class="c"># jumps to most-visited directory matching "proj"</span>
+<span class="g">z</span> <span class="b">pink</span>                        <span class="c"># jumps to ~/projects/pink-galaxy (if you go there often)</span>
+<span class="g">zi</span>                             <span class="c"># interactive fuzzy finder for all known directories</span></pre>
+<div class="out"><div class="outl">Expected Output (ls -lah)</div><pre>total 128K
+drwxr-xr-x  12 mari mari 4.0K Mar 15 15:42 .
+drwxr-xr-x   3 root root 4.0K Mar 15 10:00 ..
+-rw-------   1 mari mari 2.1K Mar 15 15:40 .bash_history
+drwxr-xr-x   8 mari mari 4.0K Mar 15 14:23 .config
+drwxr-xr-x   4 mari mari 4.0K Mar 15 13:00 projects
+-rw-r--r--   1 mari mari 3.5K Mar 15 14:20 .zshrc</pre></div></div>
+
+<p>The <span class="ic">ls -l</span> output has a specific structure worth understanding: the first column shows the file type and permissions (we cover these in detail in ARCH-CMD03), the second is the hard link count, then owner, group, size, modification date, and finally the filename. Files starting with a dot (<span class="ic">.</span>) are hidden — they only appear with the <span class="ic">-a</span> flag. This convention is used for configuration files so they do not clutter normal directory listings.</p>
+
+<div class="qz"><div class="qz-q">🧪 Why must <span class="ic">cd</span> be a shell builtin rather than an external program like <span class="ic">/usr/bin/cd</span>?</div>
+<div class="qo" onclick="ck(this,true)">Because an external program runs in a child process, and chdir() only changes the CWD of the calling process — the parent shell's directory would remain unchanged after the child exits</div>
+<div class="qo" onclick="ck(this,false)">Because cd is too simple to need a separate binary</div>
+<div class="qo" onclick="ck(this,false)">Because external programs cannot access the filesystem</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 2: mkdir / rmdir                       -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s1"><small>ARCH-CMD01.2 of 7 · ⏱ ~6 min</small></div>
+<h2>ARCH-CMD01.2 — mkdir / rmdir (Creating & Removing Directories)</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p><span class="ic">mkdir</span> creates directories. The <span class="ic">-p</span> flag is your best friend — it creates the entire path at once (including any missing parent directories) and does not complain if the directory already exists. Without <span class="ic">-p</span>, you would have to create each level separately and get errors on duplicates. The <span class="ic">rmdir</span> command removes EMPTY directories only. For removing directories with contents, you use <span class="ic">rm -r</span> (covered in the next section).</p>
+</div>
+<div class="pan te" data-l="te">
+<p>The <span class="ic">mkdir</span> command calls the <span class="ic">mkdir()</span> syscall, which creates a new directory entry in the parent directory's data blocks and allocates a new inode with the directory file type bit set. The new directory automatically gets two entries: <span class="ic">.</span> (pointing to itself) and <span class="ic">..</span> (pointing to the parent). With <span class="ic">-p</span>, mkdir iterates through each path component, calling <span class="ic">mkdir()</span> for each missing segment and ignoring <span class="ic">EEXIST</span> errors. The <span class="ic">-m MODE</span> flag sets permissions on creation (e.g., <span class="ic">mkdir -m 700 secret</span>). The <span class="ic">rmdir</span> syscall refuses to remove non-empty directories (returns <span class="ic">ENOTEMPTY</span>).</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ mkdir — Create Directories ═══</span>
+
+<span class="c"># Create a single directory</span>
+<span class="g">mkdir</span> <span class="b">testdir</span>
+
+<span class="c"># Create nested directories in one command (-p = parents)</span>
+<span class="g">mkdir</span> <span class="o">-p</span> <span class="b">projects/webapp/{src,tests,docs,config,scripts}</span>
+<span class="c"># Creates: projects/ → webapp/ → src/, tests/, docs/, config/, scripts/</span>
+
+<span class="c"># Create with specific permissions</span>
+<span class="g">mkdir</span> <span class="o">-m</span> <span class="y">700</span> <span class="b">~/.secrets</span>       <span class="c"># only owner can read/write/enter</span>
+
+<span class="c"># ═══ rmdir — Remove EMPTY Directories ═══</span>
+<span class="g">rmdir</span> <span class="b">testdir</span>                  <span class="c"># only works if empty</span>
+<span class="g">rmdir</span> <span class="o">-p</span> <span class="b">a/b/c</span>               <span class="c"># removes c, then b, then a (if all empty)</span>
+
+<span class="c"># ═══ Practical: Project Scaffolding (one-liner from BASH-F03) ═══</span>
+<span class="g">mkdir</span> <span class="o">-p</span> <span class="b">myapp/{src/{models,routes,utils},tests,docs,config}</span>
+<span class="g">touch</span> <span class="b">myapp/{README.md,.gitignore,src/{__init__,main}.py,tests/__init__.py}</span>
+<span class="g">eza</span> <span class="o">--tree</span> <span class="b">myapp</span></pre>
+<div class="out"><div class="outl">Expected Output (eza --tree myapp)</div><pre>myapp
+├── .gitignore
+├── README.md
+├── config
+├── docs
+├── src
+│   ├── __init__.py
+│   ├── main.py
+│   ├── models
+│   ├── routes
+│   └── utils
+└── tests
+    └── __init__.py</pre></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 3: cp / mv                             -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s2"><small>ARCH-CMD01.3 of 7 · ⏱ ~8 min</small></div>
+<h2>ARCH-CMD01.3 — cp and mv (Copy & Move/Rename)</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+<button class="tab" onclick="sw(this,'de')">⚙️ Deep</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p><span class="ic">cp</span> copies files and directories. <span class="ic">mv</span> moves them (or renames them — in Linux, renaming IS moving). The most important flags to know are <span class="ic">-r</span> (recursive — required for copying directories), <span class="ic">-i</span> (interactive — asks before overwriting), and <span class="ic">-v</span> (verbose — shows what is happening). A common pattern you will use constantly is making a backup copy before editing a config file: <span class="ic">cp /etc/pacman.conf /etc/pacman.conf.bak</span> — or even more elegantly with brace expansion: <span class="ic">cp /etc/pacman.conf{,.bak}</span>.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>The <span class="ic">cp</span> command creates a new file (new inode) and copies the source's data blocks to the new file's data blocks. With <span class="ic">-a</span> (archive), it also preserves ownership, permissions, timestamps, and symbolic links. The <span class="ic">mv</span> command behaves differently depending on whether the source and destination are on the same filesystem: if they are on the same filesystem, <span class="ic">mv</span> calls <span class="ic">rename()</span> which only updates directory entries (extremely fast — no data is copied); if they are on different filesystems, <span class="ic">mv</span> falls back to copy-then-delete (slow for large files). This is why <span class="ic">mv</span> within the same partition is instant regardless of file size, but moving files between partitions takes time proportional to the data size.</p>
+</div>
+<div class="pan de" data-l="de">
+<p>For same-filesystem moves, the <span class="ic">rename()</span> syscall in the VFS layer performs: (1) look up the source dentry, (2) look up or create the target dentry, (3) atomically update the parent directory's data blocks to remove the source entry and add the target entry (or update the target if it exists), (4) update the link count and <span class="ic">..</span> entry if moving a directory. The inode itself is unchanged — its data blocks, permissions, timestamps, and owner remain identical. This is an O(1) metadata operation, not an O(n) data operation. For cross-filesystem moves, the kernel returns <span class="ic">EXDEV</span> (cross-device link), and the <span class="ic">mv</span> command falls back to <span class="ic">cp -a source dest && rm source</span>. The <span class="ic">cp</span> command uses <span class="ic">read()</span>/<span class="ic">write()</span> in a loop (typically 128KB chunks) to copy data blocks, or on modern kernels, <span class="ic">copy_file_range()</span> which can use reflinks on filesystems that support them (btrfs, XFS with reflink), making the copy instant and zero-cost until the data diverges (copy-on-write).</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ cp — Copy ═══</span>
+
+<span class="c"># Copy a file</span>
+<span class="g">cp</span> <span class="b">file.txt</span> <span class="b">file_backup.txt</span>
+
+<span class="c"># Copy a directory (must use -r for recursive)</span>
+<span class="g">cp</span> <span class="o">-r</span> <span class="b">projects/webapp</span> <span class="b">projects/webapp-backup</span>
+
+<span class="c"># Copy preserving everything (permissions, timestamps, symlinks)</span>
+<span class="g">cp</span> <span class="o">-a</span> <span class="b">source/</span> <span class="b">destination/</span>
+
+<span class="c"># Interactive — ask before overwriting</span>
+<span class="g">cp</span> <span class="o">-i</span> <span class="b">newfile.txt</span> <span class="b">existing.txt</span>
+
+<span class="c"># Backup config before editing (brace expansion trick from BASH-F03)</span>
+<span class="g">sudo</span> <span class="g">cp</span> <span class="b">/etc/pacman.conf{,.bak}</span>
+<span class="c"># Expands to: sudo cp /etc/pacman.conf /etc/pacman.conf.bak</span>
+
+<span class="c"># ═══ mv — Move / Rename ═══</span>
+
+<span class="c"># Rename a file (same directory = rename)</span>
+<span class="g">mv</span> <span class="b">old_name.py</span> <span class="b">new_name.py</span>
+
+<span class="c"># Move a file to another directory</span>
+<span class="g">mv</span> <span class="b">report.pdf</span> <span class="b">~/Documents/</span>
+
+<span class="c"># Move multiple files at once</span>
+<span class="g">mv</span> <span class="b">*.py</span> <span class="b">src/</span>                  <span class="c"># move all Python files into src/</span>
+
+<span class="c"># Safe move — ask before overwriting</span>
+<span class="g">mv</span> <span class="o">-i</span> <span class="b">draft.md</span> <span class="b">final.md</span>
+
+<span class="c"># Move and rename simultaneously</span>
+<span class="g">mv</span> <span class="b">~/Downloads/archlinux-x86_64.iso</span> <span class="b">~/ISOs/arch-2026-03.iso</span></pre>
+<div class="out"><div class="outl">Key Insight</div><pre>mv within the same filesystem is INSTANT regardless of file size
+(it only changes the directory entry, not the actual data)
+mv between different filesystems copies data then deletes the source (slow for big files)</pre></div></div>
+
+<div class="qz"><div class="qz-q">🧪 You run <span class="ic">mv bigfile.iso /mnt/usb/</span> and it takes 5 minutes. On the same partition, <span class="ic">mv bigfile.iso backup.iso</span> is instant. Why?</div>
+<div class="qo" onclick="ck(this,false)">Because renaming is always faster than moving</div>
+<div class="qo" onclick="ck(this,true)">Because the USB is a different filesystem — mv must copy all data blocks then delete the original. On the same filesystem, mv only updates the directory entry (a metadata change, no data is copied)</div>
+<div class="qo" onclick="ck(this,false)">Because USB drives are slower than SSDs</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 4: rm — THE DANGER ZONE               -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s3"><small>ARCH-CMD01.4 of 7 · ⏱ ~10 min</small></div>
+<h2>ARCH-CMD01.4 — rm: The Danger Zone ⚠️</h2>
+
+<div class="note dn">
+<b>⚠️ CRITICAL WARNING:</b> Linux has no recycle bin. When you <span class="ic">rm</span> a file, it is gone. There is no "undo", no "restore from trash", no "are you sure?" (unless you add <span class="ic">-i</span>). The command <span class="ic">rm -rf /</span> will happily destroy your entire system in seconds without asking a single question. Treat <span class="ic">rm</span> with the respect you give to a loaded weapon. Always double-check your arguments before pressing Enter, especially when using variables (<span class="ic">rm -rf "$dir"</span> — if <span class="ic">$dir</span> is empty, this becomes <span class="ic">rm -rf</span> which tries to delete everything in the current directory).
+</div>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+<button class="tab" onclick="sw(this,'de')">⚙️ Deep</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p><span class="ic">rm</span> removes files. <span class="ic">rm -r</span> removes directories and everything inside them (recursive). <span class="ic">rm -f</span> forces removal without asking (even for read-only files). <span class="ic">rm -rf</span> combines both — it is the nuclear option that removes everything you point it at without any confirmation. This is the most dangerous command in Linux. The reason it is so dangerous is that Linux trusts you to know what you are doing — it does not second-guess your instructions. This trust is what makes Linux powerful, but it also means mistakes are permanent.</p>
+<p>Three safety habits that will save you: (1) always use <span class="ic">ls</span> first to preview what you are about to delete, (2) for important deletions use <span class="ic">rm -ri</span> (interactive — asks for each file), (3) never put an unquoted variable after <span class="ic">rm -rf</span> — always quote it AND check that it is non-empty first.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>The <span class="ic">rm</span> command calls <span class="ic">unlink()</span> for files and <span class="ic">rmdir()</span> for directories. The <span class="ic">unlink()</span> syscall removes the directory entry (the name→inode mapping) and decrements the inode's link count. If the link count reaches zero AND no process has the file open, the kernel frees the inode and its data blocks. If a process still has the file open (common with log files), the data persists until the last file descriptor is closed — the file becomes "deleted but still in use." The <span class="ic">-f</span> flag suppresses errors for non-existent files and overrides the write-protection prompt (which normally asks before deleting files you do not have write permission on). The <span class="ic">--preserve-root</span> flag (enabled by default in GNU coreutils) refuses to operate on <span class="ic">/</span>, but this only protects against the literal <span class="ic">rm -rf /</span>, not against <span class="ic">rm -rf /*</span> which expands to all top-level entries.</p>
+</div>
+<div class="pan de" data-l="de">
+<p>The <span class="ic">unlink()</span> syscall in the VFS layer performs: (1) resolve the path to find the target dentry and its parent, (2) check write+execute permission on the parent directory (not the file itself — because you are modifying the parent's directory entry), (3) call the filesystem's <span class="ic">unlink</span> inode operation, which removes the dentry from the parent's data blocks, decrements the inode's <span class="ic">i_nlink</span> counter, and updates the parent's <span class="ic">mtime</span>/<span class="ic">ctime</span>. (4) If <span class="ic">i_nlink == 0</span> and <span class="ic">i_count == 0</span> (no open file descriptors), the inode and its data blocks are freed — the bitmap entries for those blocks are cleared, making them available for reuse. On ext4, the inode's data block pointers are zeroed, the inode bitmap bit is cleared, and the block bitmap bits are cleared. The actual disk sectors are NOT overwritten with zeros — the data remains physically on the SSD until those blocks are reused or TRIMmed. This is why forensic tools can sometimes recover "deleted" files, and why <span class="ic">shred</span> or <span class="ic">blkdiscard</span> exist for secure deletion.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ rm — Remove Files ═══</span>
+
+<span class="c"># Delete a single file</span>
+<span class="g">rm</span> <span class="b">unwanted_file.txt</span>
+
+<span class="c"># Delete multiple files</span>
+<span class="g">rm</span> <span class="b">file1.txt</span> <span class="b">file2.txt</span> <span class="b">file3.txt</span>
+
+<span class="c"># Delete all .tmp files in current directory</span>
+<span class="g">rm</span> <span class="b">*.tmp</span>
+
+<span class="c"># Delete a directory and all its contents</span>
+<span class="g">rm</span> <span class="o">-r</span> <span class="b">old_project/</span>
+
+<span class="c"># Force delete (no prompts, no errors on missing files)</span>
+<span class="g">rm</span> <span class="o">-rf</span> <span class="b">build/</span> <span class="b">dist/</span> <span class="b">__pycache__/</span>
+
+<span class="c"># ═══ SAFE DELETION PATTERNS ═══</span>
+
+<span class="c"># 1. Preview before deleting (ALWAYS do this)</span>
+<span class="g">ls</span> <span class="b">*.log</span>                       <span class="c"># see what would be deleted</span>
+<span class="g">rm</span> <span class="b">*.log</span>                       <span class="c"># then delete</span>
+
+<span class="c"># 2. Interactive mode (asks for each file)</span>
+<span class="g">rm</span> <span class="o">-ri</span> <span class="b">old_project/</span>           <span class="c"># confirms each file — tedious but safe</span>
+
+<span class="c"># 3. SAFE variable deletion (from BASH-F08)</span>
+<span class="v">dir_to_clean</span>=<span class="y">"/tmp/build-output"</span>
+<span class="k">if</span> [[ <span class="o">-n</span> <span class="y">"$dir_to_clean"</span> && <span class="o">-d</span> <span class="y">"$dir_to_clean"</span> ]]; <span class="k">then</span>
+    <span class="g">rm</span> <span class="o">-rf</span> <span class="y">"$dir_to_clean"</span>    <span class="c"># safe — verified non-empty and exists</span>
+<span class="k">fi</span>
+<span class="c"># NEVER: rm -rf $dir (if $dir is empty, this deletes current directory!)</span>
+
+<span class="c"># 4. Use trash-cli instead (moves to trash instead of deleting)</span>
+<span class="c"># paru -S trash-cli</span>
+<span class="c"># trash-put file.txt    ← moves to trash (recoverable!)</span>
+<span class="c"># trash-list            ← see what's in trash</span>
+<span class="c"># trash-restore         ← recover a file</span></pre></div>
+
+<div class="cm">
+<div class="cm-do"><b>✅ Safe deletion habits:</b><p>Always <span class="ic">ls</span> before <span class="ic">rm</span>. Always quote variables in <span class="ic">rm</span> commands. Always check that path variables are non-empty before using them with <span class="ic">rm -rf</span>. Consider installing <span class="ic">trash-cli</span> which moves files to a recoverable trash instead of permanently deleting them. Set up Timeshift snapshots (from Part 4) as a safety net.</p></div>
+<div class="cm-x"><b>❌ The disaster scenarios:</b><p><span class="ic">rm -rf /</span> destroys everything (mitigated by --preserve-root default). <span class="ic">rm -rf $UNSET_VAR/*</span> expands to <span class="ic">rm -rf /*</span> when the variable is empty. <span class="ic">rm -rf ~/. documents</span> (accidental space) deletes your entire home directory (the <span class="ic">.</span> matches <span class="ic">~/.</span> which is your home directory). All of these are preventable with the habits above.</p></div>
+</div>
+
+<div class="qz"><div class="qz-q">🧪 You have <span class="ic">dir=""</span> (empty variable) and run <span class="ic">rm -rf $dir/*</span>. What happens?</div>
+<div class="qo" onclick="ck(this,false)">Nothing — rm sees an empty argument and does nothing</div>
+<div class="qo" onclick="ck(this,false)">rm reports an error about the empty variable</div>
+<div class="qo" onclick="ck(this,true)">The command expands to rm -rf /* which deletes everything in the root filesystem! The empty variable vanishes, leaving the /* glob which matches all top-level directories</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 5: ln — Links                          -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s4"><small>ARCH-CMD01.5 of 7 · ⏱ ~10 min</small></div>
+<h2>ARCH-CMD01.5 — ln: Hard Links and Symbolic Links</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+<button class="tab" onclick="sw(this,'de')">⚙️ Deep</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>A link is an alternative name for a file. Linux has two types. A <strong>hard link</strong> is like having two names in the phone book that ring the same phone — both names are equally "real", and the phone (the actual data) only gets disconnected when ALL names pointing to it are removed. A <strong>symbolic link</strong> (symlink) is like a redirect sign that says "go look over there" — it points to another filename, not to the actual data. If you remove the original file, the symlink breaks (it points to nothing — a "dangling symlink").</p>
+<p>Symlinks are by far the more common type in daily use. You use them for: pointing dotfile configs from your home directory into a dotfiles Git repo, creating shorter paths to deeply nested directories, pointing <span class="ic">/usr/local/bin/python</span> to your actual Python binary, and managing multiple versions of anything (the "current" symlink always points to whichever version is active).</p>
+</div>
+<div class="pan te" data-l="te">
+<p>A hard link (<span class="ic">ln source linkname</span>) creates a new directory entry pointing to the same inode as the source. Both names share the same inode number, data blocks, permissions, and timestamps. The inode's link count (<span class="ic">i_nlink</span>) increments with each hard link. Hard links cannot cross filesystem boundaries (because inodes are per-filesystem) and cannot link to directories (to prevent circular loops in the filesystem tree). A symbolic link (<span class="ic">ln -s target linkname</span>) creates a new inode whose data content is the path string of the target. When the kernel resolves a symlink, it reads the stored path and restarts path resolution from that point. Symlinks can cross filesystems, link to directories, and link to non-existent targets (dangling links).</p>
+</div>
+<div class="pan de" data-l="de">
+<p>Hard links are implemented at the filesystem level: <span class="ic">ln source link</span> calls <span class="ic">link()</span> syscall which adds a new directory entry (name + inode number) in the target directory pointing to the source's inode, and increments the inode's <span class="ic">i_nlink</span> field. No new inode or data blocks are allocated. Symbolic links are a distinct file type: <span class="ic">ln -s target link</span> calls <span class="ic">symlink()</span> syscall which creates a new inode with file type <span class="ic">S_IFLNK</span> (0xA000). For short targets (≤60 bytes on ext4), the path string is stored directly in the inode's <span class="ic">i_block[]</span> field ("fast symlinks" — no additional data block needed). For longer targets, a data block is allocated. When the VFS encounters a symlink during path resolution (<span class="ic">lookup_fast()</span> or <span class="ic">lookup_slow()</span> in <span class="ic">namei.c</span>), it calls the inode's <span class="ic">get_link()</span> operation to read the target path, then restarts resolution. A maximum of 40 symlink indirections are followed before returning <span class="ic">ELOOP</span> (to prevent infinite loops).</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ Symbolic Links (most common — use these 99% of the time) ═══</span>
+
+<span class="c"># Create a symlink: ln -s TARGET LINKNAME</span>
+<span class="g">ln</span> <span class="o">-s</span> <span class="b">~/projects/pink-galaxy</span> <span class="b">~/pg</span>
+<span class="c"># Now: cd ~/pg  → takes you to ~/projects/pink-galaxy</span>
+
+<span class="c"># Dotfiles management pattern (from Part 4)</span>
+<span class="g">ln</span> <span class="o">-sf</span> <span class="b">~/dotfiles/zshrc</span> <span class="b">~/.zshrc</span>         <span class="c"># -f = force (overwrite existing)</span>
+<span class="g">ln</span> <span class="o">-sf</span> <span class="b">~/dotfiles/hypr</span> <span class="b">~/.config/hypr</span>    <span class="c"># symlink entire directory</span>
+
+<span class="c"># Check where a symlink points</span>
+<span class="g">readlink</span> <span class="o">-f</span> <span class="b">~/.zshrc</span>           <span class="c"># /home/mari/dotfiles/zshrc</span>
+<span class="g">ls</span> <span class="o">-la</span> <span class="b">~/.zshrc</span>                <span class="c"># shows: .zshrc → /home/mari/dotfiles/zshrc</span>
+
+<span class="c"># ═══ Hard Links (less common, but useful to understand) ═══</span>
+
+<span class="c"># Create a hard link</span>
+<span class="g">ln</span> <span class="b">original.txt</span> <span class="b">hardlink.txt</span>
+<span class="c"># Both names point to the same inode (same data on disk)</span>
+
+<span class="c"># Verify they share the same inode number</span>
+<span class="g">ls</span> <span class="o">-li</span> <span class="b">original.txt</span> <span class="b">hardlink.txt</span>
+<span class="c"># The first column (inode number) is the same for both</span>
+
+<span class="c"># Delete the original — hard link STILL works (data persists)</span>
+<span class="g">rm</span> <span class="b">original.txt</span>
+<span class="g">cat</span> <span class="b">hardlink.txt</span>               <span class="c"># still accessible! Data lives until ALL links gone</span></pre>
+<div class="out"><div class="outl">Expected Output (ls -li)</div><pre>1048577 -rw-r--r-- 2 mari mari 42 Mar 15 16:00 hardlink.txt
+1048577 -rw-r--r-- 2 mari mari 42 Mar 15 16:00 original.txt
+                   ↑ link count = 2 (two names point to same inode 1048577)</pre></div></div>
+
+<div class="qz"><div class="qz-q">🧪 You create a symlink <span class="ic">ln -s /tmp/data.txt ~/link.txt</span> then delete <span class="ic">/tmp/data.txt</span>. What happens when you <span class="ic">cat ~/link.txt</span>?</div>
+<div class="qo" onclick="ck(this,true)">Error: "No such file or directory" — the symlink becomes "dangling" because it points to a path that no longer exists (symlinks point to names, not data)</div>
+<div class="qo" onclick="ck(this,false)">It still works because the symlink preserves the data</div>
+<div class="qo" onclick="ck(this,false)">The symlink is automatically deleted</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 6: find / fd                           -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s5"><small>ARCH-CMD01.6 of 7 · ⏱ ~10 min</small></div>
+<h2>ARCH-CMD01.6 — find and fd: Searching the Filesystem</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p><span class="ic">find</span> is the classic file search tool — extremely powerful but with a syntax that feels backwards to most people. It walks through directory trees checking each file against your criteria (name, size, type, age, permissions, owner) and either prints matches or executes a command on them. It can answer questions like "find all Python files modified in the last 24 hours" or "find all files larger than 100MB" or "find all empty directories and delete them."</p>
+<p><span class="ic">fd</span> is the modern replacement (installed on your Arch system) — it has a much simpler syntax, uses regex by default, respects <span class="ic">.gitignore</span>, has colorized output, and is significantly faster because it is written in Rust with parallel directory traversal. For everyday searches, use <span class="ic">fd</span>. For complex searches with advanced conditions and actions, use <span class="ic">find</span>.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>The <span class="ic">find</span> command performs a depth-first traversal of the filesystem tree using <span class="ic">opendir()</span>/<span class="ic">readdir()</span> calls, applying test expressions to each entry. The expression language supports tests (<span class="ic">-name</span>, <span class="ic">-type</span>, <span class="ic">-size</span>, <span class="ic">-mtime</span>, <span class="ic">-perm</span>, <span class="ic">-user</span>), actions (<span class="ic">-print</span>, <span class="ic">-exec</span>, <span class="ic">-delete</span>), and logical operators (<span class="ic">-and</span>, <span class="ic">-or</span>, <span class="ic">-not</span>, <span class="ic">\( \)</span> for grouping). The <span class="ic">-exec {} \;</span> syntax runs a command for each match (one fork/exec per file). The <span class="ic">-exec {} +</span> syntax batches matches into a single command invocation (much faster — equivalent to xargs). The <span class="ic">fd</span> tool from the <span class="ic">fd</span> package uses the <span class="ic">ignore</span> crate to respect .gitignore patterns and the <span class="ic">rayon</span> crate for parallel directory traversal, giving 5-10x speedup over find on large trees.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ find — The Classic Search Tool ═══</span>
+
+<span class="c"># Find by name</span>
+<span class="g">find</span> <span class="b">.</span> <span class="o">-name</span> <span class="y">"*.py"</span>                          <span class="c"># Python files in current tree</span>
+<span class="g">find</span> <span class="b">/etc</span> <span class="o">-name</span> <span class="y">"*.conf"</span> 2>/dev/null           <span class="c"># config files in /etc</span>
+<span class="g">find</span> <span class="b">.</span> <span class="o">-iname</span> <span class="y">"readme*"</span>                        <span class="c"># case-insensitive search</span>
+
+<span class="c"># Find by type</span>
+<span class="g">find</span> <span class="b">.</span> <span class="o">-type f</span> <span class="o">-name</span> <span class="y">"*.log"</span>                 <span class="c"># files only (not directories)</span>
+<span class="g">find</span> <span class="b">.</span> <span class="o">-type d</span> <span class="o">-empty</span>                         <span class="c"># empty directories</span>
+<span class="g">find</span> <span class="b">.</span> <span class="o">-type l</span>                                 <span class="c"># symbolic links only</span>
+
+<span class="c"># Find by size</span>
+<span class="g">find</span> <span class="b">.</span> <span class="o">-size +100M</span>                             <span class="c"># files larger than 100MB</span>
+<span class="g">find</span> <span class="b">.</span> <span class="o">-size -1k</span>                               <span class="c"># files smaller than 1KB</span>
+
+<span class="c"># Find by time</span>
+<span class="g">find</span> <span class="b">.</span> <span class="o">-mtime -1</span>                               <span class="c"># modified in last 24 hours</span>
+<span class="g">find</span> <span class="b">.</span> <span class="o">-mmin -30</span>                               <span class="c"># modified in last 30 minutes</span>
+
+<span class="c"># Find and DO something (-exec)</span>
+<span class="g">find</span> <span class="b">.</span> <span class="o">-name</span> <span class="y">"*.pyc"</span> <span class="o">-delete</span>                  <span class="c"># delete all .pyc files</span>
+<span class="g">find</span> <span class="b">.</span> <span class="o">-name</span> <span class="y">"*.py"</span> <span class="o">-exec</span> <span class="g">wc</span> <span class="o">-l</span> {} \;        <span class="c"># count lines in each .py file</span>
+<span class="g">find</span> <span class="b">.</span> <span class="o">-name</span> <span class="y">"*.py"</span> <span class="o">-exec</span> <span class="g">wc</span> <span class="o">-l</span> {} +          <span class="c"># same but batched (faster!)</span>
+<span class="g">find</span> <span class="b">.</span> <span class="o">-type d</span> <span class="o">-empty</span> <span class="o">-delete</span>                  <span class="c"># delete empty directories</span>
+
+<span class="c"># ═══ fd — The Modern Alternative ═══</span>
+
+<span class="g">fd</span> <span class="y">".py$"</span>                                      <span class="c"># find Python files (regex!)</span>
+<span class="g">fd</span> <span class="y">"readme"</span> <span class="o">-i</span>                                 <span class="c"># case-insensitive</span>
+<span class="g">fd</span> <span class="o">-e</span> <span class="y">py</span>                                        <span class="c"># by extension (shorthand)</span>
+<span class="g">fd</span> <span class="o">-e</span> <span class="y">py</span> <span class="o">-x</span> <span class="g">wc</span> <span class="o">-l</span>                              <span class="c"># execute wc -l on each match</span>
+<span class="g">fd</span> <span class="o">-t d</span> <span class="o">-e</span>                                      <span class="c"># empty directories</span>
+<span class="g">fd</span> <span class="o">--size +10m</span>                                  <span class="c"># files > 10MB</span>
+<span class="g">fd</span> <span class="o">--changed-within 1h</span>                          <span class="c"># modified in last hour</span>
+<span class="g">fd</span> <span class="y">"test"</span> <span class="b">src/</span>                                  <span class="c"># search only in src/</span></pre>
+<div class="out"><div class="outl">Expected Output (fd -e py)</div><pre>src/main.py
+src/utils.py
+src/models/user.py
+tests/test_main.py</pre></div></div>
+
+<div class="cm">
+<div class="cm-do"><b>✅ When to use find vs fd:</b><p>Use <span class="ic">fd</span> for everyday searches — it is faster, has better defaults, and the syntax is simpler. Use <span class="ic">find</span> when you need complex boolean conditions (<span class="ic">-and</span>, <span class="ic">-or</span>, <span class="ic">-not</span>), permission-based searches, or when writing POSIX-portable scripts. Both are essential tools in your arsenal.</p></div>
+<div class="cm-x"><b>❌ Performance trap:</b><p><span class="ic">find . -exec cmd {} \;</span> forks a new process for EVERY match. <span class="ic">find . -exec cmd {} +</span> (note the plus instead of semicolon) batches matches into a single command invocation. For thousands of files, this can be 100x faster. The fd equivalent <span class="ic">fd -x cmd</span> runs in parallel by default for even more speed.</p></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 7: Practice                            -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s6"><small>ARCH-CMD01.7 of 7 · ⏱ ~15 min</small></div>
+<h2>ARCH-CMD01.7 — Practice Exercises</h2>
+
+<h3>Exercise 1 (Easy) — Directory Explorer</h3>
+<p>Navigate to <span class="ic">/etc</span>, list all <span class="ic">.conf</span> files sorted by size (largest first) with human-readable sizes. Then navigate to your home directory and use <span class="ic">eza --tree</span> to display the structure of <span class="ic">~/.config</span> (3 levels deep).</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">solution</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="g">cd</span> <span class="b">/etc</span>
+<span class="g">ls</span> <span class="o">-lhS</span> <span class="b">*.conf</span> 2>/dev/null    <span class="c"># -S sorts by size, -h human-readable</span>
+<span class="g">cd</span>
+<span class="g">eza</span> <span class="o">--tree</span> <span class="o">-L</span> <span class="y">3</span> <span class="b">~/.config</span></pre></div>
+
+<h3>Exercise 2 (Medium) — Cleanup Script</h3>
+<p>Write a script that finds all files in <span class="ic">/tmp</span> owned by your user that are older than 7 days and larger than 1MB. Print them with their sizes using <span class="ic">find</span> + <span class="ic">-exec</span>. Add a <span class="ic">--delete</span> flag that actually removes them (only if the flag is passed).</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">solution</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="g">set</span> <span class="o">-euo</span> <span class="y">pipefail</span>
+
+<span class="v">DELETE</span>=<span class="y">false</span>
+[[ <span class="y">"${1:-}"</span> == <span class="y">"--delete"</span> ]] && <span class="v">DELETE</span>=<span class="y">true</span>
+
+<span class="g">echo</span> <span class="y">"🧹 Old large files in /tmp (>7 days, >1MB, owned by $USER):"</span>
+<span class="g">echo</span> <span class="y">"───────────────────────────────────────────────────"</span>
+
+<span class="g">find</span> <span class="b">/tmp</span> <span class="o">-user</span> <span class="y">"$USER"</span> <span class="o">-type f</span> <span class="o">-mtime +7</span> <span class="o">-size +1M</span> \
+    <span class="o">-exec</span> <span class="g">ls</span> <span class="o">-lh</span> {} \; 2>/dev/null
+
+<span class="k">if</span> <span class="y">"$DELETE"</span>; <span class="k">then</span>
+    <span class="g">echo</span> <span class="y">""</span>
+    <span class="g">read</span> <span class="o">-rp</span> <span class="y">"Delete these files? [y/N] "</span> <span class="v">confirm</span>
+    <span class="k">if</span> [[ <span class="y">"${confirm,,}"</span> == <span class="y">"y"</span> ]]; <span class="k">then</span>
+        <span class="g">find</span> <span class="b">/tmp</span> <span class="o">-user</span> <span class="y">"$USER"</span> <span class="o">-type f</span> <span class="o">-mtime +7</span> <span class="o">-size +1M</span> <span class="o">-delete</span>
+        <span class="g">echo</span> <span class="y">"✓ Deleted"</span>
+    <span class="k">fi</span>
+<span class="k">else</span>
+    <span class="g">echo</span> <span class="y">""</span>
+    <span class="g">echo</span> <span class="y">"Run with --delete to remove these files"</span>
+<span class="k">fi</span></pre></div>
+
+<h3>Exercise 3 (Hard) — Project Analyzer</h3>
+<p>Write a script that takes a project directory as an argument and generates a report: total files, total directories, total size, file count by extension (top 10), largest files (top 5), most recently modified files (top 5), and any symlinks found. Use a combination of <span class="ic">find</span>, <span class="ic">fd</span>, <span class="ic">awk</span>, <span class="ic">sort</span>, and <span class="ic">printf</span> for formatting.</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">solution</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="g">set</span> <span class="o">-euo</span> <span class="y">pipefail</span>
+
+<span class="v">dir</span>=<span class="y">"${1:?Usage: $0 <directory>}"</span>
+[[ <span class="o">-d</span> <span class="y">"$dir"</span> ]] || { <span class="g">echo</span> <span class="y">"Not a directory: $dir"</span> >&2; <span class="g">exit</span> <span class="y">1</span>; }
+
+<span class="g">echo</span> <span class="y">"═══ Project Report: $dir ═══"</span>
+<span class="g">echo</span> <span class="y">""</span>
+<span class="g">printf</span> <span class="y">"  %-20s %s\n"</span> <span class="y">"Total files:"</span> <span class="y">"$(find "$dir" -type f | wc -l)"</span>
+<span class="g">printf</span> <span class="y">"  %-20s %s\n"</span> <span class="y">"Total dirs:"</span> <span class="y">"$(find "$dir" -type d | wc -l)"</span>
+<span class="g">printf</span> <span class="y">"  %-20s %s\n"</span> <span class="y">"Total size:"</span> <span class="y">"$(du -sh "$dir" | awk '{print $1}')"</span>
+<span class="g">printf</span> <span class="y">"  %-20s %s\n"</span> <span class="y">"Symlinks:"</span> <span class="y">"$(find "$dir" -type l | wc -l)"</span>
+
+<span class="g">echo</span> <span class="y">""</span>
+<span class="g">echo</span> <span class="y">"─── Top Extensions ───"</span>
+<span class="g">find</span> <span class="y">"$dir"</span> <span class="o">-type f</span> | <span class="g">sed</span> <span class="y">'s/.*\.//'</span> | <span class="g">sort</span> | <span class="g">uniq</span> <span class="o">-c</span> | <span class="g">sort</span> <span class="o">-rn</span> | <span class="g">head</span> <span class="o">-10</span> | \
+    <span class="k">while</span> <span class="g">read</span> <span class="o">-r</span> <span class="v">count</span> <span class="v">ext</span>; <span class="k">do</span>
+        <span class="g">printf</span> <span class="y">"  %-6d .%s\n"</span> <span class="y">"$count"</span> <span class="y">"$ext"</span>
+    <span class="k">done</span>
+
+<span class="g">echo</span> <span class="y">""</span>
+<span class="g">echo</span> <span class="y">"─── Largest Files ───"</span>
+<span class="g">find</span> <span class="y">"$dir"</span> <span class="o">-type f</span> <span class="o">-exec</span> <span class="g">du</span> <span class="o">-h</span> {} + 2>/dev/null | <span class="g">sort</span> <span class="o">-rh</span> | <span class="g">head</span> <span class="o">-5</span>
+
+<span class="g">echo</span> <span class="y">""</span>
+<span class="g">echo</span> <span class="y">"─── Recently Modified ───"</span>
+<span class="g">find</span> <span class="y">"$dir"</span> <span class="o">-type f</span> <span class="o">-printf</span> <span class="y">'%T@ %Tc  %p\n'</span> 2>/dev/null | <span class="g">sort</span> <span class="o">-rn</span> | <span class="g">head</span> <span class="o">-5</span> | \
+    <span class="g">awk</span> <span class="y">'{$1=""; print}'</span></pre>
+<div class="out"><div class="outl">Expected Output (./analyze.sh ~/projects/pink-galaxy)</div><pre>═══ Project Report: /home/mari/projects/pink-galaxy ═══
+
+  Total files:         847
+  Total dirs:          42
+  Total size:          2.3M
+  Symlinks:            3
+
+─── Top Extensions ───
+  312    py
+  156    html
+  89     css
+  67     js
+  45     md
+  38     json
+
+─── Largest Files ───
+  240K  ./src/data/seed.sql
+  128K  ./docs/architecture.md
+  96K   ./static/bundle.js
+
+─── Recently Modified ───
+  Sat 15 Mar 2026 16:42:01  ./src/main.py
+  Sat 15 Mar 2026 16:40:33  ./tests/test_api.py
+  Sat 15 Mar 2026 15:18:00  ./docs/README.md</pre></div></div>
+
+<div class="note gn">
+<b>🌸 Module Complete!</b> You now have mastery over the core filesystem commands: navigating with <span class="ic">pwd</span>/<span class="ic">cd</span>/<span class="ic">ls</span> and their modern replacements (<span class="ic">eza</span>, <span class="ic">zoxide</span>), creating structures with <span class="ic">mkdir -p</span> and brace expansion, copying and moving with understanding of same-filesystem vs cross-filesystem behavior, deleting safely with awareness of the dangers and defensive patterns from BASH-F08, creating both hard and symbolic links with understanding of inode-level mechanics, and searching the filesystem with both <span class="ic">find</span> (powerful but verbose) and <span class="ic">fd</span> (fast and modern). These commands will be your most-used tools every single day. Next module: ARCH-CMD02 (Text Processing) — grep, sed, awk, and the pipeline toolkit.
+</div>
+
+</div>
+<div class="sf"><button onclick="svB()">💾 Save Brick 9</button></div>
+<script>
+function sw(btn,lv){let el=btn.parentElement.nextElementSibling;while(el&&!el.classList.contains('sd')&&!el.classList.contains('qz')&&!el.classList.contains('cm')&&!el.classList.contains('cw')&&el.tagName!=='H3'&&el.tagName!=='TABLE'){if(el.classList.contains('pan'))el.classList.toggle('on',el.dataset.l===lv);el=el.nextElementSibling;}btn.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');}
+function ck(btn,ok){const box=btn.closest('.qz');box.querySelectorAll('.qo').forEach(o=>o.disabled=true);btn.classList.add(ok?'y':'n');const fb=box.querySelector('.qfb');fb.classList.add('s');fb.className=ok?'qfb s w':'qfb s l';fb.textContent=ok?'✓ Correct! +10 XP':'✗ Review the section above.';}
+function cpC(b){const pre=b.closest('.cw').querySelector('pre');navigator.clipboard.writeText(pre.textContent).then(()=>{b.textContent='✓';setTimeout(()=>b.textContent='Copy',1500);});}
+function svB(){const blob=new Blob(['<!DOCTYPE html>\n'+document.documentElement.outerHTML],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='brick9_ARCHCMD01_navigation_'+new Date().toISOString().slice(0,10)+'.html';a.click();}
+</script>
+</body>
+</html>

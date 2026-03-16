@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arch Linux — Pink Galaxy Guide — Part 2: Display, Shell & Peripherals</title>
+<!-- Confirmed scope: Part 2 — Hyprland, Terminal, Audio, BT, Stream Deck, Logitech, HDMI -->
+<!-- Target system: Dell Inspiron 14 7420 2-in-1 (Arch base from Part 1) -->
+<!-- Mode: theory_code -->
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--pink:#e91e63;--pink-light:#f8bbd0;--pink-dark:#880e4f;--pink-glow:rgba(233,30,99,0.3);--green:#2e7d32;--green-light:#c8e6c9;--bg:#0a0a12;--bg-card:rgba(15,15,30,0.85);--bg-code:#1a1a2e;--border:rgba(233,30,99,0.2);--border-g:rgba(46,125,50,0.3);--text:#e8e6f0;--text2:#a8a6b8;--muted:#6c6a7e;--star:#ffd700;--ok:#4caf50;--warn:#ff9800;--danger:#f44336;--cg:#a5d6a7;--cp:#f48fb1;--cy:#fff59d;--cb:#90caf9;--co:#ffcc80;--cc:#6a6a8a;--cs:#c5e1a5;--cv:#ce93d8;}
+body{font-family:Calibri,"Segoe UI",sans-serif;font-size:11pt;color:var(--text);background:var(--bg);line-height:1.7;padding:20px 30px 80px;padding-right:70px;transition:padding-right .3s;overflow-x:hidden;}
+body.menu-expanded{padding-right:390px;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 20% 50%,rgba(233,30,99,.08)0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(103,58,183,.06)0%,transparent 50%),radial-gradient(ellipse at 50% 80%,rgba(46,125,50,.05)0%,transparent 50%);}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background-image:radial-gradient(1px 1px at 10% 20%,rgba(255,255,255,.4),transparent),radial-gradient(1px 1px at 50% 10%,rgba(233,30,99,.5),transparent),radial-gradient(1px 1px at 70% 40%,rgba(255,255,255,.3),transparent),radial-gradient(1.5px 1.5px at 45% 45%,rgba(255,255,255,.5),transparent),radial-gradient(1px 1px at 85% 15%,rgba(255,255,255,.4),transparent);animation:tw 8s ease-in-out infinite alternate;}
+@keyframes tw{0%{opacity:.6}50%{opacity:1}100%{opacity:.7}}
+.w{position:relative;z-index:1;max-width:1100px;margin:0 auto;}
+h1{color:var(--pink);font-size:26pt;margin:40px 0 20px;text-shadow:0 0 30px var(--pink-glow);border-bottom:2px solid var(--pink);padding-bottom:12px;}
+h2{color:var(--green);font-size:19pt;margin:36px 0 14px;text-shadow:0 0 20px rgba(46,125,50,.3);border-left:4px solid var(--green);padding-left:16px;}
+h3{color:var(--pink);font-size:14pt;margin:28px 0 10px;}
+h4{color:var(--green);font-size:12pt;margin:20px 0 8px;}
+p{margin:10px 0;text-align:justify;}
+a{color:var(--pink);text-decoration:none;transition:all .2s;}a:hover{color:var(--pink-light);text-shadow:0 0 8px var(--pink-glow);}
+.ic{font-family:"Courier New",monospace;font-size:9.5pt;background:rgba(233,30,99,.1);padding:1px 6px;border-radius:4px;color:var(--cp);}
+.cover{text-align:center;padding:50px 40px;margin-bottom:40px;background:linear-gradient(135deg,#1a0533,#0d1b2a,#1b0a2e);border:2px solid var(--pink);border-radius:16px;box-shadow:0 0 60px var(--pink-glow),inset 0 0 60px rgba(233,30,99,.05);position:relative;overflow:hidden;}
+.cover h1{border:none;font-size:32pt;background:linear-gradient(90deg,var(--pink),#f48fb1,var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.cover .part{display:inline-block;background:var(--pink);color:#fff;padding:6px 24px;border-radius:20px;font-size:11pt;font-weight:bold;margin:16px 0;letter-spacing:2px;text-transform:uppercase;}
+.cover .sub{color:var(--text2);font-size:13pt;margin:8px 0;}
+.cover .conf{color:var(--muted);font-size:9pt;margin-top:20px;font-family:"Courier New",monospace;text-align:left;background:rgba(0,0,0,.3);padding:12px;border-radius:8px;border:1px solid var(--border);}
+.callout{border-radius:10px;border:2px solid var(--pink);padding:16px 20px;margin:16px 0;background:rgba(233,30,99,.05);break-inside:avoid;}
+.callout.g{border-color:var(--green);background:rgba(46,125,50,.05);}
+.callout.w{border-color:var(--warn);background:rgba(255,152,0,.05);}
+.ct{font-weight:bold;font-size:10pt;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.callout:not(.g):not(.w) .ct{color:var(--pink);}.callout.g .ct{color:var(--green);}.callout.w .ct{color:var(--warn);}
+.cb{margin:16px 0;border:1px solid var(--border-g);border-radius:10px;overflow:hidden;background:var(--bg-code);position:relative;}
+.ch{display:flex;justify-content:space-between;align-items:center;padding:6px 14px;background:rgba(46,125,50,.15);border-bottom:1px solid var(--border-g);font-size:9pt;}
+.cl{color:var(--green);font-family:"Courier New",monospace;font-weight:bold;text-transform:uppercase;letter-spacing:1px;}
+.cc{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:var(--text2);padding:3px 10px;border-radius:4px;cursor:pointer;font-size:8.5pt;font-family:"Courier New",monospace;transition:all .2s;}
+.cc:hover{background:var(--pink);color:#fff;border-color:var(--pink);}.cc.ok{background:var(--green);color:#fff;border-color:var(--green);}
+pre{font-family:"Courier New",monospace;font-size:10pt;background:var(--bg-code);padding:16px;overflow-x:auto;white-space:pre;line-height:1.5;margin:0;color:var(--text);}
+pre .c{color:var(--cc);font-style:italic;}pre .g{color:var(--cg);}pre .p{color:var(--cp);}pre .y{color:var(--cy);}pre .b{color:var(--cb);}pre .o{color:var(--co);}pre .v{color:var(--cv);}pre .s{color:var(--cs);}
+.co{background:rgba(46,125,50,.08);border-top:2px solid var(--green);padding:12px 16px;font-family:"Courier New",monospace;font-size:9.5pt;color:var(--cg);}
+.col{color:var(--green);font-weight:bold;font-size:8.5pt;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.pv{background:rgba(233,30,99,.06);border-left:3px solid var(--pink);padding:10px 14px;margin:12px 0 4px;font-size:10pt;border-radius:0 6px 6px 0;}
+.pv .lb{color:var(--pink);font-weight:bold;font-size:9pt;text-transform:uppercase;letter-spacing:1px;}
+.dt{background:rgba(46,125,50,.06);border-left:3px solid var(--green);padding:10px 14px;margin:4px 0;font-size:10pt;border-radius:0 6px 6px 0;}
+.dt .lb{color:var(--green);font-weight:bold;font-size:9pt;text-transform:uppercase;letter-spacing:1px;}
+.sc{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0;padding:10px 14px;background:var(--bg-card);border-radius:8px;border:1px solid var(--border);}
+.cg{display:flex;gap:12px;flex-wrap:wrap;}
+.ci{display:flex;align-items:center;gap:4px;cursor:pointer;font-size:9pt;color:var(--text2);user-select:none;}
+.ci input[type="checkbox"]{accent-color:var(--pink);width:15px;height:15px;cursor:pointer;}
+.sr{display:inline-flex;gap:2px;cursor:pointer;}.sr .st{font-size:16px;color:var(--muted);transition:color .15s;cursor:pointer;}.sr .st.a{color:var(--star);}
+.nt{font-size:9pt;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:4px;}.nt:hover{color:var(--pink);}
+.na{display:none;margin:8px 0;padding:10px;background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:6px;}.na.v{display:block;}
+.na textarea{width:100%;min-height:60px;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:Calibri,sans-serif;font-size:10pt;padding:8px;resize:vertical;}
+.pc{width:100%;height:6px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden;margin:8px 0;}.pf{height:100%;background:linear-gradient(90deg,var(--pink),var(--green));border-radius:3px;transition:width .4s;width:0%;}
+.gp{position:sticky;top:0;z-index:100;background:var(--bg);padding:6px 0;border-bottom:1px solid var(--border);margin-bottom:20px;}
+.gp .pc{height:4px;}.gpt{display:flex;justify-content:space-between;font-size:8pt;color:var(--muted);}
+.cdiv{text-align:center;margin:50px 0 30px;position:relative;}.cdiv::before{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:linear-gradient(90deg,transparent,var(--pink),transparent);}
+.cn{display:inline-block;background:var(--bg);padding:0 20px;position:relative;color:var(--pink);font-size:10pt;text-transform:uppercase;letter-spacing:4px;font-weight:bold;}
+.btt{display:flex;align-items:center;gap:4px;color:var(--muted);font-size:9pt;margin:16px 0;cursor:pointer;}.btt:hover{color:var(--pink);}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:10pt;}
+th{background:rgba(233,30,99,.15);color:var(--pink-light);padding:10px 14px;text-align:left;font-weight:bold;border-bottom:2px solid var(--pink);}
+td{padding:8px 14px;border-bottom:1px solid var(--border);color:var(--text2);}
+tr:hover td{background:rgba(233,30,99,.03);}
+.fm{position:fixed;top:20px;right:20px;z-index:9999;background:rgba(15,12,30,.95);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:14px;box-shadow:0 8px 40px rgba(0,0,0,.4),0 0 20px var(--pink-glow);transition:all .3s;overflow:hidden;}
+.fm.c{width:48px;height:48px;}.fm.e{width:360px;max-height:80vh;overflow-y:auto;}
+.mt{width:48px;height:48px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px;color:var(--pink);background:none;border:none;transition:transform .3s;}
+.fm.e .mt{transform:rotate(90deg);}
+.mb{display:none;padding:12px 16px 16px;}.fm.e .mb{display:block;}
+.ms{margin-bottom:14px;}.mst{font-size:8pt;color:var(--pink);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;font-weight:bold;}
+.mi{width:100%;padding:8px 12px;background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:"Courier New",monospace;font-size:10pt;outline:none;}
+.mi:focus{border-color:var(--pink);box-shadow:0 0 8px var(--pink-glow);}
+.mi::placeholder{color:var(--muted);}
+.fb{padding:3px 10px;border-radius:12px;border:1px solid var(--border);background:rgba(0,0,0,.3);color:var(--text2);font-size:8pt;cursor:pointer;transition:all .2s;}
+.fb:hover,.fb.a{background:var(--pink);color:#fff;border-color:var(--pink);}
+.stb{width:100%;padding:8px;background:linear-gradient(135deg,var(--pink-dark),var(--pink));border:none;border-radius:6px;color:#fff;font-weight:bold;font-size:9pt;cursor:pointer;text-transform:uppercase;letter-spacing:1px;margin-top:4px;}
+.stb:hover{box-shadow:0 0 20px var(--pink-glow);}
+.svb{width:100%;padding:8px;background:linear-gradient(135deg,#1b5e20,var(--green));border:none;border-radius:6px;color:#fff;font-weight:bold;font-size:9pt;cursor:pointer;text-transform:uppercase;letter-spacing:1px;margin-top:4px;}
+.tb{display:inline-block;padding:3px 10px;border-radius:10px;font-size:8pt;font-weight:bold;margin-top:6px;}
+.tb.p{background:var(--green);color:#fff;}.tb.f{background:var(--danger);color:#fff;}
+hr{border:none;height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:30px 0;}
+.page-break{page-break-before:always;}
+@media print{body{background:#fff;color:#2c3e50;padding-right:0!important;}body::before,body::after{display:none;}.fm,.gp,.sc,.na,.btt{display:none!important;}h1{color:#e91e63!important;text-shadow:none;}h2{color:#2e7d32!important;text-shadow:none;}pre{background:#f8f9fa!important;border:1px solid #e1e5ea;color:#2c3e50;}.callout{background:#fff!important;}p,td{color:#2c3e50!important;}@page{size:A4;margin:1.5cm 1cm;}}
+::-webkit-scrollbar{width:8px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--pink-dark);border-radius:4px;}::-webkit-scrollbar-thumb:hover{background:var(--pink);}
+</style>
+</head>
+<body>
+
+<!-- FLOATING MENU -->
+<div class="fm c" id="fm"><button class="mt" id="mt" onclick="this.parentElement.classList.toggle('c');this.parentElement.classList.toggle('e');document.body.classList.toggle('menu-expanded');">☰</button>
+<div class="mb">
+<div class="ms"><div class="mst">Search</div><input type="text" class="mi" id="si" placeholder="Search… (regex OK)" oninput="doSearch(this.value)"><div id="sr"></div></div>
+<div class="ms"><div class="mst">Navigate</div><div style="display:flex;gap:4px;flex-wrap:wrap;"><button class="fb" onclick="document.getElementById('top').scrollIntoView({behavior:'smooth'})">Top</button><button class="fb" onclick="document.getElementById('toc').scrollIntoView({behavior:'smooth'})">ToC</button><button class="fb" onclick="window.print()">Print</button></div></div>
+<div class="ms"><div class="mst">Save</div><button class="svb" onclick="saveSnap()">💾 Save Snapshot</button><div style="font-size:7pt;color:var(--muted);margin-top:4px;">Saves notes + progress INTO the file</div></div>
+</div></div>
+
+<!-- GLOBAL PROGRESS -->
+<div class="gp"><div class="gpt"><span>Part 2 Progress</span><span id="gpp">0%</span></div><div class="pc"><div class="pf" id="gpb"></div></div></div>
+
+<div class="w">
+
+<!-- ═══ COVER ═══ -->
+<div class="cover" id="top">
+  <div class="part">Part 2 — Display, Shell & Peripherals</div>
+  <h1>🌸 Arch Linux: The Pink Galaxy Guide</h1>
+  <p class="sub">Hyprland • Kitty • Zsh • PipeWire • Bluetooth • Stream Deck • Logitech • HDMI</p>
+  <div class="conf">
+Prerequisite: Part 1 complete (base system installed, booted, user created, NetworkManager running)<br>
+Target: Dell Inspiron 14 7420 2-in-1 running Arch Linux<br>
+This part: Ch 8 (Display/Compositor) → Ch 9 (Terminal/Shell) → Ch 10 (Audio/BT/Peripherals)<br>
+After this part: you will have a fully usable graphical Arch system with Hyprland,<br>
+a configured terminal, audio, Bluetooth keyboard/mouse/headset, Stream Deck,<br>
+Logitech peripherals, and multi-monitor HDMI support.<br>
+💾 Use Save Snapshot to preserve all notes and progress into the file
+  </div>
+</div>
+
+<!-- ═══ TOC ═══ -->
+<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:24px 30px;margin:30px 0;" id="toc">
+<h2 style="margin-top:0;">Table of Contents</h2>
+<p><a href="#ch8" style="font-weight:bold;color:var(--pink-light)">Chapter 8 — Display Server & Hyprland Compositor</a></p>
+<p style="padding-left:20px"><a href="#s8-1">8.1 Wayland vs Xorg — Why Wayland</a></p>
+<p style="padding-left:20px"><a href="#s8-2">8.2 Installing Hyprland & Dependencies</a></p>
+<p style="padding-left:20px"><a href="#s8-3">8.3 First Launch & Basic Configuration</a></p>
+<p style="padding-left:20px"><a href="#s8-4">8.4 Waybar — Status Bar</a></p>
+<p style="padding-left:20px"><a href="#s8-5">8.5 Wofi — Application Launcher</a></p>
+<p style="padding-left:20px"><a href="#s8-6">8.6 Notifications, Screenshots & Clipboard</a></p>
+<p><a href="#ch9" style="font-weight:bold;color:var(--pink-light)">Chapter 9 — Terminal & Shell</a></p>
+<p style="padding-left:20px"><a href="#s9-1">9.1 Kitty Terminal</a></p>
+<p style="padding-left:20px"><a href="#s9-2">9.2 Zsh + Starship Prompt</a></p>
+<p style="padding-left:20px"><a href="#s9-3">9.3 Shell Plugins & Aliases</a></p>
+<p style="padding-left:20px"><a href="#s9-4">9.4 tmux Configuration</a></p>
+<p><a href="#ch10" style="font-weight:bold;color:var(--pink-light)">Chapter 10 — Audio, Bluetooth & Peripherals</a></p>
+<p style="padding-left:20px"><a href="#s10-1">10.1 PipeWire Audio Setup</a></p>
+<p style="padding-left:20px"><a href="#s10-2">10.2 Bluetooth — Keyboard, Mouse, Headset</a></p>
+<p style="padding-left:20px"><a href="#s10-3">10.3 HDMI & Multi-Monitor</a></p>
+<p style="padding-left:20px"><a href="#s10-4">10.4 Elgato Stream Deck Setup</a></p>
+<p style="padding-left:20px"><a href="#s10-5">10.5 Logitech Mouse & Keyboard (Solaar + Piper)</a></p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--            CHAPTER 8: DISPLAY SERVER & HYPRLAND             -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="cdiv" id="ch8"><span class="cn">Chapter 8</span></div>
+<h1>Display Server & Hyprland Compositor</h1>
+<div class="pc"><div class="pf cp" data-ch="8"></div></div>
+<div class="sc" data-s="ch8"><div class="cg"><label class="ci"><input type="checkbox" data-t="read" onchange="uc(this)"> Read</label><label class="ci"><input type="checkbox" data-t="applied" onchange="uc(this)"> Applied</label><label class="ci"><input type="checkbox" data-t="memorized" onchange="uc(this)"> Memorized</label><label class="ci"><input type="checkbox" data-t="implemented" onchange="uc(this)"> Implemented</label></div><div class="sr" data-s="ch8"><span class="st" data-v="1" onclick="sr(this)">★</span><span class="st" data-v="2" onclick="sr(this)">★</span><span class="st" data-v="3" onclick="sr(this)">★</span><span class="st" data-v="4" onclick="sr(this)">★</span><span class="st" data-v="5" onclick="sr(this)">★</span></div><span class="nt" onclick="tn(this)">📝 Notes</span></div>
+<div class="na" data-s="ch8"><textarea placeholder="Notes on Hyprland…" onchange="sn(this)"></textarea></div>
+
+<h2 id="s8-1">8.1 Wayland vs Xorg — Why Wayland</h2>
+
+<p><strong>Layman version:</strong> Think of the display server as a translator between your programs (which want to draw windows) and your screen (which needs to know what pixels to show). Xorg (X11) is the old translator — born in 1984, it is like a medieval messenger system with complex handshakes and no security guards. Wayland is the modern replacement — leaner, faster, more secure, and built for today's hardware. Hyprland is a Wayland compositor, meaning it handles both the window management (tiling, floating, moving windows) and the display compositing (layering windows, transparency, animations) in a single program.</p>
+
+<p><strong>Technical detail:</strong> In the X11 architecture, the X server owns the display hardware and clients (applications) send drawing requests via the X protocol over a Unix socket. The window manager is a separate client that arranges windows but cannot control compositing directly — that requires yet another program (like picom/compton). This three-layer architecture (X server → WM → compositor) creates latency and tearing because frame presentation is not synchronized. Wayland eliminates this by merging the server, WM, and compositor into a single "compositor" process. Clients render their own content into shared-memory buffers (using EGL/Vulkan), then the compositor takes those buffers and composites them onto the output using DRM/KMS (Direct Rendering Manager / Kernel Mode Setting). This yields lower latency, eliminates tearing by design (atomic page-flipping), provides per-client security isolation (no key-logging between clients), and supports fractional scaling natively for HiDPI displays — all of which matter on your Dell 7420 with its touchscreen.</p>
+
+<h2 id="s8-2">8.2 Installing Hyprland & Dependencies</h2>
+
+<div class="pv"><span class="lb">Preview</span> — After this section, you will have Hyprland and all required components installed. Not yet configured — that is 8.3.</div>
+
+<div class="cb"><div class="ch"><span class="cl">bash</span><button class="cc" onclick="cpy(this)">Copy</button></div>
+<pre><span class="c"># ═══ CORE WAYLAND + HYPRLAND ═══</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> \
+  <span class="y">hyprland</span>                          <span class="c"># the compositor itself</span> \
+  <span class="y">xdg-desktop-portal-hyprland</span>       <span class="c"># screen sharing, file dialogs</span> \
+  <span class="y">xdg-desktop-portal-gtk</span>            <span class="c"># GTK file picker fallback</span> \
+  <span class="y">qt5-wayland qt6-wayland</span>           <span class="c"># Qt Wayland support (for VS Code, etc.)</span> \
+  <span class="y">polkit-gnome</span>                      <span class="c"># auth agent for sudo in GUI apps</span>
+
+<span class="c"># ═══ TERMINAL + BAR + LAUNCHER ═══</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> \
+  <span class="y">kitty</span>                             <span class="c"># GPU-accelerated terminal</span> \
+  <span class="y">waybar</span>                            <span class="c"># status bar</span> \
+  <span class="y">wofi</span>                              <span class="c"># app launcher</span> \
+  <span class="y">dunst</span>                             <span class="c"># notification daemon</span>
+
+<span class="c"># ═══ UTILITIES ═══</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> \
+  <span class="y">grim slurp</span>                        <span class="c"># screenshots (capture + region select)</span> \
+  <span class="y">wl-clipboard</span>                      <span class="c"># clipboard (wl-copy / wl-paste)</span> \
+  <span class="y">brightnessctl</span>                     <span class="c"># screen brightness</span> \
+  <span class="y">swaylock</span>                          <span class="c"># screen locker</span> \
+  <span class="y">swayidle</span>                          <span class="c"># auto-lock after idle</span> \
+  <span class="y">wlr-randr</span>                         <span class="c"># monitor config</span> \
+  <span class="y">thunar</span>                            <span class="c"># file manager</span>
+
+<span class="c"># ═══ WALLPAPER (AUR) ═══</span>
+<span class="g">paru</span> <span class="o">-S</span> <span class="y">swww</span>                       <span class="c"># animated wallpaper daemon</span>
+
+<span class="c"># ═══ FONTS (essential for terminal icons + UI) ═══</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> \
+  <span class="y">ttf-jetbrains-mono-nerd</span>           <span class="c"># Nerd Font for terminal + Waybar icons</span> \
+  <span class="y">noto-fonts noto-fonts-cjk noto-fonts-emoji</span>  <span class="c"># Unicode coverage</span> \
+  <span class="y">ttf-font-awesome</span>                  <span class="c"># icon font for Waybar</span></pre>
+<div class="co"><div class="col">Expected Output (abbreviated)</div>
+<pre>resolving dependencies...
+Packages (25+) hyprland-0.x  kitty-0.x  waybar-0.x  ...
+Total Download Size:   ~180 MiB
+Total Installed Size:  ~600 MiB
+:: Proceed? [Y/n] Y</pre></div></div>
+
+<p>The <span class="ic">qt5-wayland</span> and <span class="ic">qt6-wayland</span> packages are essential because VS Code (Electron-based) and other Qt applications need them to run natively on Wayland instead of falling back to XWayland (the X11 compatibility layer). XWayland works but lacks Wayland's security isolation and adds latency. The <span class="ic">xdg-desktop-portal-hyprland</span> package implements the freedesktop portal interface, which is how Wayland handles screen sharing (for video calls, OBS), file open/save dialogs, and other actions that require cross-application communication.</p>
+
+<h2 id="s8-3">8.3 First Launch & Basic Configuration</h2>
+
+<p><strong>Layman version:</strong> Right now you have a black screen with a blinking cursor (TTY). We are going to type one command that launches Hyprland, which will transform that text console into a tiling window manager with wallpapers, transparency, and animations. The first time you launch it, Hyprland creates a default config file that we will then customize.</p>
+
+<div class="cb"><div class="ch"><span class="cl">bash</span><button class="cc" onclick="cpy(this)">Copy</button></div>
+<pre><span class="c"># Launch Hyprland from the TTY (you must be logged in as your user, NOT root)</span>
+<span class="g">Hyprland</span>
+
+<span class="c"># If it works, you'll see a tiled desktop. Press Super+Q to open Kitty terminal.</span>
+<span class="c"># If the screen is blank or crashes, check logs:</span>
+<span class="g">cat</span> <span class="b">~/.local/share/hyprland/hyprland.log</span></pre></div>
+
+<div class="callout g"><div class="ct">💡 AUTO-START HYPRLAND ON LOGIN</div>
+<p>Add this to the end of your <span class="ic">~/.bash_profile</span> (or <span class="ic">~/.zprofile</span> after switching to zsh):</p>
+</div>
+
+<div class="cb"><div class="ch"><span class="cl">bash — ~/.bash_profile</span><button class="cc" onclick="cpy(this)">Copy</button></div>
+<pre><span class="c"># Auto-start Hyprland on TTY1 login</span>
+<span class="p">if</span> [ -z <span class="s">"$DISPLAY"</span> ] && [ <span class="s">"$XDG_VTNR"</span> -eq <span class="y">1</span> ]; <span class="p">then</span>
+  <span class="g">exec</span> <span class="g">Hyprland</span>
+<span class="p">fi</span></pre></div>
+
+<p>This checks if there is no display server running (<span class="ic">$DISPLAY</span> is empty) and if you are on virtual terminal 1 (the default login TTY). If both conditions are true, it replaces the shell process with Hyprland via <span class="ic">exec</span>. The <span class="ic">exec</span> is important — it means when Hyprland exits, you go back to the login prompt rather than having an orphaned shell.</p>
+
+<p>Now let's create the Hyprland configuration. This is the core file that defines keybindings, monitor layout, window rules, and animations:</p>
+
+<div class="cb"><div class="ch"><span class="cl">bash</span><button class="cc" onclick="cpy(this)">Copy</button></div>
+<pre><span class="c"># Create the config directory</span>
+<span class="g">mkdir</span> <span class="o">-p</span> <span class="b">~/.config/hypr</span>
+
+<span class="c"># Edit the main config file</span>
+<span class="g">vim</span> <span class="b">~/.config/hypr/hyprland.conf</span></pre></div>
+
+<div class="cb"><div class="ch"><span class="cl">hyprland.conf — ~/.config/hypr/hyprland.conf</span><button class="cc" onclick="cpy(this)">Copy</button></div>
+<pre><span class="c"># ═══════════════════════════════════════════════════</span>
+<span class="c"># 🌸 PINK GALAXY HYPRLAND CONFIG — Dell 7420 2-in-1</span>
+<span class="c"># ═══════════════════════════════════════════════════</span>
+
+<span class="c"># ── MONITORS ──</span>
+<span class="c"># Dell 7420 internal display + HDMI external</span>
+<span class="v">monitor</span> = eDP-1, preferred, 0x0, 1       <span class="c"># internal laptop display</span>
+<span class="v">monitor</span> = HDMI-A-1, preferred, 1920x0, 1 <span class="c"># HDMI monitor to the right</span>
+<span class="v">monitor</span> = , preferred, auto, 1            <span class="c"># fallback for any other monitor</span>
+
+<span class="c"># ── ENVIRONMENT VARIABLES ──</span>
+<span class="v">env</span> = XCURSOR_SIZE, 24
+<span class="v">env</span> = QT_QPA_PLATFORMTHEME, qt5ct
+<span class="v">env</span> = QT_QPA_PLATFORM, wayland;xcb       <span class="c"># Qt: try Wayland first, fall back to X</span>
+<span class="v">env</span> = GDK_BACKEND, wayland,x11            <span class="c"># GTK: try Wayland first</span>
+<span class="v">env</span> = MOZ_ENABLE_WAYLAND, 1               <span class="c"># Firefox native Wayland</span>
+<span class="v">env</span> = ELECTRON_OZONE_PLATFORM_HINT, auto  <span class="c"># VS Code native Wayland</span>
+
+<span class="c"># ── AUTOSTART ──</span>
+<span class="v">exec-once</span> = waybar                                 <span class="c"># status bar</span>
+<span class="v">exec-once</span> = dunst                                  <span class="c"># notifications</span>
+<span class="v">exec-once</span> = swww-daemon && swww img ~/wallpaper.jpg <span class="c"># wallpaper</span>
+<span class="v">exec-once</span> = /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+<span class="v">exec-once</span> = wl-paste --type text --watch cliphist store   <span class="c"># clipboard history</span>
+<span class="v">exec-once</span> = swayidle -w timeout 300 'swaylock -f' timeout 600 'hyprctl dispatch dpms off' resume 'hyprctl dispatch dpms on'
+<span class="v">exec-once</span> = blueman-applet                         <span class="c"># Bluetooth tray</span>
+<span class="v">exec-once</span> = solaar --window=hide                   <span class="c"># Logitech manager (hidden)</span>
+<span class="v">exec-once</span> = streamdeck -n                           <span class="c"># Stream Deck UI (no window)</span>
+
+<span class="c"># ── INPUT ──</span>
+<span class="v">input</span> {
+    kb_layout = de
+    kb_variant =
+    follow_mouse = 1
+    touchpad {
+        natural_scroll = true
+        tap-to-click = true
+        drag_lock = true
+    }
+    sensitivity = 0
+}
+
+<span class="c"># ── LOOK & FEEL (Pink Galaxy Theme) ──</span>
+<span class="v">general</span> {
+    gaps_in = 5
+    gaps_out = 10
+    border_size = 2
+    col.active_border = rgba(e91e63ff) rgba(f48fb1ff) 45deg    <span class="c"># pink gradient!</span>
+    col.inactive_border = rgba(2c3e50aa)
+    layout = dwindle
+}
+
+<span class="v">decoration</span> {
+    rounding = 10
+    blur {
+        enabled = true
+        size = 8
+        passes = 2
+        new_optimizations = true
+    }
+    shadow {
+        enabled = true
+        range = 20
+        render_power = 3
+        color = rgba(1a1a2e99)
+    }
+}
+
+<span class="v">animations</span> {
+    enabled = true
+    bezier = pink, 0.05, 0.9, 0.1, 1.05
+    animation = windows, 1, 7, pink
+    animation = windowsOut, 1, 7, default, popin 80%
+    animation = border, 1, 10, default
+    animation = fade, 1, 7, default
+    animation = workspaces, 1, 6, default
+}
+
+<span class="v">dwindle</span> {
+    pseudotile = true
+    preserve_split = true
+}
+
+<span class="c"># ── KEYBINDINGS ──</span>
+<span class="v">$mod</span> = SUPER
+
+<span class="v">bind</span> = $mod, Q, exec, kitty                        <span class="c"># terminal</span>
+<span class="v">bind</span> = $mod, C, killactive                          <span class="c"># close window</span>
+<span class="v">bind</span> = $mod, M, exit                                 <span class="c"># exit Hyprland</span>
+<span class="v">bind</span> = $mod, E, exec, thunar                        <span class="c"># file manager</span>
+<span class="v">bind</span> = $mod, V, togglefloating                      <span class="c"># float/tile toggle</span>
+<span class="v">bind</span> = $mod, R, exec, wofi --show drun              <span class="c"># app launcher</span>
+<span class="v">bind</span> = $mod, P, pseudo                               <span class="c"># pseudo-tile</span>
+<span class="v">bind</span> = $mod, J, togglesplit                          <span class="c"># toggle split direction</span>
+<span class="v">bind</span> = $mod, F, fullscreen                           <span class="c"># fullscreen</span>
+<span class="v">bind</span> = $mod, L, exec, swaylock -f                   <span class="c"># lock screen</span>
+
+<span class="c"># Screenshots</span>
+<span class="v">bind</span> = , Print, exec, grim - | wl-copy              <span class="c"># full screen → clipboard</span>
+<span class="v">bind</span> = $mod SHIFT, S, exec, grim -g "$(slurp)" - | wl-copy  <span class="c"># region select</span>
+
+<span class="c"># Audio (PipeWire)</span>
+<span class="v">binde</span> = , XF86AudioRaiseVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
+<span class="v">binde</span> = , XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+<span class="v">bind</span>  = , XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+
+<span class="c"># Brightness</span>
+<span class="v">binde</span> = , XF86MonBrightnessUp, exec, brightnessctl s 5%+
+<span class="v">binde</span> = , XF86MonBrightnessDown, exec, brightnessctl s 5%-
+
+<span class="c"># Move focus</span>
+<span class="v">bind</span> = $mod, left, movefocus, l
+<span class="v">bind</span> = $mod, right, movefocus, r
+<span class="v">bind</span> = $mod, up, movefocus, u
+<span class="v">bind</span> = $mod, down, movefocus, d
+
+<span class="c"># Workspaces</span>
+<span class="v">bind</span> = $mod, 1, workspace, 1
+<span class="v">bind</span> = $mod, 2, workspace, 2
+<span class="v">bind</span> = $mod, 3, workspace, 3
+<span class="v">bind</span> = $mod, 4, workspace, 4
+<span class="v">bind</span> = $mod, 5, workspace, 5
+
+<span class="c"># Move window to workspace</span>
+<span class="v">bind</span> = $mod SHIFT, 1, movetoworkspace, 1
+<span class="v">bind</span> = $mod SHIFT, 2, movetoworkspace, 2
+<span class="v">bind</span> = $mod SHIFT, 3, movetoworkspace, 3
+<span class="v">bind</span> = $mod SHIFT, 4, movetoworkspace, 4
+<span class="v">bind</span> = $mod SHIFT, 5, movetoworkspace, 5
+
+<span class="c"># Mouse bindings</span>
+<span class="v">bindm</span> = $mod, mouse:272, movewindow       <span class="c"># Super+LeftClick drag to move</span>
+<span class="v">bindm</span> = $mod, mouse:273, resizewindow     <span class="c"># Super+RightClick drag to resize</span>
+
+<span class="c"># Touchscreen gestures (Dell 7420 2-in-1)</span>
+<span class="v">gestures</span> {
+    workspace_swipe = true
+    workspace_swipe_fingers = 3
+}</pre></div>
+
+<p>Save this file and Hyprland will hot-reload the configuration. If you are already inside Hyprland, the changes take effect immediately — no restart needed. The <span class="ic">exec-once</span> directives run only on the first launch, not on config reload. The <span class="ic">binde</span> keyword (vs <span class="ic">bind</span>) means the key can be held and repeated, which is why we use it for volume and brightness controls.</p>
+
+<h2 id="s8-4">8.4 Waybar — Status Bar</h2>
+
+<div class="cb"><div class="ch"><span class="cl">bash</span><button class="cc" onclick="cpy(this)">Copy</button></div>
+<pre><span class="g">mkdir</span> <span class="o">-p</span> <span class="b">~/.config/waybar</span>
+<span class="g">vim</span> <span class="b">~/.config/waybar/config.jsonc</span></pre></div>
+
+<div class="cb"><div class="ch"><span class="cl">jsonc — ~/.config/waybar/config.jsonc</span><button class="cc" onclick="cpy(this)">Copy</button></div>
+<pre>{
+    <span class="s">"layer"</span>: <span class="s">"top"</span>,
+    <span class="s">"position"</span>: <span class="s">"top"</span>,
+    <span class="s">"height"</span>: <span class="y">34</span>,
+    <span class="s">"spacing"</span>: <span class="y">4</span>,
+    <span class="s">"modules-left"</span>: [<span class="s">"hyprland/workspaces"</span>],
+    <span class="s">"modules-center"</span>: [<span class="s">"clock"</span>],
+    <span class="s">"modules-right"</span>: [<span class="s">"pulseaudio"</span>, <span class="s">"bluetooth"</span>, <span class="s">"network"</span>, <span class="s">"battery"</span>, <span class="s">"tray"</span>],
+    <span class="s">"clock"</span>: { <span class="s">"format"</span>: <span class="s">"{:%H:%M  %a %d %b}"</span> },
+    <span class="s">"battery"</span>: { <span class="s">"format"</span>: <span class="s">"{icon} {capacity}%"</span>, <span class="s">"format-icons"</span>: [<span class="s">"🔋"</span>] },
+    <span class="s">"network"</span>: { <span class="s">"format-wifi"</span>: <span class="s">" {essid}"</span>, <span class="s">"format-disconnected"</span>: <span class="s">"❌ No Net"</span> },
+    <span class="s">"pulseaudio"</span>: { <span class="s">"format"</span>: <span class="s">"{icon} {volume}%"</span>, <span class="s">"format-icons"</span>: { <span class="s">"default"</span>: [<span class="s">"🔈"</span>,<span class="s">"🔉"</span>,<span class="s">"🔊"</span>] } },
+    <span class="s">"bluetooth"</span>: { <span class="s">"format"</span>: <span class="s">" {status}"</span> },
+    <span class="s">"tray"</span>: { <span class="s">"spacing"</span>: <span class="y">8</span> }
+}</pre></div>
+
+<h2 id="s8-5">8.5 Wofi — Application Launcher</h2>
+
+<p>Press <span class="ic">Super+R</span> to open Wofi (defined in the Hyprland config). Type part of an app name and press Enter. Let's make it match the pink galaxy theme:</p>
+
+<div class="cb"><div class="ch"><span class="cl">bash</span><button class="cc" onclick="cpy(this)">Copy</button></div>
+<pre><span class="g">mkdir</span> <span class="o">-p</span> <span class="b">~/.config/wofi</span>
+<span class="g">cat</span> > <span class="b">~/.config/wofi/style.css</span> << <span class="s">'EOF'</span>
+window { background-color: rgba(10, 10, 18, 0.9); border: 2px solid #e91e63; border-radius: 12px; }
+#input { background: rgba(0,0,0,0.4); color: #e8e6f0; border: 1px solid #e91e63; border-radius: 8px; padding: 8px 12px; font-family: "JetBrains Mono Nerd Font"; }
+#entry:selected { background-color: rgba(233, 30, 99, 0.3); }
+#text { color: #e8e6f0; }
+<span class="s">EOF</span></pre></div>
+
+<h2 id="s8-6">8.6 Notifications, Screenshots & Clipboard</h2>
+
+<p>All of these are already installed and configured in the autostart section of hyprland.conf. Here is a quick reference of how they work:</p>
+
+<table>
+<tr><th>Feature</th><th>Tool</th><th>How to Use</th></tr>
+<tr><td>Notifications</td><td>dunst</td><td>Automatic — any app can send notifications via D-Bus. Dunst catches and displays them.</td></tr>
+<tr><td>Screenshot (full)</td><td>grim + wl-copy</td><td>Press <span class="ic">Print Screen</span> — captures entire screen to clipboard</td></tr>
+<tr><td>Screenshot (region)</td><td>grim + slurp</td><td>Press <span class="ic">Super+Shift+S</span> — drag to select region, copies to clipboard</td></tr>
+<tr><td>Clipboard</td><td>wl-clipboard</td><td><span class="ic">wl-copy "text"</span> to copy, <span class="ic">wl-paste</span> to paste in terminal. Ctrl+C/V works in GUI apps.</td></tr>
+</table>
+
+<a class="btt" href="#top">↑ Back to top</a>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--            CHAPTER 9: TERMINAL & SHELL                      -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<div class="cdiv" id="ch9"><span class="cn">Chapter 9</span></div>
+<h1>Terminal & Shell</h1>
+<div class="pc"><div class="pf cp" data-ch="9"></div></div>
+<div class="sc" data-s="ch9"><div class="cg"><label class="ci"><input type="checkbox" data-t="read" onchange="uc(this)"> Read</label><label class="ci"><input type="checkbox" data-t="applied" onchange="uc(this)"> Applied</label><label class="ci"><input type="checkbox" data-t="memorized" onchange="uc(this)"> Memorized</label><label class="ci"><input type="checkbox" data-t="implemented" onchange="uc(this)"> Implemented</label></div><div class="sr" data-s="ch9"><span class="st" data-v="1" onclick="sr(this)">★</span><span class="st" data-v="2" onclick="sr(this)">★</span><span class="st" data-v="3" onclick="sr(this)">★</span><span class="st" data-v="4" onclick="sr(this)">★</span><span class="st" data-v="5" onclick="sr(this)">★</span></div><span class="nt" onclick="tn(this)">📝 Notes</span></div>
+<div class="na" data-s="ch9"><textarea placeholder="Notes on terminal/shell…" onchange="sn(this)"></textarea></div>
+
+<h2 id="s9-1">9.1 Kitty Terminal — Pink Galaxy Theme</h2>
+
+<div class="cb"><div class="ch"><span class="cl">bash</span><button class="cc" onclick="cpy(this)">Copy</button></div>
+<pre><span class="g">mkdir</span> <span class="o">-p</span> <span class="b">~/.config/kitty</span>
+<span class="g">vim</span> <span class="b">~/.config/kitty/kitty.conf</span></pre></div>
+
+<div class="cb"><div class="ch"><span class="cl">conf — ~/.config/kitty/kitty.conf</span><button class="cc" onclick="cpy(this)">Copy</button></div>
+<pre><span class="c"># 🌸 Pink Galaxy Kitty Theme</span>
+font_family      JetBrains Mono Nerd Font
+font_size        11.0
+bold_font        auto
+italic_font      auto
+
+<span class="c"># Window</span>
+background_opacity 0.88
+window_padding_width 8
+confirm_os_window_close 0
+
+<span class="c"># Colors — Pink Galaxy</span>
+foreground           #e8e6f0
+background           #0a0a12
+selection_foreground #0a0a12
+selection_background #e91e63
+
+<span class="c"># Normal colors</span>
+color0  #2c3e50
+color1  #e91e63
+color2  #2e7d32
+color3  #f9a825
+color4  #1565c0
+color5  #8e24aa
+color6  #00838f
+color7  #b0bec5
+
+<span class="c"># Bright colors</span>
+color8  #546e7a
+color9  #f48fb1
+color10 #66bb6a
+color11 #fff59d
+color12 #42a5f5
+color13 #ce93d8
+color14 #4dd0e1
+color15 #eceff1
+
+<span class="c"># Cursor</span>
+cursor           #e91e63
+cursor_shape     beam
+
+<span class="c"># URL handling</span>
+url_color        #e91e63
+url_style        curly</pre></div>
+
+<h2 id="s9-2">9.2 Zsh + Starship Prompt</h2>
+
+<div class="cb"><div class="ch"><span class="cl">bash</span><button class="cc" onclick="cpy(this)">Copy</button></div>
+<pre><span class="c"># Install Zsh and plugins</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="y">zsh zsh-autosuggestions zsh-syntax-highlighting starship</span>
+
+<span class="c"># Change your default shell to Zsh</span>
+<span class="g">chsh</span> <span class="o">-s</span> <span class="b">/usr/bin/zsh</span>
+
+<span class="c"># Create your .zshrc</span>
+<span class="g">vim</span> <span class="b">~/.zshrc</span></pre></div>
+
+<div class="cb"><div class="ch"><span class="cl">zsh — ~/.zshrc</span><button class="cc" onclick="cpy(this)">Copy</button></div>
+<pre><span class="c"># 🌸 Pink Galaxy Zsh Config</span>
+
+<span class="c"># ── History ──</span>
+HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt appendhistory sharehistory hist_ignore_dups
+
+<span class="c"># ── Plugins ──</span>
+source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+<span class="c"># ── Key bindings ──</span>
+bindkey '^[[A' history-search-backward    <span class="c"># Up arrow: search history</span>
+bindkey '^[[B' history-search-forward     <span class="c"># Down arrow: search history</span>
+
+<span class="c"># ── Modern CLI aliases ──</span>
+alias ls='eza --icons --group-directories-first'
+alias ll='eza -la --icons --git'
+alias tree='eza --tree --icons'
+alias cat='bat --style=plain'
+alias grep='rg'
+alias find='fd'
+alias cd='z'                               <span class="c"># zoxide smart cd</span>
+alias top='btop'
+alias du='dust'
+alias df='duf'
+
+<span class="c"># ── Git aliases ──</span>
+alias gs='git status'
+alias ga='git add'
+alias gc='git commit -m'
+alias gp='git push'
+alias gl='git log --oneline --graph -20'
+alias gd='git diff'
+
+<span class="c"># ── Docker aliases ──</span>
+alias dc='docker compose'
+alias dps='docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"'
+
+<span class="c"># ── Tool initialization ──</span>
+eval "$(zoxide init zsh)"                  <span class="c"># smart cd replacement</span>
+eval "$(starship init zsh)"                <span class="c"># prompt (MUST be last line)</span></pre></div>
+
+<p>Now configure Starship with the pink galaxy theme:</p>
+
+<div class="cb"><div class="ch"><span class="cl">bash</span><button class="cc" onclick="cpy(this)">Copy</button></div>
+<pre><span class="g">mkdir</span> <span class="o">-p</span> <span class="b">~/.config</span>
+<span class="g">vim</span> <span class="b">~/.config/starship.toml</span></pre></div>
+
+<div class="cb"><div class="ch"><span class="cl">toml — ~/.config/starship.toml</span><button class="cc" onclick="cpy(this)">Copy</button></div>
+<pre><span class="c"># 🌸 Pink Galaxy Starship Prompt</span>
+format = <span class="s">"""$directory$git_branch$git_status$python$nodejs$rust$docker_context$aws$azure$cmd_duration$line_break$character"""</span>
+
+[character]
+success_symbol = <span class="s">"[🌸](bold #e91e63)"</span>
+error_symbol = <span class="s">"[✗](bold red)"</span>
+
+[directory]
+style = <span class="s">"bold #f48fb1"</span>
+truncation_length = 3
+
+[git_branch]
+format = <span class="s">"on [$symbol$branch]($style) "</span>
+style = <span class="s">"bold #2e7d32"</span>
+
+[python]
+format = <span class="s">"[🐍 $version( \\($virtualenv\\))]($style) "</span>
+style = <span class="s">"bold #f9a825"</span>
+
+[aws]
+format = <span class="s">"[☁️ $profile(/$region)]($style) "</span>
+style = <span class="s">"bold #ff9800"</span>
+
+[cmd_duration]
+min_time = 2000
+format = <span class="s">"took [$duration]($style) "</span>
+style = <span class="s">"bold #6c6a7e"</span></pre></div>
+
+<h2 id="s9-3">9.3 Shell Plugins & Aliases</h2>
+
+<p>The aliases defined in <span class="ic">.zshrc</span> above replace legacy tools with modern Rust-based alternatives. Here is what each one does: <span class="ic">eza</span> replaces <span class="ic">ls</span> with colors, icons, and Git status in every listing. <span class="ic">bat</span> replaces <span class="ic">cat</span> with syntax highlighting for over 200 languages. <span class="ic">ripgrep</span> replaces <span class="ic">grep</span> and is 10-100x faster because it uses SIMD-optimized string search algorithms and skips binary files and <span class="ic">.gitignore</span>d paths by default. <span class="ic">fd</span> replaces <span class="ic">find</span> with a simpler syntax and faster performance (also Rust-based). <span class="ic">zoxide</span> replaces <span class="ic">cd</span> by learning your most-visited directories and letting you jump to them with fuzzy matching — type <span class="ic">z proj</span> and it takes you to <span class="ic">~/projects</span>.</p>
+
+<h2 id="s9-4">9.4 tmux Configuration</h2>
+
+<div class="cb"><div class="ch"><span class="cl">bash — ~/.tmux.conf</span><button class="cc" onclick="cpy(this)">Copy</button></div>
+<pre><span class="c"># 🌸 Pink Galaxy tmux config</span>
+set -g default-terminal "tmux-256color"
+set -g mouse on                            <span class="c"># enable mouse (click panes, scroll, resize)</span>
+set -g base-index 1                        <span class="c"># windows start at 1, not 0</span>
+set -g renumber-windows on
+
+<span class="c"># Change prefix from Ctrl+B to Ctrl+A (easier to reach)</span>
+unbind C-b
+set -g prefix C-a
+bind C-a send-prefix
+
+<span class="c"># Split panes with | and -</span>
+bind | split-window -h -c "#{pane_current_path}"
+bind - split-window -v -c "#{pane_current_path}"
+
+<span class="c"># Navigate panes with Alt+arrows (no prefix needed)</span>
+bind -n M-Left select-pane -L
+bind -n M-Right select-pane -R
+bind -n M-Up select-pane -U
+bind -n M-Down select-pane -D
+
+<span class="c"># Status bar — pink galaxy</span>
+set -g status-style "bg=#1a1a2e,fg=#e8e6f0"
+set -g status-left "#[fg=#e91e63,bold] 🌸 #S "
+set -g status-right "#[fg=#2e7d32] %H:%M #[fg=#e91e63]%d-%b"
+set -g window-status-current-style "fg=#e91e63,bold"</pre></div>
+
+<a class="btt" href="#top">↑ Back to top</a>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--          CHAPTER 10: AUDIO, BLUETOOTH & PERIPHERALS         -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<div class="cdiv" id="ch10"><span class="cn">Chapter 10</span></div>
+<h1>Audio, Bluetooth & Peripherals</h1>
+<div class="pc"><div class="pf cp" data-ch="10"></div></div>
+<div class="sc" data-s="ch10"><div class="cg"><label class="ci"><input type="checkbox" data-t="read" onchange="uc(this)"> Read</label><label class="ci"><input type="checkbox" data-t="applied" onchange="uc(this)"> Applied</label><label class="ci"><input type="checkbox" data-t="memorized" onchange="uc(this)"> Memorized</label><label class="ci"><input type="checkbox" data-t="implemented" onchange="uc(this)"> Implemented</label></div><div class="sr" data-s="ch10"><span class="st" data-v="1" onclick="sr(this)">★</span><span class="st" data-v="2" onclick="sr(this)">★</span><span class="st" data-v="3" onclick="sr(this)">★</span><span class="st" data-v="4" onclick="sr(this)">★</span><span class="st" data-v="5" onclick="sr(this)">★</span></div><span class="nt" onclick="tn(this)">📝 Notes</span></div>
+<div class="na" data-s="ch10"><textarea placeholder="Notes on audio/peripherals…" onchange="sn(this)"></textarea></div>
+
+<h2 id="s10-1">10.1 PipeWire Audio Setup</h2>
+
+<p><strong>Layman version:</strong> PipeWire is the modern audio and video routing system for Linux. It replaces both PulseAudio (for desktop audio) and JACK (for professional audio) with a single, unified daemon. Think of it as the sound mixing board for your entire system — every application sends its audio through PipeWire, which mixes it and sends it to your speakers, headphones, or Bluetooth headset.</p>
+
+<div class="cb"><div class="ch"><span class="cl">bash</span><button class="cc" onclick="cpy(this)">Copy</button></div>
+<pre><span class="c"># Install PipeWire and its compatibility layers</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="y">pipewire pipewire-pulse pipewire-alsa pipewire-jack wireplumber</span>
+
+<span class="c"># PipeWire runs as a user service (NOT system). Enable it:</span>
+<span class="g">systemctl</span> <span class="o">--user</span> <span class="o">enable</span> <span class="o">--now</span> <span class="y">pipewire pipewire-pulse wireplumber</span>
+
+<span class="c"># Install GUI volume control</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="y">pavucontrol</span>
+
+<span class="c"># Test audio</span>
+<span class="g">speaker-test</span> <span class="o">-c</span> <span class="y">2</span>                  <span class="c"># plays white noise from left/right speakers</span>
+
+<span class="c"># Check PipeWire status</span>
+<span class="g">wpctl</span> <span class="o">status</span>                       <span class="c"># shows all audio sinks, sources, and their connections</span></pre>
+<div class="co"><div class="col">Expected Output (wpctl status)</div>
+<pre>PipeWire 'pipewire-0' [1.x, user@pinkgalaxy, cookie:xxxx]
+ └─ Clients:
+        31. WirePlumber                 [1.x]
+        32. wpctl                       [1.x]
+        ...
+Audio
+ ├─ Sinks:
+ │      46. Built-in Audio [vol: 0.74]    ← your laptop speakers
+ │     *47. USB Headset [vol: 0.80]       ← headset (if connected)
+ └─ Sources:
+        48. Built-in Audio                ← internal mic</pre></div></div>
+
+<p><strong>Technical detail:</strong> PipeWire uses a graph-based architecture where audio nodes are connected via links. The WirePlumber session manager automatically creates and manages these links based on routing policies. When you plug in a USB headset, WirePlumber detects the new ALSA device, creates a PipeWire node for it, and reroutes all audio streams from the built-in speakers to the headset. The <span class="ic">pipewire-pulse</span> package creates a PulseAudio-compatible socket so existing applications that use the PulseAudio API (Firefox, Discord, etc.) work without any changes. For your Dell 7420, the <span class="ic">sof-firmware</span> package (installed in Part 1) loads the audio DSP firmware into the Intel SOF chip during boot — without it, PipeWire sees no audio devices.</p>
+
+<h2 id="s10-2">10.2 Bluetooth — Keyboard, Mouse, Headset</h2>
+
+<div class="cb"><div class="ch"><span class="cl">bash</span><button class="cc" onclick="cpy(this)">Copy</button></div>
+<pre><span class="c"># Install Bluetooth stack + GUI manager</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="y">bluez bluez-utils blueman</span>
+
+<span class="c"># Enable and start the Bluetooth service</span>
+<span class="g">sudo</span> <span class="g">systemctl</span> <span class="o">enable</span> <span class="o">--now</span> <span class="y">bluetooth</span>
+
+<span class="c"># ═══ METHOD 1: GUI (blueman) ═══</span>
+<span class="c"># blueman-applet is already in Hyprland autostart</span>
+<span class="c"># Click the Bluetooth icon in Waybar system tray</span>
+<span class="c"># Or run: blueman-manager</span>
+
+<span class="c"># ═══ METHOD 2: CLI (bluetoothctl) ═══</span>
+<span class="g">bluetoothctl</span>
+<span class="c"># Inside the interactive shell:</span>
+<span class="p">power</span> on                           <span class="c"># turn on Bluetooth radio</span>
+<span class="p">agent</span> on                           <span class="c"># enable pairing agent</span>
+<span class="p">default-agent</span>
+<span class="p">scan</span> on                            <span class="c"># start scanning for devices</span>
+<span class="c"># Wait for your device to appear, note its MAC address (XX:XX:XX:XX:XX:XX)</span>
+<span class="p">pair</span> XX:XX:XX:XX:XX:XX             <span class="c"># pair with device</span>
+<span class="p">connect</span> XX:XX:XX:XX:XX:XX          <span class="c"># connect</span>
+<span class="p">trust</span> XX:XX:XX:XX:XX:XX            <span class="c"># auto-connect in future</span>
+<span class="p">exit</span></pre>
+<div class="co"><div class="col">Expected Scan Output</div>
+<pre>[NEW] Device AA:BB:CC:DD:EE:FF Logitech MX Keys
+[NEW] Device 11:22:33:44:55:66 WH-1000XM4
+[NEW] Device 77:88:99:AA:BB:CC Logitech MX Master 3S</pre></div></div>
+
+<p>When you pair a Bluetooth keyboard, the kernel's <span class="ic">btusb</span> module communicates with the Intel Bluetooth firmware (loaded from <span class="ic">linux-firmware</span>) via HCI (Host Controller Interface) commands. The <span class="ic">bluez</span> daemon manages the pairing handshake (including PIN exchange for legacy devices and Secure Simple Pairing for BLE 4.0+ devices), creates a <span class="ic">/dev/input/eventN</span> device via the <span class="ic">uhid</span> kernel module, and Hyprland's <span class="ic">libinput</span> backend picks it up automatically as a keyboard/mouse input. The <span class="ic">trust</span> command stores the device's link key in <span class="ic">/var/lib/bluetooth/</span>, enabling automatic reconnection on future boots.</p>
+
+<h2 id="s10-3">10.3 HDMI & Multi-Monitor</h2>
+
+<div class="cb"><div class="ch"><span class="cl">bash</span><button class="cc" onclick="cpy(this)">Copy</button></div>
+<pre><span class="c"># See connected monitors</span>
+<span class="g">hyprctl</span> <span class="o">monitors</span>
+
+<span class="c"># Or use wlr-randr for detailed info</span>
+<span class="g">wlr-randr</span>
+
+<span class="c"># Install GUI display configurator</span>
+<span class="g">paru</span> <span class="o">-S</span> <span class="y">nwg-displays</span>
+
+<span class="c"># Install kanshi for automatic profile switching</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="y">kanshi</span></pre>
+<div class="co"><div class="col">Expected Output (hyprctl monitors)</div>
+<pre>Monitor eDP-1 (ID 0):
+	1920x1080@60.00 at 0x0
+	active workspace: 1
+Monitor HDMI-A-1 (ID 1):
+	2560x1440@60.00 at 1920x0
+	active workspace: 2</pre></div></div>
+
+<p>The monitor configuration in hyprland.conf (section 8.3) already handles the basic layout. The first entry <span class="ic">monitor = eDP-1, preferred, 0x0, 1</span> tells Hyprland to place the internal laptop display at coordinates (0,0) which is the top-left origin. The second entry places the HDMI monitor at (1920,0), which means immediately to the right of the laptop screen. If you want the external monitor above the laptop, change it to <span class="ic">monitor = HDMI-A-1, preferred, 0x-1440, 1</span> (negative Y places it above). You can also use <span class="ic">nwg-displays</span> for a visual drag-and-drop layout editor.</p>
+
+<p>For automatic switching when you plug/unplug HDMI, create a kanshi config:</p>
+
+<div class="cb"><div class="ch"><span class="cl">bash — ~/.config/kanshi/config</span><button class="cc" onclick="cpy(this)">Copy</button></div>
+<pre><span class="c"># Laptop only</span>
+profile undocked {
+    output eDP-1 enable mode 1920x1080 position 0,0
+}
+
+<span class="c"># Laptop + external HDMI</span>
+profile docked {
+    output eDP-1 enable mode 1920x1080 position 0,0
+    output HDMI-A-1 enable mode 2560x1440 position 1920,0
+}</pre></div>
+
+<h2 id="s10-4">10.4 Elgato Stream Deck Setup</h2>
+
+<p><strong>Layman version:</strong> On Windows/macOS, Elgato provides the Stream Deck software. On Linux, the community built <span class="ic">streamdeck-ui</span>, which provides the same functionality — assign icons, actions, and multi-actions to each button. Your Stream Deck+ with its LCD keys and rotary encoders is fully supported.</p>
+
+<div class="cb"><div class="ch"><span class="cl">bash</span><button class="cc" onclick="cpy(this)">Copy</button></div>
+<pre><span class="c"># Step 1: Install dependencies</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="y">hidapi python-pip</span>
+
+<span class="c"># Step 2: Create udev rule so you don't need root to access the Stream Deck</span>
+<span class="g">sudo</span> <span class="g">tee</span> <span class="b">/etc/udev/rules.d/70-streamdeck.rules</span> << <span class="s">'EOF'</span>
+# Elgato Stream Deck Original
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0060", TAG+="uaccess"
+# Elgato Stream Deck Mini
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0063", TAG+="uaccess"
+# Elgato Stream Deck XL
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="006c", TAG+="uaccess"
+# Elgato Stream Deck MK.2
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0080", TAG+="uaccess"
+# Elgato Stream Deck+
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0084", TAG+="uaccess"
+# Elgato Stream Deck Pedal
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0086", TAG+="uaccess"
+# Elgato Stream Deck Neo
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="009a", TAG+="uaccess"
+<span class="s">EOF</span>
+
+<span class="c"># Step 3: Reload udev rules</span>
+<span class="g">sudo</span> <span class="g">udevadm</span> <span class="o">control</span> <span class="o">--reload-rules</span>
+<span class="g">sudo</span> <span class="g">udevadm</span> <span class="o">trigger</span>
+
+<span class="c"># Step 4: Install streamdeck-ui</span>
+<span class="g">paru</span> <span class="o">-S</span> <span class="y">streamdeck-ui</span>
+
+<span class="c"># Step 5: Unplug and replug your Stream Deck, then launch:</span>
+<span class="g">streamdeck</span>                         <span class="c"># opens the GUI configuration tool</span></pre>
+<div class="co"><div class="col">Expected Result</div>
+<pre>StreamDeck UI window opens showing your device's buttons.
+Each button can be assigned:
+  - Command (any shell command)
+  - Hotkey (keyboard shortcut)
+  - Icon (custom PNG/SVG)
+  - Text label
+  - Folder/Page (nested button pages)
+  
+For Stream Deck+: dials can be mapped to volume, brightness, etc.</pre></div></div>
+
+<p><strong>Technical detail:</strong> The Stream Deck communicates via USB HID (Human Interface Device) protocol. Each button press sends an HID input report to the host. The host sends HID output reports to update the button LCD displays (each button has a tiny 72×72 or 96×96 pixel screen). The <span class="ic">hidapi</span> library provides a cross-platform API to read/write these HID reports. The <span class="ic">streamdeck-ui</span> app runs a background daemon that listens for button presses and executes the configured actions (shell commands, hotkeys, or D-Bus calls). The udev rule with <span class="ic">TAG+="uaccess"</span> grants the currently logged-in user (via systemd-logind) access to the USB device without needing root or adding yourself to special groups.</p>
+
+<div class="callout g"><div class="ct">💡 STREAM DECK PYTHON SCRIPTING</div>
+<p>For truly custom behavior (dynamic button icons, system monitoring on buttons, integration with your Arch system), install the Python library: <span class="ic">pip install streamdeck</span>. This lets you write Python scripts that react to button presses and update button images programmatically. You can display CPU usage, Git status, Docker container states, or anything else on your Stream Deck buttons.</p>
+</div>
+
+<h2 id="s10-5">10.5 Logitech Mouse & Keyboard (Solaar + Piper)</h2>
+
+<div class="cb"><div class="ch"><span class="cl">bash</span><button class="cc" onclick="cpy(this)">Copy</button></div>
+<pre><span class="c"># ═══ SOLAAR — Logitech Unifying/Bolt Receiver Manager ═══</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="y">solaar</span>
+
+<span class="c"># Launch Solaar (already in Hyprland autostart as 'solaar --window=hide')</span>
+<span class="g">solaar</span>
+
+<span class="c"># Solaar shows:</span>
+<span class="c">#   - All paired Logitech devices</span>
+<span class="c">#   - Battery levels</span>
+<span class="c">#   - DPI settings (for mice)</span>
+<span class="c">#   - Button/key remapping</span>
+<span class="c">#   - Smart Shift / Smooth Scrolling toggle</span>
+
+<span class="c"># ═══ PIPER — Advanced Mouse Configuration GUI ═══</span>
+<span class="g">sudo</span> <span class="g">pacman</span> <span class="o">-S</span> <span class="y">libratbag piper</span>
+
+<span class="c"># Start the ratbagd daemon (required by Piper)</span>
+<span class="g">sudo</span> <span class="g">systemctl</span> <span class="o">enable</span> <span class="o">--now</span> <span class="y">ratbagd</span>
+
+<span class="c"># Launch Piper for detailed mouse config</span>
+<span class="g">piper</span>
+
+<span class="c"># Piper provides:</span>
+<span class="c">#   - DPI profiles (multiple DPI levels, switch with button)</span>
+<span class="c">#   - Button mapping (assign any key/macro to any button)</span>
+<span class="c">#   - LED color customization</span>
+<span class="c">#   - Scroll speed and direction</span>
+<span class="c">#   - Angle snapping and acceleration curves</span>
+
+<span class="c"># ═══ KEYD — System-Level Key Remapping ═══</span>
+<span class="g">paru</span> <span class="o">-S</span> <span class="y">keyd</span>
+<span class="g">sudo</span> <span class="g">systemctl</span> <span class="o">enable</span> <span class="o">--now</span> <span class="y">keyd</span></pre></div>
+
+<p>Solaar communicates with Logitech receivers via the HID++ protocol, a proprietary extension that Logitech devices use for advanced features like per-device DPI, battery reporting, and Smart Shift (where the scroll wheel switches between ratchet and free-spin based on scroll speed). Piper and libratbag use the <span class="ic">ratbagd</span> daemon which directly writes to the mouse's onboard memory to store DPI profiles and button mappings — these persist even if you plug the mouse into a different computer.</p>
+
+<p>For key remapping, <span class="ic">keyd</span> operates at the evdev level (between the kernel's input subsystem and userspace), which means it works for every application including Wayland compositors, TTY consoles, and even the login screen. Example config at <span class="ic">/etc/keyd/default.conf</span>:</p>
+
+<div class="cb"><div class="ch"><span class="cl">conf — /etc/keyd/default.conf</span><button class="cc" onclick="cpy(this)">Copy</button></div>
+<pre>[ids]
+*                                  <span class="c"># apply to all keyboards</span>
+
+[main]
+capslock = overload(control, esc)  <span class="c"># Caps = Ctrl when held, Esc when tapped</span></pre></div>
+
+<a class="btt" href="#top">↑ Back to top</a>
+
+<hr>
+
+<div class="callout g">
+<div class="ct">✅ PART 2 COMPLETE — WHAT YOU HAVE NOW</div>
+<p>After completing all steps in Part 2, your system has: a tiling Wayland compositor (Hyprland) with pink galaxy theme, animated wallpapers, a configured status bar (Waybar), application launcher (Wofi), notifications (dunst), screenshots (grim+slurp), a GPU-accelerated terminal (Kitty) with pink galaxy colors, Zsh shell with modern plugins and aliases, Starship prompt showing Git/Python/AWS status, tmux for session management, PipeWire audio with full hardware support, Bluetooth for keyboard/mouse/headset, HDMI multi-monitor with auto-switching, Elgato Stream Deck fully configured, and Logitech peripheral management.</p>
+<p><strong>Next: Part 3</strong> — Developer Environment (Python, Node, Rust, Docker, VS Code, Claude Code, PostgreSQL, AWS/Azure/Databricks CLIs) and <strong>Part 4</strong> — Security Arsenal (BlackArch, nmap, Wireshark, Metasploit) + Pink Galaxy Rice polish.</p>
+</div>
+
+</div><!-- end content -->
+
+<!-- ═══ JAVASCRIPT ═══ -->
+<script>
+(function(){
+'use strict';
+const K='archguide_p2_v1';
+function ls(){try{return JSON.parse(localStorage.getItem(K))||{};}catch{return {};}}
+function ss(s){try{localStorage.setItem(K,JSON.stringify(s));}catch{}}
+let S=ls();if(!S.c)S.c={};if(!S.r)S.r={};if(!S.n)S.n={};
+
+// Checkboxes
+window.uc=function(el){const s=el.closest('[data-s]').dataset.s,t=el.dataset.t;if(!S.c[s])S.c[s]={};S.c[s][t]=el.checked;ss(S);rp();};
+document.querySelectorAll('.sc').forEach(c=>{const s=c.dataset.s;if(S.c[s])c.querySelectorAll('input[type="checkbox"]').forEach(b=>{if(S.c[s][b.dataset.t])b.checked=true;});});
+
+// Stars
+window.sr=function(el){const c=el.closest('.sr'),s=c.dataset.s,v=+el.dataset.v;S.r[s]=v;ss(S);rs(c,v);};
+function rs(c,v){c.querySelectorAll('.st').forEach(s=>{s.classList.toggle('a',+s.dataset.v<=v);});}
+document.querySelectorAll('.sr').forEach(c=>{const s=c.dataset.s;if(S.r[s])rs(c,S.r[s]);});
+
+// Notes
+window.tn=function(el){const n=el.closest('.sc').nextElementSibling;if(n&&n.classList.contains('na'))n.classList.toggle('v');};
+window.sn=function(ta){const s=ta.closest('[data-s]').dataset.s;S.n[s]={t:ta.value,ts:new Date().toISOString()};ss(S);};
+document.querySelectorAll('.na').forEach(a=>{const s=a.dataset.s;if(S.n[s]){const t=a.querySelector('textarea');if(t)t.value=S.n[s].t;}});
+
+// Copy
+window.cpy=function(b){const p=b.closest('.cb').querySelector('pre');navigator.clipboard.writeText(p.textContent).then(()=>{b.textContent='✓';b.classList.add('ok');setTimeout(()=>{b.textContent='Copy';b.classList.remove('ok');},1500);});};
+
+// Progress
+function rp(){
+  let t=0,c=0;
+  document.querySelectorAll('.sc input[type="checkbox"]').forEach(b=>{t++;if(b.checked)c++;});
+  const p=t>0?Math.round(c/t*100):0;
+  document.getElementById('gpb').style.width=p+'%';
+  document.getElementById('gpp').textContent=p+'%';
+}
+rp();
+
+// Search
+window.doSearch=function(q){
+  const r=document.getElementById('sr');r.innerHTML='';
+  if(!q||q.length<2)return;
+  let rx;try{rx=new RegExp(q,'gi');}catch{rx=new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');}
+  const els=document.querySelectorAll('h1[id],h2[id],h3[id],p');let res=[];
+  els.forEach(e=>{if(rx.test(e.textContent)){const id=e.id||(e.closest('[id]')?e.closest('[id]').id:'');res.push({id,snip:e.textContent.substring(0,70)+'…',el:e});}rx.lastIndex=0;});
+  res.slice(0,15).forEach(i=>{const d=document.createElement('div');d.style.cssText='padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer;font-size:8.5pt;color:var(--text2);';d.textContent=i.snip;d.onclick=()=>{if(i.id)document.getElementById(i.id).scrollIntoView({behavior:'smooth'});else i.el.scrollIntoView({behavior:'smooth',block:'center'});};r.appendChild(d);});
+};
+
+// Portable save
+window.saveSnap=function(){
+  const snap={c:S.c,r:S.r,n:S.n,at:new Date().toISOString()};
+  let h=document.documentElement.outerHTML;
+  const mk='/*EP2S*/';const me='/*EP2E*/';
+  const sc=`<script id="es">\n${mk}\nwindow.__ES__=${JSON.stringify(snap)};\n${me}\n<\/script>`;
+  if(h.includes(mk)){h=h.replace(/<script id="es">[\s\S]*?<\/script>/,sc);}else{h=h.replace('</head>',sc+'\n</head>');}
+  const b=new Blob(['<!DOCTYPE html>\n<html lang="en">\n'+h.substring(h.indexOf('<head'))],{type:'text/html'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='archlinux_guide_part2_SAVED_'+new Date().toISOString().slice(0,10)+'.html';a.click();
+};
+if(window.__ES__){const e=window.__ES__;S={c:e.c||{},r:e.r||{},n:e.n||{}};ss(S);
+document.querySelectorAll('.sc').forEach(c=>{const s=c.dataset.s;if(S.c[s])c.querySelectorAll('input[type="checkbox"]').forEach(b=>{if(S.c[s][b.dataset.t])b.checked=true;});});
+document.querySelectorAll('.sr').forEach(c=>{const s=c.dataset.s;if(S.r[s])rs(c,S.r[s]);});
+document.querySelectorAll('.na').forEach(a=>{const s=a.dataset.s;if(S.n[s]){const t=a.querySelector('textarea');if(t)t.value=S.n[s].t;}});rp();}
+})();
+</script>
+</body>
+</html>

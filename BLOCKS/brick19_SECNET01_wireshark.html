@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧱 Brick 19 — SEC-NET01: Network Analysis (Wireshark & tcpdump)</title>
+<style>
+:root{--p:#e91e63;--pl:#f8bbd0;--g:#2e7d32;--gl:#a5d6a7;--bg:#0a0a12;--s2:#1a1a2e;--tx:#e8e6f0;--t2:#a8a6b8;--mt:#6c6a7e;--bd:rgba(233,30,99,.18);--bdg:rgba(46,125,50,.2);--purple:#9c27b0;--mono:"Courier New",monospace;--dn:#ff5252;--sec:#ff6f00;--secl:#ffcc80;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Calibri,"Segoe UI",sans-serif;background:var(--bg);color:var(--tx);font-size:11pt;line-height:1.65;padding:20px;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 80% 30%,rgba(255,111,0,.04),transparent 50%);}
+.w{max-width:900px;margin:0 auto;position:relative;z-index:1;}
+h1{color:var(--p);font-size:20pt;margin:30px 0 12px;border-bottom:2px solid var(--p);padding-bottom:8px;}
+h2{color:var(--sec);font-size:15pt;margin:28px 0 10px;border-left:4px solid var(--sec);padding-left:12px;}
+h3{color:var(--p);font-size:12pt;margin:20px 0 8px;}
+p{margin:8px 0;text-align:justify;}
+.ic{font-family:var(--mono);font-size:9pt;background:rgba(255,111,0,.08);padding:1px 5px;border-radius:3px;color:var(--secl);}
+.note{background:var(--s2);border-left:3px solid var(--p);padding:12px;border-radius:0 8px 8px 0;margin:14px 0;font-size:9.5pt;}.note b{color:var(--p);}.note.gn{border-left-color:var(--g);}.note.gn b{color:var(--gl);}.note.dn{border-left-color:var(--dn);}.note.dn b{color:var(--dn);}.note.sec{border-left-color:var(--sec);}.note.sec b{color:var(--secl);}
+.tabs{display:flex;gap:2px;margin:14px 0 6px;}
+.tab{padding:5px 12px;border-radius:6px 6px 0 0;border:1px solid transparent;background:none;color:var(--mt);cursor:pointer;font-size:8.5pt;font-family:inherit;}.tab.on{background:var(--s2);color:var(--sec);border-color:rgba(255,111,0,.2);border-bottom-color:var(--s2);}
+.pan{display:none;background:var(--s2);border:1px solid rgba(255,111,0,.15);border-radius:0 8px 8px 8px;padding:14px;font-size:10pt;}.pan.on{display:block;}.pan.si{border-left:3px solid var(--gl);}.pan.te{border-left:3px solid var(--sec);}.pan.de{border-left:3px solid var(--purple);}
+.cw{margin:10px 0;border:1px solid rgba(255,111,0,.15);border-radius:8px;overflow:hidden;background:#10101c;}
+.cwt{display:flex;justify-content:space-between;align-items:center;padding:3px 10px;background:rgba(255,111,0,.06);border-bottom:1px solid rgba(255,111,0,.15);font-size:7pt;}
+.cwl{color:var(--sec);font-family:var(--mono);font-weight:bold;text-transform:uppercase;letter-spacing:1px;}
+.cwb{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--t2);padding:2px 7px;border-radius:4px;cursor:pointer;font-size:7pt;font-family:var(--mono);}.cwb:hover{background:var(--sec);color:#fff;}
+pre{font-family:var(--mono);font-size:9.5pt;padding:10px;overflow-x:auto;white-space:pre;line-height:1.5;margin:0;color:var(--tx);background:#10101c;}
+pre .c{color:#555;font-style:italic;}pre .g{color:#a5d6a7;}pre .y{color:#fff59d;}pre .b{color:#90caf9;}pre .o{color:#ffcc80;}pre .p{color:#f48fb1;}pre .v{color:#ce93d8;}pre .r{color:#ef9a9a;}
+.out{background:rgba(255,111,0,.04);border-top:2px solid var(--sec);padding:6px 10px;font-family:var(--mono);font-size:8.5pt;color:var(--secl);}
+.outl{color:var(--sec);font-weight:bold;font-size:7pt;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;}
+.cm{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;}.cm>div{border-radius:8px;padding:10px;font-size:9pt;}
+.cm-do{background:rgba(46,125,50,.05);border:1px solid var(--bdg);}.cm-do b{color:var(--gl);}
+.cm-x{background:rgba(255,111,0,.04);border:1px solid rgba(255,111,0,.15);}.cm-x b{color:var(--secl);}
+.cm p{margin:3px 0;color:var(--t2);}
+.qz{background:var(--s2);border:1px solid rgba(255,111,0,.15);border-radius:8px;padding:12px;margin:12px 0;}.qz-q{color:var(--tx);font-size:10pt;margin-bottom:8px;}
+.qo{padding:7px 12px;border:1px solid var(--bd);border-radius:8px;cursor:pointer;font-size:9pt;color:var(--t2);background:none;font-family:inherit;width:100%;text-align:left;transition:all .15s;display:block;margin-bottom:5px;}.qo:hover:not(:disabled){border-color:var(--sec);color:var(--secl);}.qo.y{border-color:var(--g);background:rgba(46,125,50,.1);color:var(--gl);}.qo.n{border-color:var(--dn);background:rgba(255,82,82,.06);color:var(--dn);}
+.qfb{margin-top:6px;font-size:9pt;padding:8px;border-radius:6px;display:none;}.qfb.s{display:block;}.qfb.w{background:rgba(46,125,50,.08);color:var(--gl);border:1px solid var(--bdg);}.qfb.l{background:rgba(255,82,82,.05);color:var(--dn);border:1px solid rgba(255,82,82,.15);}
+.sd{margin:40px 0 0;padding:16px 0 8px;border-top:1px solid rgba(255,111,0,.1);}.sd small{color:var(--mt);font-size:8pt;text-transform:uppercase;letter-spacing:2px;}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:9.5pt;}
+th{background:rgba(255,111,0,.08);color:var(--secl);padding:8px 10px;text-align:left;border-bottom:2px solid var(--sec);}
+td{padding:6px 10px;border-bottom:1px solid var(--bd);color:var(--t2);}
+td code{font-family:var(--mono);font-size:9pt;color:var(--secl);background:rgba(255,111,0,.06);padding:1px 4px;border-radius:2px;}
+.sf{position:fixed;bottom:14px;right:14px;z-index:9999;}.sf button{padding:8px 16px;background:var(--sec);color:#fff;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(0,0,0,.3);}
+.cover{text-align:center;padding:30px;margin-bottom:20px;background:linear-gradient(135deg,#1a0a00,#0d1b2a);border:2px solid var(--sec);border-radius:14px;position:relative;overflow:hidden;}.cover h1{border:none;color:var(--secl);font-size:16pt;margin:0;}.cover p{color:var(--t2);font-size:10pt;}.cover::after{content:'🦈';position:absolute;font-size:80pt;opacity:0.04;right:10px;top:-10px;}
+@media print{body{background:#fff;color:#333;}h1{color:#e91e63!important;}h2{color:#ff6f00!important;}pre{background:#f5f5f5!important;color:#333;}.sf{display:none;}@page{size:A4;margin:1.5cm 1cm;}}
+</style>
+</head>
+<body>
+<div class="w">
+
+<div class="cover">
+<h1>🧱 Brick 19 — SEC-NET01: Network Analysis</h1>
+<p>Seeing every packet: tcpdump for capture, Wireshark for dissection, and what attacks look like on the wire</p>
+<p style="font-size:8pt;color:var(--mt);margin-top:6px;">🛡️ SECURITY Track · 7 sections · X-ray vision for your network</p>
+</div>
+
+<div class="note sec">
+<b>🔥 Why network analysis is a superpower:</b> In Brick 18 you exploited web applications from the browser. But what did those attacks actually look like at the network level? Every SQL injection payload, every XSS probe, every stolen cookie travels across the wire as packets that can be captured, inspected, and analyzed. Network analysis lets you see the invisible — you can watch an nmap scan unfold packet by packet, see exactly what data an application sends (and to whom), detect unauthorized traffic leaving your network, and prove whether an attack occurred by examining the evidence. It is the difference between "I think someone hacked us" and "Here is the exact packet at 14:32:07 where the attacker injected SQL through the login form."
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 1: Packet Capture Fundamentals         -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s0"><small>SEC-NET01.1 of 7 · ⏱ ~10 min</small></div>
+<h2>SEC-NET01.1 — Packet Capture Fundamentals</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+<button class="tab" onclick="sw(this,'de')">⚙️ Deep</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>Every piece of data that travels over a network — every web page, every API call, every DNS lookup, every nmap probe — is broken into small pieces called <strong>packets</strong>. Each packet has a header (the envelope — who sent it, who it is for, what protocol it uses) and a payload (the contents — the actual data). A <strong>packet capture</strong> records every packet that passes through a network interface, allowing you to inspect what happened after the fact or watch traffic in real time.</p>
+<p>Two tools dominate this space. <span class="ic">tcpdump</span> is the command-line packet capture tool — fast, scriptable, available on every Linux system, and perfect for quick captures and server-side analysis. <span class="ic">Wireshark</span> is the graphical packet analyzer — it provides a visual dissection of every protocol layer with color coding, search, filtering, and deep protocol analysis. The professional workflow is: capture with tcpdump (lightweight, can run on servers without a GUI), then analyze with Wireshark (rich visual analysis on your workstation).</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Packet capture works through the kernel's packet socket mechanism. Both tcpdump and Wireshark use <span class="ic">libpcap</span> (the Packet Capture Library) which opens a raw socket on the specified interface and attaches a BPF (Berkeley Packet Filter) program to filter packets in kernel space (much faster than filtering in userspace). On your Arch system, capture requires either root privileges or membership in the <span class="ic">wireshark</span> group (which grants the <span class="ic">CAP_NET_RAW</span> and <span class="ic">CAP_NET_ADMIN</span> capabilities). Captured packets are stored in the <span class="ic">pcap</span> format (legacy) or <span class="ic">pcapng</span> format (modern — supports multiple interfaces, annotations, and name resolution records). The <span class="ic">pcapng</span> format is Wireshark's default and can be read by all modern tools. For capturing traffic to/from your Docker containers (which communicate over the <span class="ic">docker0</span> bridge or custom Docker networks), capture on the <span class="ic">lo</span> (loopback) interface since the containers are accessed via localhost port mappings.</p>
+</div>
+<div class="pan de" data-l="de">
+<p>When you capture on an interface, libpcap calls <span class="ic">socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL))</span> which creates a socket that receives copies of ALL packets traversing the interface — both incoming and outgoing. The kernel delivers packet copies to this socket via a memory-mapped ring buffer (<span class="ic">PACKET_MMAP</span>) to avoid the overhead of per-packet syscalls. The BPF filter (compiled from tcpdump's filter expression via <span class="ic">pcap_compile()</span>) is attached with <span class="ic">setsockopt(SO_ATTACH_FILTER)</span> and runs as a virtual machine inside the kernel — packets that do not match the filter are dropped before ever being copied to userspace, which is critical for performance on high-traffic interfaces. On your Dell 7420's Intel Wi-Fi adapter, enabling monitor mode (<span class="ic">iwconfig wlan0 mode monitor</span>) would let you capture all wireless frames on the channel (including other devices' traffic), but this is typically only used for wireless security analysis and breaks your normal Wi-Fi connection.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash — setup</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ Ensure You Can Capture Packets ═══</span>
+
+<span class="c"># Add yourself to the wireshark group (if not already done in Part 3)</span>
+<span class="g">sudo</span> <span class="g">usermod</span> <span class="o">-aG</span> <span class="y">wireshark</span> <span class="y">mari</span>
+<span class="c"># Log out and back in for the group change to take effect</span>
+
+<span class="c"># Verify you can capture</span>
+<span class="g">groups</span> | <span class="g">grep</span> <span class="o">-q</span> <span class="y">wireshark</span> && <span class="g">echo</span> <span class="y">"✓ Ready to capture"</span> || <span class="g">echo</span> <span class="y">"✗ Rejoin and relogin"</span>
+
+<span class="c"># List available capture interfaces</span>
+<span class="g">tcpdump</span> <span class="o">-D</span>
+<span class="c"># You will see: lo, wlan0, docker0, any, and others</span>
+<span class="c"># For Docker lab traffic: use 'lo' (loopback) or 'any'</span></pre></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 2: tcpdump                             -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s1"><small>SEC-NET01.2 of 7 · ⏱ ~14 min</small></div>
+<h2>SEC-NET01.2 — tcpdump: Command-Line Packet Capture</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p><span class="ic">tcpdump</span> is the Swiss Army knife of packet capture — it runs in the terminal, works on every Linux system (including remote servers via SSH where Wireshark cannot run), and can capture millions of packets to a file for later analysis. The basic pattern is <span class="ic">tcpdump -i interface filter-expression</span>. The filter expression tells tcpdump which packets to capture — you can filter by host, port, protocol, or complex combinations. Without a filter, tcpdump captures everything, which can be overwhelming on a busy network.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Essential tcpdump flags: <span class="ic">-i IFACE</span> (capture on this interface; <span class="ic">any</span> for all), <span class="ic">-n</span> (do not resolve hostnames — much faster), <span class="ic">-nn</span> (do not resolve hostnames OR port names), <span class="ic">-v</span>/<span class="ic">-vv</span>/<span class="ic">-vvv</span> (increasing verbosity), <span class="ic">-c N</span> (capture exactly N packets then stop), <span class="ic">-w FILE</span> (write raw packets to pcap file — for later Wireshark analysis), <span class="ic">-r FILE</span> (read from a pcap file instead of live capture), <span class="ic">-A</span> (print packet contents in ASCII — great for seeing HTTP traffic), <span class="ic">-X</span> (print contents in hex AND ASCII), <span class="ic">-s 0</span> or <span class="ic">-s0</span> (capture full packets, not just first 262144 bytes). BPF filter primitives: <span class="ic">host IP</span>, <span class="ic">src IP</span>, <span class="ic">dst IP</span>, <span class="ic">port N</span>, <span class="ic">src port N</span>, <span class="ic">dst port N</span>, <span class="ic">tcp</span>, <span class="ic">udp</span>, <span class="ic">icmp</span>, <span class="ic">net CIDR</span>. Combine with <span class="ic">and</span>, <span class="ic">or</span>, <span class="ic">not</span>, and parentheses: <span class="ic">tcp port 80 and host 192.168.178.42</span>.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash — tcpdump essentials</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ Basic Captures ═══</span>
+
+<span class="c"># Capture ALL traffic on loopback (for Docker lab)</span>
+<span class="g">sudo</span> <span class="g">tcpdump</span> <span class="o">-i lo</span> <span class="o">-nn</span>
+<span class="c"># -nn = no name resolution (faster, shows raw IPs and ports)</span>
+<span class="c"># Ctrl+C to stop</span>
+
+<span class="c"># Capture only traffic to DVWA (port 8081)</span>
+<span class="g">sudo</span> <span class="g">tcpdump</span> <span class="o">-i lo</span> <span class="o">-nn</span> <span class="y">port 8081</span>
+
+<span class="c"># Capture HTTP traffic and show the content in ASCII</span>
+<span class="g">sudo</span> <span class="g">tcpdump</span> <span class="o">-i lo</span> <span class="o">-nn</span> <span class="o">-A</span> <span class="y">port 8081</span>
+<span class="c"># -A shows the HTTP request/response bodies — you can SEE the SQL injection!</span>
+
+<span class="c"># Capture exactly 100 packets</span>
+<span class="g">sudo</span> <span class="g">tcpdump</span> <span class="o">-i lo</span> <span class="o">-nn</span> <span class="o">-c 100</span> <span class="y">port 8081</span>
+
+<span class="c"># ═══ Save to File (for Wireshark analysis) ═══</span>
+
+<span class="c"># Capture DVWA traffic to a pcap file</span>
+<span class="g">sudo</span> <span class="g">tcpdump</span> <span class="o">-i lo</span> <span class="o">-nn</span> <span class="o">-w</span> <span class="b">~/captures/dvwa_session.pcap</span> <span class="y">port 8081</span>
+<span class="c"># Run this in one terminal, then perform your attacks in the browser</span>
+<span class="c"># Ctrl+C when done → open the pcap in Wireshark</span>
+
+<span class="c"># ═══ Filter Expressions (BPF) ═══</span>
+
+<span class="c"># Only TCP SYN packets (connection initiations — see nmap scans!)</span>
+<span class="g">sudo</span> <span class="g">tcpdump</span> <span class="o">-i lo</span> <span class="o">-nn</span> <span class="y">'tcp[tcpflags] &amp; (tcp-syn) != 0 and tcp[tcpflags] &amp; (tcp-ack) == 0'</span>
+
+<span class="c"># DNS queries only</span>
+<span class="g">sudo</span> <span class="g">tcpdump</span> <span class="o">-i wlan0</span> <span class="o">-nn</span> <span class="y">port 53</span>
+
+<span class="c"># Traffic to/from your FRITZ!Box gateway</span>
+<span class="g">sudo</span> <span class="g">tcpdump</span> <span class="o">-i wlan0</span> <span class="o">-nn</span> <span class="y">host 192.168.178.1</span>
+
+<span class="c"># Combine: HTTP POST requests to DVWA (see form submissions)</span>
+<span class="g">sudo</span> <span class="g">tcpdump</span> <span class="o">-i lo</span> <span class="o">-nn</span> <span class="o">-A</span> <span class="y">port 8081</span> | <span class="g">grep</span> <span class="o">-A 10</span> <span class="y">"POST"</span>
+
+<span class="c"># ═══ Read a Saved Capture ═══</span>
+
+<span class="c"># Read and display a pcap file</span>
+<span class="g">tcpdump</span> <span class="o">-nn</span> <span class="o">-r</span> <span class="b">~/captures/dvwa_session.pcap</span>
+
+<span class="c"># Read with filter (only HTTP GET requests)</span>
+<span class="g">tcpdump</span> <span class="o">-nn</span> <span class="o">-A</span> <span class="o">-r</span> <span class="b">~/captures/dvwa_session.pcap</span> | <span class="g">grep</span> <span class="o">-B 2</span> <span class="y">"GET /"</span></pre>
+<div class="out"><div class="outl">Expected Output (tcpdump -i lo -nn port 8081 — first few packets)</div><pre>17:42:01.234567 IP 127.0.0.1.45678 > 127.0.0.1.8081: Flags [S], seq 123456, win 65535
+17:42:01.234589 IP 127.0.0.1.8081 > 127.0.0.1.45678: Flags [S.], seq 789012, ack 123457, win 65535
+17:42:01.234601 IP 127.0.0.1.45678 > 127.0.0.1.8081: Flags [.], ack 1, win 65535
+17:42:01.235100 IP 127.0.0.1.45678 > 127.0.0.1.8081: Flags [P.], seq 1:487, ack 1, win 65535
+         ↑ SYN        ↑ SYN-ACK       ↑ ACK          ↑ Data (HTTP GET request)
+         └─────── TCP three-way handshake ──────────┘</pre></div></div>
+
+<div class="cm">
+<div class="cm-do"><b>✅ The capture-then-analyze workflow:</b><p>Run <span class="ic">tcpdump -i lo -w capture.pcap port 8081</span> in one terminal. Perform your web attacks in the browser. Stop tcpdump with Ctrl+C. Open <span class="ic">capture.pcap</span> in Wireshark for deep visual analysis. This gives you the best of both worlds — lightweight capture + powerful analysis.</p></div>
+<div class="cm-x"><b>❌ Common mistake — forgetting -w:</b><p>Without <span class="ic">-w</span>, tcpdump only shows a summary to the terminal and does NOT save the raw packet data. If you want to analyze packets in Wireshark later, you MUST use <span class="ic">-w file.pcap</span>. The terminal output is just a summary — the pcap file contains the complete packet data.</p></div>
+</div>
+
+<div class="qz"><div class="qz-q">🛡️ You need to capture traffic between your browser and DVWA running on port 8081. Which tcpdump command captures this to a file for later Wireshark analysis?</div>
+<div class="qo" onclick="ck(this,true)">sudo tcpdump -i lo -nn -w capture.pcap port 8081 — captures on loopback (since DVWA is on localhost), with no name resolution, saves raw packets to a pcap file filtered to port 8081</div>
+<div class="qo" onclick="ck(this,false)">sudo tcpdump -i wlan0 port 8081 — this captures on the Wi-Fi interface, not loopback</div>
+<div class="qo" onclick="ck(this,false)">tcpdump port 8081 — this does not save to a file and may fail without sudo</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 3: Wireshark                           -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s2"><small>SEC-NET01.3 of 7 · ⏱ ~14 min</small></div>
+<h2>SEC-NET01.3 — Wireshark: Visual Packet Analysis</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>Wireshark is the world's most popular network protocol analyzer. Where tcpdump shows you a text summary of each packet, Wireshark displays the complete contents in a three-pane view: the packet list (top — all captured packets in sequence), the protocol detail tree (middle — every field of the selected packet broken down by protocol layer), and the raw hex/ASCII view (bottom — the actual bytes on the wire). Every protocol is color-coded — HTTP in green, TCP in grey, DNS in blue, errors in red — so you can spot patterns at a glance. The display filter bar at the top lets you narrow the view to exactly what you need: <span class="ic">http.request.method == "POST"</span> shows only HTTP POST requests, <span class="ic">tcp.port == 8081</span> shows only DVWA traffic.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Wireshark's display filters (different from tcpdump's capture filters!) use a protocol-aware expression language. Key filter expressions: <span class="ic">http</span> (all HTTP traffic), <span class="ic">http.request</span> (HTTP requests only), <span class="ic">http.response</span> (responses only), <span class="ic">http.request.method == "POST"</span> (POST requests), <span class="ic">http.request.uri contains "sqli"</span> (URLs containing "sqli"), <span class="ic">http.cookie</span> (packets with cookies), <span class="ic">tcp.port == 8081</span> (DVWA traffic), <span class="ic">dns</span> (DNS queries/responses), <span class="ic">tcp.flags.syn == 1 and tcp.flags.ack == 0</span> (SYN-only — nmap scan probes), <span class="ic">ip.addr == 192.168.178.42</span> (traffic to/from your machine). Right-click any field in the detail pane → "Apply as Filter" to instantly filter on that value. The "Follow TCP Stream" feature (right-click a packet → Follow → TCP Stream) reassembles the entire TCP conversation and shows it as a continuous dialog — perfect for reading complete HTTP request/response exchanges, including SQL injection payloads and responses.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">wireshark — essential display filters</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ Wireshark Display Filters (type these in the filter bar) ═══</span>
+
+<span class="c"># All HTTP traffic</span>
+<span class="y">http</span>
+
+<span class="c"># Only HTTP POST requests (form submissions, login attempts)</span>
+<span class="y">http.request.method == "POST"</span>
+
+<span class="c"># HTTP requests containing "sqli" in the URL (SQL injection pages)</span>
+<span class="y">http.request.uri contains "sqli"</span>
+
+<span class="c"># HTTP requests containing a single quote (SQL injection probes!)</span>
+<span class="y">http.request.uri contains "'"</span>
+
+<span class="c"># Only packets with cookies (session tracking)</span>
+<span class="y">http.cookie</span>
+
+<span class="c"># TCP SYN packets without ACK (nmap SYN scan probes)</span>
+<span class="y">tcp.flags.syn == 1 and tcp.flags.ack == 0</span>
+
+<span class="c"># DNS queries (name resolution)</span>
+<span class="y">dns.qr == 0</span>
+
+<span class="c"># Only error responses (HTTP 4xx/5xx)</span>
+<span class="y">http.response.code >= 400</span>
+
+<span class="c"># Traffic to DVWA only</span>
+<span class="y">tcp.port == 8081</span>
+
+<span class="c"># Combine filters with and/or/not</span>
+<span class="y">http.request.method == "POST" and tcp.port == 8081</span>
+<span class="y">http and not http.request.method == "GET"</span>
+
+<span class="c"># ═══ Essential Wireshark Actions (keyboard shortcuts) ═══</span>
+
+<span class="c"># Ctrl+E      → Start/stop capture</span>
+<span class="c"># Ctrl+F      → Find packet by content</span>
+<span class="c"># Ctrl+G      → Go to packet number</span>
+<span class="c"># Ctrl+Shift+F → Follow TCP/HTTP stream (selected packet)</span>
+<span class="c"># Right-click → Follow → TCP Stream (reassemble entire conversation)</span>
+<span class="c"># Right-click → Apply as Filter → Selected (filter on clicked value)</span>
+<span class="c"># Statistics → Conversations (see who talked to whom)</span>
+<span class="c"># Statistics → Protocol Hierarchy (what protocols are in the capture)</span></pre></div>
+
+<p>The most powerful Wireshark feature for security analysis is <strong>Follow TCP Stream</strong>. Right-click any packet in an HTTP conversation and select Follow → TCP Stream. Wireshark reassembles the entire exchange into a readable dialogue — the client's requests in red, the server's responses in blue. For HTTP traffic to DVWA, you will see the complete SQL injection payload in the GET parameter, the server's HTML response containing the extracted database data, the session cookies being exchanged, and every other detail of the attack — all in plain text because HTTP is unencrypted.</p>
+
+<div class="qz"><div class="qz-q">🛡️ You want to find all packets in a Wireshark capture where a SQL injection was attempted against DVWA. Which display filter would most effectively identify these?</div>
+<div class="qo" onclick="ck(this,true)">http.request.uri contains "'" or http.request.uri contains "UNION" or http.request.uri contains "OR" — SQL injection payloads almost always contain single quotes, UNION keywords, or OR conditions in the URL parameters</div>
+<div class="qo" onclick="ck(this,false)">tcp.port == 3306 — this is the MySQL port, but the injection goes through the web server on port 8081</div>
+<div class="qo" onclick="ck(this,false)">http — this shows all HTTP traffic, not specifically injection attempts</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 4: Capturing Your Own Attacks          -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s3"><small>SEC-NET01.4 of 7 · ⏱ ~14 min</small></div>
+<h2>SEC-NET01.4 — Capturing Your Own Attacks: See SQLi &amp; XSS on the Wire</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>This is where everything connects. You will capture the traffic while performing the attacks from Brick 18, then analyze the captures to see exactly what the attack looks like at the packet level. This is the perspective of a defender with a network monitoring system — they see your attack traffic and must identify it. It is also the perspective of a forensic analyst investigating after a breach — they have a packet capture and must reconstruct what happened.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>The exercise flow: Terminal 1 runs tcpdump to capture traffic. Your browser performs the attack against DVWA. Terminal 1 captures every packet of the attack. You analyze the capture either with tcpdump filters or by opening the pcap in Wireshark. For SQL injection, you will see the payload in the HTTP GET parameters (URL-encoded). For XSS, you will see the injected script tags in the request. For command injection, you will see the chained commands in the POST data. The session cookie (PHPSESSID) is visible in every request — demonstrating why cookie theft via XSS is so dangerous.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash — capture while attacking</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ EXERCISE: Capture SQL Injection Traffic ═══</span>
+
+<span class="c"># Terminal 1: Start capturing DVWA traffic</span>
+<span class="g">mkdir</span> <span class="o">-p</span> <span class="b">~/captures</span>
+<span class="g">sudo</span> <span class="g">tcpdump</span> <span class="o">-i lo</span> <span class="o">-nn</span> <span class="o">-w</span> <span class="b">~/captures/sqli_attack.pcap</span> <span class="y">port 8081</span>
+
+<span class="c"># Terminal 2 / Browser: Perform the SQL injection from Brick 18</span>
+<span class="c"># Go to DVWA → SQL Injection → enter: 1' UNION SELECT user, password FROM users -- -</span>
+
+<span class="c"># Terminal 1: Stop capture with Ctrl+C after the attack</span>
+
+<span class="c"># ═══ Analyze with tcpdump ═══</span>
+
+<span class="c"># See the HTTP requests (including the injection payload)</span>
+<span class="g">tcpdump</span> <span class="o">-nn</span> <span class="o">-A</span> <span class="o">-r</span> <span class="b">~/captures/sqli_attack.pcap</span> | <span class="g">grep</span> <span class="o">-A 5</span> <span class="y">"GET /vulnerabilities/sqli"</span>
+
+<span class="c"># Find the exact SQL injection payload in the URL</span>
+<span class="g">tcpdump</span> <span class="o">-nn</span> <span class="o">-A</span> <span class="o">-r</span> <span class="b">~/captures/sqli_attack.pcap</span> | <span class="g">grep</span> <span class="y">"UNION"</span>
+
+<span class="c"># Find session cookies being transmitted</span>
+<span class="g">tcpdump</span> <span class="o">-nn</span> <span class="o">-A</span> <span class="o">-r</span> <span class="b">~/captures/sqli_attack.pcap</span> | <span class="g">grep</span> <span class="y">"PHPSESSID"</span>
+
+<span class="c"># ═══ Open in Wireshark for Visual Analysis ═══</span>
+<span class="g">wireshark</span> <span class="b">~/captures/sqli_attack.pcap</span> &
+
+<span class="c"># In Wireshark:</span>
+<span class="c"># 1. Filter: http.request.uri contains "sqli"</span>
+<span class="c"># 2. Click on the GET request packet</span>
+<span class="c"># 3. In the middle pane, expand "Hypertext Transfer Protocol"</span>
+<span class="c"># 4. Look at "Request URI" — you'll see the injection payload URL-encoded</span>
+<span class="c"># 5. Right-click → Follow → TCP Stream to see the full conversation</span>
+<span class="c">#    - RED text = your browser's request (with the SQL injection)</span>
+<span class="c">#    - BLUE text = DVWA's response (with the extracted database data!)</span>
+
+<span class="c"># ═══ Capture an nmap Scan ═══</span>
+
+<span class="c"># Terminal 1: Capture</span>
+<span class="g">sudo</span> <span class="g">tcpdump</span> <span class="o">-i lo</span> <span class="o">-nn</span> <span class="o">-w</span> <span class="b">~/captures/nmap_scan.pcap</span>
+
+<span class="c"># Terminal 2: Run nmap</span>
+<span class="g">sudo</span> <span class="g">nmap</span> <span class="o">-sS</span> <span class="o">-p</span> <span class="y">22,80,8081,3000</span> <span class="y">localhost</span>
+
+<span class="c"># In Wireshark, filter: tcp.flags.syn == 1 and tcp.flags.ack == 0</span>
+<span class="c"># You will see the SYN probes nmap sent to each port</span>
+<span class="c"># Then filter: tcp.flags.syn == 1 and tcp.flags.ack == 1</span>
+<span class="c"># These are the SYN-ACK responses from open ports</span></pre>
+<div class="out"><div class="outl">What you see in the SQL injection capture (tcpdump -A)</div><pre>GET /vulnerabilities/sqli/?id=1'+UNION+SELECT+user,+password+FROM+users+--+-
+  &Submit=Submit HTTP/1.1
+Host: localhost:8081
+Cookie: PHPSESSID=abc123def456; security=low
+                     ↑                              ↑
+              SQL injection payload           Session cookie in plaintext!
+              (URL-encoded)                   (stealable via XSS)
+
+HTTP/1.1 200 OK
+...
+<pre>admin5f4dcc3b5aa765d61d8327deb882cf99</pre>
+       ↑
+       The stolen data visible in the response!</pre></div></div>
+
+<div class="cm">
+<div class="cm-do"><b>✅ What this teaches you as a defender:</b><p>If you were monitoring a production web server's traffic, you could detect SQL injection attempts by looking for SQL keywords (UNION, SELECT, OR, AND, single quotes) in HTTP request parameters. A WAF (Web Application Firewall) does exactly this — it inspects every HTTP request for attack signatures and blocks them before they reach the application.</p></div>
+<div class="cm-x"><b>❌ Why HTTPS matters:</b><p>Everything you just saw — the SQL injection payload, the extracted credentials, the session cookie — was visible in plain text because DVWA uses HTTP (not HTTPS). If the traffic were encrypted with TLS, tcpdump and Wireshark would only see encrypted gibberish. This is why HTTPS is critical — it protects data in transit from network-level interception. An attacker on the same Wi-Fi cannot read HTTPS traffic.</p></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 5: Protocol Analysis                   -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s4"><small>SEC-NET01.5 of 7 · ⏱ ~12 min</small></div>
+<h2>SEC-NET01.5 — Protocol Analysis: DNS, HTTP, and TLS</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>Beyond capturing attacks, network analysis lets you understand how protocols work at the deepest level. You can watch a DNS query resolve a domain name to an IP address, see the TCP three-way handshake establish a connection, watch the TLS handshake negotiate encryption, and follow the HTTP request-response exchange that delivers a web page. This understanding is invaluable for both security (detecting anomalies) and debugging (figuring out why a connection fails).</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Key protocols to analyze: <strong>DNS</strong> — filter <span class="ic">dns</span>. Look at the query name (what domain was looked up), query type (A, AAAA, MX), response code (NOERROR, NXDOMAIN = domain does not exist, SERVFAIL = server error), and response data (the resolved IP). DNS exfiltration is a real attack technique where stolen data is encoded in DNS query names (e.g., <span class="ic">stolen-data-hex.attacker.com</span>). <strong>HTTP</strong> — filter <span class="ic">http</span>. Analyze request methods (GET, POST), headers (Host, User-Agent, Cookie, Authorization), request bodies (POST data — form submissions, JSON), response codes (200, 301, 403, 404, 500), and response bodies. <strong>TLS</strong> — filter <span class="ic">tls</span>. You can see the Client Hello (supported cipher suites, TLS version, SNI hostname), Server Hello (chosen cipher suite and certificate), and the encrypted application data (unreadable without the session key). The SNI (Server Name Indication) in the Client Hello reveals which domain is being accessed even though the content is encrypted — this is how firewalls can block HTTPS sites without decrypting traffic.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash — protocol analysis exercises</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ DNS Analysis ═══</span>
+
+<span class="c"># Capture DNS traffic while browsing</span>
+<span class="g">sudo</span> <span class="g">tcpdump</span> <span class="o">-i wlan0</span> <span class="o">-nn</span> <span class="o">-w</span> <span class="b">~/captures/dns.pcap</span> <span class="y">port 53</span> &
+<span class="c"># Browse some websites, then stop with: kill %1</span>
+
+<span class="c"># Wireshark filter: dns</span>
+<span class="c"># Look at: Query name, Query type (A/AAAA), Response addresses</span>
+<span class="c"># Every site you visited is visible in DNS queries!</span>
+
+<span class="c"># ═══ TCP Handshake Analysis ═══</span>
+
+<span class="c"># Wireshark filter: tcp.flags.syn == 1</span>
+<span class="c"># Every connection starts with a SYN → SYN-ACK → ACK sequence</span>
+<span class="c"># Statistics → Flow Graph → TCP Flows shows the visual handshake</span>
+
+<span class="c"># ═══ HTTP Deep Inspection ═══</span>
+
+<span class="c"># Capture a login to DVWA</span>
+<span class="g">sudo</span> <span class="g">tcpdump</span> <span class="o">-i lo</span> <span class="o">-nn</span> <span class="o">-w</span> <span class="b">~/captures/http_login.pcap</span> <span class="y">port 8081</span>
+<span class="c"># In browser: log into DVWA with admin/password</span>
+<span class="c"># Stop capture, open in Wireshark</span>
+
+<span class="c"># Wireshark filter: http.request.method == "POST"</span>
+<span class="c"># Follow TCP Stream on the POST packet</span>
+<span class="c"># You will see: username=admin&password=password in the POST body!</span>
+<span class="c"># The login credentials are transmitted in PLAIN TEXT over HTTP.</span>
+
+<span class="c"># ═══ TLS/HTTPS Analysis ═══</span>
+
+<span class="c"># Capture HTTPS traffic (e.g., to github.com)</span>
+<span class="g">sudo</span> <span class="g">tcpdump</span> <span class="o">-i wlan0</span> <span class="o">-nn</span> <span class="o">-w</span> <span class="b">~/captures/tls.pcap</span> <span class="y">host github.com</span> &
+<span class="g">curl</span> <span class="o">-sS</span> <span class="y">https://github.com</span> > /dev/null
+<span class="g">kill</span> <span class="y">%1</span>
+
+<span class="c"># Wireshark filter: tls.handshake</span>
+<span class="c"># You can see: Client Hello (TLS version, cipher suites, SNI=github.com)</span>
+<span class="c"># and Server Hello (chosen cipher, certificate)</span>
+<span class="c"># But the actual page content is encrypted — you only see "Application Data"</span>
+<span class="c"># This is what HTTPS protects against: network-level sniffing</span></pre>
+<div class="out"><div class="outl">What HTTP login looks like in a capture (plain text!)</div><pre>POST /login.php HTTP/1.1
+Host: localhost:8081
+Content-Type: application/x-www-form-urlencoded
+Cookie: PHPSESSID=abc123
+
+username=admin&password=password&Login=Login
+      ↑              ↑
+      Username        Password — COMPLETELY VISIBLE on the network!
+      
+This is why HTTPS exists. On HTTPS, this would be encrypted gibberish.</pre></div></div>
+
+<div class="qz"><div class="qz-q">🛡️ You capture traffic on a coffee shop Wi-Fi and see HTTP POST requests to a banking site containing <span class="ic">username=john&password=secret123</span>. What went wrong?</div>
+<div class="qo" onclick="ck(this,true)">The banking site is using HTTP instead of HTTPS — login credentials are transmitted in plain text and visible to anyone capturing traffic on the same network. A properly secured bank uses HTTPS (TLS encryption), which would make the POST body completely unreadable in the capture.</div>
+<div class="qo" onclick="ck(this,false)">The user's password is too short</div>
+<div class="qo" onclick="ck(this,false)">The coffee shop's Wi-Fi is too slow to encrypt</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 6: Detection & Forensics               -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s5"><small>SEC-NET01.6 of 7 · ⏱ ~10 min</small></div>
+<h2>SEC-NET01.6 — Detection &amp; Forensics: Identifying Attacks in Captures</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>Now flip the perspective — you are the defender. Someone hands you a packet capture and says "we think we were hacked last night." How do you find the evidence? This is network forensics, and the techniques you have learned in this module give you the tools to answer: What happened? When? From where? What data was compromised? This is one of the most valuable skills in cybersecurity — the ability to read a packet capture like a detective reads a crime scene.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Attack signatures in packet captures: <strong>Port scanning</strong> — many SYN packets from one source to many ports, most receiving RST (closed) or no response (filtered). In Wireshark: <span class="ic">tcp.flags.syn == 1 and tcp.flags.ack == 0</span> then check Statistics → Conversations for the source IP. <strong>SQL injection</strong> — HTTP requests containing SQL keywords in parameters: <span class="ic">http.request.uri contains "UNION" or http.request.uri contains "'" or http.request.uri contains "SELECT"</span>. <strong>XSS attempts</strong> — HTTP requests containing <span class="ic">&lt;script</span>, <span class="ic">onerror=</span>, <span class="ic">javascript:</span> in parameters. <strong>Brute force</strong> — many HTTP POST requests to a login page from one IP in rapid succession, most receiving the same response size (failed login) with occasional different size (successful login). <strong>Data exfiltration</strong> — unusually large response bodies, connections to unfamiliar IP addresses, DNS queries with long subdomain labels (DNS tunneling). <strong>Command and control (C2)</strong> — periodic outbound connections to the same IP at regular intervals (beaconing).</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">wireshark — attack detection filters</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ Wireshark Filters for Detecting Attacks ═══</span>
+
+<span class="c"># Detect port scanning (many SYN-only packets from one source)</span>
+<span class="y">tcp.flags.syn == 1 and tcp.flags.ack == 0</span>
+<span class="c"># Then: Statistics → Conversations → TCP tab → Sort by packets</span>
+<span class="c"># A scanner will have hundreds of entries with 1-2 packets each</span>
+
+<span class="c"># Detect SQL injection attempts</span>
+<span class="y">http.request.uri contains "UNION" or http.request.uri contains "SELECT" or http.request.uri contains "'"</span>
+
+<span class="c"># Detect XSS attempts</span>
+<span class="y">http.request.uri contains "&lt;script" or http.request.uri contains "onerror"</span>
+
+<span class="c"># Detect brute-force login (many POSTs to login page)</span>
+<span class="y">http.request.method == "POST" and http.request.uri contains "login"</span>
+<span class="c"># Check if many come from the same IP in a short time</span>
+
+<span class="c"># Detect credential theft (passwords in plain HTTP)</span>
+<span class="y">http.request.method == "POST" and http contains "password"</span>
+
+<span class="c"># Detect unusual DNS (possible exfiltration or C2)</span>
+<span class="y">dns.qr == 0 and dns.qry.name.len > 50</span>
+<span class="c"># Legitimate DNS queries are rarely longer than 50 characters</span>
+<span class="c"># DNS exfiltration encodes data in very long subdomain labels</span>
+
+<span class="c"># Detect connections to unusual ports</span>
+<span class="y">tcp.dstport > 10000 and tcp.flags.syn == 1</span>
+<span class="c"># Outbound connections to high ports may indicate backdoors or C2</span>
+
+<span class="c"># ═══ Forensic Analysis Workflow ═══</span>
+<span class="c"># 1. Statistics → Protocol Hierarchy (what protocols are present?)</span>
+<span class="c"># 2. Statistics → Conversations (who talked to whom?)</span>
+<span class="c"># 3. Statistics → Endpoints (which IPs are most active?)</span>
+<span class="c"># 4. Apply attack filters above to find specific evidence</span>
+<span class="c"># 5. Follow TCP Stream on suspicious packets to read the full exchange</span>
+<span class="c"># 6. File → Export Objects → HTTP (extract files transferred over HTTP)</span></pre></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 7: Practice                            -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s6"><small>SEC-NET01.7 of 7 · ⏱ ~20 min</small></div>
+<h2>SEC-NET01.7 — Practice: Capture, Attack, Analyze</h2>
+
+<h3>Exercise 1 (Easy) — Capture and Analyze a Login</h3>
+<p>Start a tcpdump capture on port 8081, log into DVWA in your browser with admin/password, stop the capture. Open the pcap in Wireshark. Find the POST request containing the login credentials. Follow the TCP stream to see the complete login exchange. Document: the exact POST data, the session cookie that was set, and the HTTP response code.</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">solution</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="g">set</span> <span class="o">-euo</span> <span class="y">pipefail</span>
+
+<span class="g">mkdir</span> <span class="o">-p</span> <span class="b">~/captures</span>
+
+<span class="g">echo</span> <span class="y">"Starting capture on port 8081..."</span>
+<span class="g">echo</span> <span class="y">"→ Log into DVWA at http://localhost:8081 in your browser"</span>
+<span class="g">echo</span> <span class="y">"→ Press Ctrl+C here when done"</span>
+<span class="g">echo</span> <span class="y">""</span>
+<span class="g">sudo</span> <span class="g">tcpdump</span> <span class="o">-i lo</span> <span class="o">-nn</span> <span class="o">-w</span> <span class="b">~/captures/login.pcap</span> <span class="y">port 8081</span>
+
+<span class="g">echo</span> <span class="y">""</span>
+<span class="g">echo</span> <span class="y">"═══ Quick Analysis ═══"</span>
+
+<span class="g">echo</span> <span class="y">"--- POST requests (login form submission) ---"</span>
+<span class="g">tcpdump</span> <span class="o">-nn</span> <span class="o">-A</span> <span class="o">-r</span> <span class="b">~/captures/login.pcap</span> | <span class="g">grep</span> <span class="o">-A 3</span> <span class="y">"POST /login"</span>
+
+<span class="g">echo</span> <span class="y">""</span>
+<span class="g">echo</span> <span class="y">"--- Credentials in plain text ---"</span>
+<span class="g">tcpdump</span> <span class="o">-nn</span> <span class="o">-A</span> <span class="o">-r</span> <span class="b">~/captures/login.pcap</span> | <span class="g">grep</span> <span class="y">"username="</span>
+
+<span class="g">echo</span> <span class="y">""</span>
+<span class="g">echo</span> <span class="y">"--- Session cookies ---"</span>
+<span class="g">tcpdump</span> <span class="o">-nn</span> <span class="o">-A</span> <span class="o">-r</span> <span class="b">~/captures/login.pcap</span> | <span class="g">grep</span> <span class="y">"PHPSESSID"</span> | <span class="g">head</span> <span class="o">-3</span>
+
+<span class="g">echo</span> <span class="y">""</span>
+<span class="g">echo</span> <span class="y">"Open in Wireshark: wireshark ~/captures/login.pcap"</span></pre></div>
+
+<h3>Exercise 2 (Medium) — Capture and Identify an nmap Scan</h3>
+<p>Start a capture on the loopback interface with no filter. In another terminal, run an nmap SYN scan against localhost on ports 1-1000. Stop the capture. Open it in Wireshark and answer: How many SYN packets did nmap send? How many ports responded with SYN-ACK (open)? How many with RST (closed)? How many had no response (filtered)? Use Wireshark's Statistics → Conversations to quantify this.</p>
+
+<h3>Exercise 3 (Hard) — Full Attack Capture and Forensic Report</h3>
+<p>Start a capture. Perform a complete DVWA attack session: login, SQL injection (extract all users), XSS (stored script injection), and command injection (read /etc/passwd). Stop the capture. Analyze the pcap in Wireshark and write a forensic report documenting every attack with timestamps, source/destination, exact payloads (extracted from the packets), and the data that was compromised. Include Wireshark screenshots or filter expressions that isolate each attack. This is a real-world forensic analysis exercise.</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">forensic report template</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ Network Forensic Report Template ═══</span>
+
+<span class="y"># Network Forensic Analysis Report</span>
+<span class="y">## Capture File: ~/captures/full_attack.pcap</span>
+<span class="y">## Duration: [start time] to [end time]</span>
+<span class="y">## Total Packets: [N]</span>
+
+<span class="y">## Timeline of Events</span>
+
+<span class="y">### 17:42:01 — Login (Credential Transmission)</span>
+<span class="y">- Filter: http.request.method == "POST" and http contains "login"</span>
+<span class="y">- Packet #: [N]</span>
+<span class="y">- Credentials: username=admin, password=password</span>
+<span class="y">- Session cookie: PHPSESSID=[value]</span>
+<span class="y">- ⚠ Transmitted in plain text (no HTTPS)</span>
+
+<span class="y">### 17:42:15 — SQL Injection Attack</span>
+<span class="y">- Filter: http.request.uri contains "UNION"</span>
+<span class="y">- Packet #: [N]</span>
+<span class="y">- Payload: 1' UNION SELECT user, password FROM users -- -</span>
+<span class="y">- Data extracted: 5 user credentials with password hashes</span>
+<span class="y">- OWASP: A03 Injection</span>
+
+<span class="y">### 17:42:30 — Stored XSS Injection</span>
+<span class="y">- Filter: http contains "&lt;script"</span>
+<span class="y">- Packet #: [N]</span>
+<span class="y">- Payload: &lt;script&gt;alert(document.cookie)&lt;/script&gt;</span>
+<span class="y">- Impact: Persistent — all subsequent visitors affected</span>
+<span class="y">- OWASP: A07 XSS</span>
+
+<span class="y">### 17:42:45 — Command Injection</span>
+<span class="y">- Filter: http.request.method == "POST" and http contains "cat"</span>
+<span class="y">- Packet #: [N]</span>
+<span class="y">- Payload: 127.0.0.1; cat /etc/passwd</span>
+<span class="y">- Data extracted: Full /etc/passwd file (all system users)</span>
+<span class="y">- OWASP: A03 Injection</span>
+
+<span class="y">## Indicators of Compromise (IOCs)</span>
+<span class="y">- Source IP: 127.0.0.1 (attacker)</span>
+<span class="y">- Session cookie used: PHPSESSID=[value]</span>
+<span class="y">- Attack signatures: UNION SELECT, &lt;script&gt;, ; cat /etc/passwd</span>
+
+<span class="y">## Recommendations</span>
+<span class="y">- Enable HTTPS (prevents credential sniffing)</span>
+<span class="y">- Implement parameterized queries (prevents SQLi)</span>
+<span class="y">- Add output encoding + CSP (prevents XSS)</span>
+<span class="y">- Remove system command calls (prevents cmd injection)</span>
+<span class="y">- Deploy a WAF (detects attack signatures in transit)</span></pre></div>
+
+<div class="note gn">
+<b>🌸🛡️ Module Complete!</b> You now have X-ray vision for your network. You can capture packets with tcpdump (fast, scriptable, works over SSH) and save them to pcap files for analysis. You can analyze captures in Wireshark using display filters, TCP stream reassembly, protocol hierarchy statistics, and conversation analysis. You have seen your own SQL injection, XSS, and command injection attacks at the packet level — understanding exactly what they look like on the wire. You can detect attacks in packet captures by recognizing their signatures: port scans (many SYN-only packets), SQL injection (SQL keywords in HTTP parameters), XSS (script tags in requests), brute force (rapid login attempts), and data exfiltration (unusual DNS or outbound connections). You understand why HTTPS matters — every credential and attack payload you saw was readable because HTTP is unencrypted.
+
+<p style="margin-top:10px;">Your Security track now covers the complete offensive and defensive lifecycle: think like an attacker (Brick 15), gather intelligence (Brick 16), scan and fingerprint (Brick 17), exploit web vulnerabilities (Brick 18), and analyze the evidence (Brick 19). This is a complete introductory penetration testing and forensics skill set. The next modules could go deeper into any of these areas: privilege escalation, password cracking, wireless security, or advanced web attacks. 🛡️🌸</p>
+</div>
+
+</div>
+<div class="sf"><button onclick="svB()">💾 Save Brick 19</button></div>
+<script>
+function sw(btn,lv){let el=btn.parentElement.nextElementSibling;while(el&&!el.classList.contains('sd')&&!el.classList.contains('qz')&&!el.classList.contains('cm')&&!el.classList.contains('cw')&&el.tagName!=='H3'&&el.tagName!=='TABLE'){if(el.classList.contains('pan'))el.classList.toggle('on',el.dataset.l===lv);el=el.nextElementSibling;}btn.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');}
+function ck(btn,ok){const box=btn.closest('.qz');box.querySelectorAll('.qo').forEach(o=>o.disabled=true);btn.classList.add(ok?'y':'n');const fb=box.querySelector('.qfb');fb.classList.add('s');fb.className=ok?'qfb s w':'qfb s l';fb.textContent=ok?'✓ Correct! +10 XP':'✗ Review the section above.';}
+function cpC(b){const pre=b.closest('.cw').querySelector('pre');navigator.clipboard.writeText(pre.textContent).then(()=>{b.textContent='✓';setTimeout(()=>b.textContent='Copy',1500);});}
+function svB(){const blob=new Blob(['<!DOCTYPE html>\n'+document.documentElement.outerHTML],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='brick19_SECNET01_wireshark_'+new Date().toISOString().slice(0,10)+'.html';a.click();}
+</script>
+</body>
+</html>

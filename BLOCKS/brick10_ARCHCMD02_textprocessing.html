@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧱 Brick 10 — ARCH-CMD02: Text Processing (grep, sed, awk, pipes)</title>
+<style>
+:root{--p:#e91e63;--pl:#f8bbd0;--g:#2e7d32;--gl:#a5d6a7;--bg:#0a0a12;--s2:#1a1a2e;--tx:#e8e6f0;--t2:#a8a6b8;--mt:#6c6a7e;--bd:rgba(233,30,99,.18);--bdg:rgba(46,125,50,.2);--purple:#9c27b0;--mono:"Courier New",monospace;--dn:#ff5252;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Calibri,"Segoe UI",sans-serif;background:var(--bg);color:var(--tx);font-size:11pt;line-height:1.65;padding:20px;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 20% 50%,rgba(233,30,99,.05),transparent 50%);}
+.w{max-width:900px;margin:0 auto;position:relative;z-index:1;}
+h1{color:var(--p);font-size:20pt;margin:30px 0 12px;border-bottom:2px solid var(--p);padding-bottom:8px;}
+h2{color:var(--g);font-size:15pt;margin:28px 0 10px;border-left:4px solid var(--g);padding-left:12px;}
+h3{color:var(--p);font-size:12pt;margin:20px 0 8px;}
+p{margin:8px 0;text-align:justify;}
+.ic{font-family:var(--mono);font-size:9pt;background:rgba(233,30,99,.08);padding:1px 5px;border-radius:3px;color:var(--pl);}
+.note{background:var(--s2);border-left:3px solid var(--p);padding:12px;border-radius:0 8px 8px 0;margin:14px 0;font-size:9.5pt;}.note b{color:var(--p);}.note.gn{border-left-color:var(--g);}.note.gn b{color:var(--gl);}
+.tabs{display:flex;gap:2px;margin:14px 0 6px;}
+.tab{padding:5px 12px;border-radius:6px 6px 0 0;border:1px solid transparent;background:none;color:var(--mt);cursor:pointer;font-size:8.5pt;font-family:inherit;}.tab.on{background:var(--s2);color:var(--p);border-color:var(--bd);border-bottom-color:var(--s2);}
+.pan{display:none;background:var(--s2);border:1px solid var(--bd);border-radius:0 8px 8px 8px;padding:14px;font-size:10pt;}.pan.on{display:block;}.pan.si{border-left:3px solid var(--gl);}.pan.te{border-left:3px solid var(--p);}.pan.de{border-left:3px solid var(--purple);}
+.cw{margin:10px 0;border:1px solid var(--bdg);border-radius:8px;overflow:hidden;background:#10101c;}
+.cwt{display:flex;justify-content:space-between;align-items:center;padding:3px 10px;background:rgba(46,125,50,.1);border-bottom:1px solid var(--bdg);font-size:7pt;}
+.cwl{color:var(--g);font-family:var(--mono);font-weight:bold;text-transform:uppercase;letter-spacing:1px;}
+.cwb{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--t2);padding:2px 7px;border-radius:4px;cursor:pointer;font-size:7pt;font-family:var(--mono);}.cwb:hover{background:var(--p);color:#fff;}
+pre{font-family:var(--mono);font-size:9.5pt;padding:10px;overflow-x:auto;white-space:pre;line-height:1.5;margin:0;color:var(--tx);background:#10101c;}
+pre .c{color:#555;font-style:italic;}pre .g{color:#a5d6a7;}pre .y{color:#fff59d;}pre .b{color:#90caf9;}pre .o{color:#ffcc80;}pre .p{color:#f48fb1;}pre .v{color:#ce93d8;}
+.out{background:rgba(46,125,50,.05);border-top:2px solid var(--g);padding:6px 10px;font-family:var(--mono);font-size:8.5pt;color:#a5d6a7;}
+.outl{color:var(--g);font-weight:bold;font-size:7pt;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;}
+.cm{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;}.cm>div{border-radius:8px;padding:10px;font-size:9pt;}
+.cm-do{background:rgba(46,125,50,.05);border:1px solid var(--bdg);}.cm-do b{color:var(--gl);}
+.cm-x{background:rgba(233,30,99,.04);border:1px solid var(--bd);}.cm-x b{color:var(--pl);}
+.cm p{margin:3px 0;color:var(--t2);}
+.qz{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:12px;margin:12px 0;}.qz-q{color:var(--tx);font-size:10pt;margin-bottom:8px;}
+.qo{padding:7px 12px;border:1px solid var(--bd);border-radius:8px;cursor:pointer;font-size:9pt;color:var(--t2);background:none;font-family:inherit;width:100%;text-align:left;transition:all .15s;display:block;margin-bottom:5px;}.qo:hover:not(:disabled){border-color:var(--p);color:var(--pl);}.qo.y{border-color:var(--g);background:rgba(46,125,50,.1);color:var(--gl);}.qo.n{border-color:var(--dn);background:rgba(255,82,82,.06);color:var(--dn);}
+.qfb{margin-top:6px;font-size:9pt;padding:8px;border-radius:6px;display:none;}.qfb.s{display:block;}.qfb.w{background:rgba(46,125,50,.08);color:var(--gl);border:1px solid var(--bdg);}.qfb.l{background:rgba(255,82,82,.05);color:var(--dn);border:1px solid rgba(255,82,82,.15);}
+.sd{margin:40px 0 0;padding:16px 0 8px;border-top:1px solid rgba(233,30,99,.1);}.sd small{color:var(--mt);font-size:8pt;text-transform:uppercase;letter-spacing:2px;}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:9.5pt;}
+th{background:rgba(233,30,99,.1);color:var(--pl);padding:8px 10px;text-align:left;border-bottom:2px solid var(--p);}
+td{padding:6px 10px;border-bottom:1px solid var(--bd);color:var(--t2);}
+td code{font-family:var(--mono);font-size:9pt;color:var(--pl);background:rgba(233,30,99,.06);padding:1px 4px;border-radius:2px;}
+.sf{position:fixed;bottom:14px;right:14px;z-index:9999;}.sf button{padding:8px 16px;background:var(--g);color:#fff;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(0,0,0,.3);}
+.cover{text-align:center;padding:30px;margin-bottom:20px;background:linear-gradient(135deg,#1a0533,#0d1b2a);border:2px solid #c62828;border-radius:14px;position:relative;overflow:hidden;}.cover h1{border:none;color:#ef9a9a;font-size:16pt;margin:0;}.cover p{color:var(--t2);font-size:10pt;}.cover::after{content:'⚡';position:absolute;font-size:80pt;opacity:0.04;right:10px;top:-10px;}
+@media print{body{background:#fff;color:#333;}h1{color:#e91e63!important;}h2{color:#2e7d32!important;}pre{background:#f5f5f5!important;color:#333;}.sf{display:none;}@page{size:A4;margin:1.5cm 1cm;}}
+</style>
+</head>
+<body>
+<div class="w">
+
+<div class="cover">
+<h1>🧱 Brick 10 — ARCH-CMD02: Text Processing</h1>
+<p>The Unix philosophy in action: grep, sed, awk, sort, and the art of the pipeline</p>
+<p style="font-size:8pt;color:var(--mt);margin-top:6px;">🐧 ARCH Commands Track · 8 sections · The most powerful text processing system ever built</p>
+</div>
+
+<div class="note">
+<b>🎯 Why this is a superpower:</b> The ability to chain small commands with pipes to process text is the single most distinctive feature of Unix-like systems. With grep, sed, awk, sort, and friends, you can analyze log files, transform data formats, extract information from command output, generate reports, and automate text manipulation — all from a one-liner in the terminal. People who master these tools can do in 30 seconds what others write 50-line Python scripts to accomplish.
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 1: Pipes & Redirection Recap           -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s0"><small>ARCH-CMD02.1 of 8 · ⏱ ~6 min</small></div>
+<h2>ARCH-CMD02.1 — Pipes &amp; Redirection (Quick Recap)</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>You learned pipes and redirection in BASH-F07 (Brick 7). Here is the 30-second recap that puts you in the right mindset for this module. A <strong>pipe</strong> (<span class="ic">|</span>) connects one command's output to the next command's input, forming an assembly line. <strong>Redirection</strong> (<span class="ic">></span>, <span class="ic">>></span>, <span class="ic"><</span>) sends output to files or reads input from files. Every text processing pipeline in this module uses both. The mental model is: data flows left to right through a sequence of filters, each one transforming it further, until the final result emerges at the end.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>The pipe operator creates a kernel pipe (64KB buffer), forks both commands as separate processes, wires stdout→pipe→stdin between them, and runs them simultaneously. Every tool in this module reads from stdin and writes to stdout by default, which is what makes them composable. The key principle is that each tool does one thing well: grep filters lines, sed transforms text, awk processes columns, sort orders lines, uniq removes duplicates, wc counts, cut extracts fields, tr translates characters, and xargs converts stdin into command arguments. Chained together, they form an incredibly powerful data processing language.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">mental model</span></div>
+<pre><span class="c"># The data flows left → right through each filter:</span>
+
+<span class="g">cat</span> access.log | <span class="g">grep</span> <span class="y">"404"</span> | <span class="g">awk</span> <span class="y">'{print $7}'</span> | <span class="g">sort</span> | <span class="g">uniq</span> <span class="o">-c</span> | <span class="g">sort</span> <span class="o">-rn</span> | <span class="g">head</span> <span class="o">-10</span>
+<span class="c"> ↑             ↑              ↑                 ↑       ↑              ↑              ↑</span>
+<span class="c"> read file     keep 404s      extract URL        sort    count dupes    most first     top 10</span>
+
+<span class="c"># Result: top 10 most-requested URLs that returned 404 errors</span>
+<span class="c"># All in a single line. This replaces a 40-line Python script.</span></pre></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 2: grep / ripgrep                      -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s1"><small>ARCH-CMD02.2 of 8 · ⏱ ~12 min</small></div>
+<h2>ARCH-CMD02.2 — grep / ripgrep: Pattern Searching</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+<button class="tab" onclick="sw(this,'de')">⚙️ Deep</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p><span class="ic">grep</span> searches through text and shows only the lines that match a pattern. It is the most frequently used text processing tool — you will use it dozens of times per day to search log files, filter command output, find configuration values, and check if something exists in a file. The name stands for "Global Regular Expression Print" — it searches globally (all lines), matches using regular expressions (patterns), and prints the matching lines.</p>
+<p>On your Arch system, <span class="ic">ripgrep</span> (<span class="ic">rg</span>) is installed as the modern replacement. It is written in Rust, searches recursively by default, respects <span class="ic">.gitignore</span>, uses PCRE-style regex, and is 5-10x faster than grep for large codebases. Use <span class="ic">rg</span> for everyday searching and classic <span class="ic">grep</span> for pipeline filtering and POSIX scripts.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>The <span class="ic">grep</span> command reads lines from stdin or files, applies a regex match against each line, and prints lines where the match succeeds (exit code 0 if any match, 1 if none, 2 on error). Key flags: <span class="ic">-i</span> (case-insensitive), <span class="ic">-v</span> (invert — show non-matching lines), <span class="ic">-n</span> (show line numbers), <span class="ic">-c</span> (count matches instead of printing), <span class="ic">-l</span> (list filenames with matches), <span class="ic">-r</span> (recursive), <span class="ic">-w</span> (whole word match), <span class="ic">-E</span> (extended regex, equivalent to <span class="ic">egrep</span>), <span class="ic">-P</span> (Perl-compatible regex — supports lookaheads, lookbehinds, <span class="ic">\d</span>, <span class="ic">\w</span>), <span class="ic">-o</span> (print only the matched portion), <span class="ic">-A N</span> (print N lines after match), <span class="ic">-B N</span> (N lines before), <span class="ic">-C N</span> (N lines of context around match), <span class="ic">-q</span> (quiet — exit code only, for use in scripts). The <span class="ic">ripgrep</span> tool (<span class="ic">rg</span>) uses the <span class="ic">regex</span> Rust crate with a hybrid DFA/NFA engine for fast matching and the <span class="ic">ignore</span> crate for gitignore-aware directory traversal.</p>
+</div>
+<div class="pan de" data-l="de">
+<p>Classical grep uses a DFA (Deterministic Finite Automaton) compiled from the regex pattern. The pattern string is parsed into an NFA (Nondeterministic Finite Automaton) using Thompson's construction algorithm, then converted to a DFA via the subset construction. The DFA processes input one byte at a time with guaranteed O(n) time complexity (n = input length). The <span class="ic">-P</span> flag switches to PCRE (libpcre2) which uses a backtracking NFA engine — more powerful (supports backreferences, lookaround) but with worst-case exponential time on pathological patterns. The ripgrep implementation uses a "lazy DFA" (builds DFA states on demand from the NFA, caching them in a hash table) which avoids the upfront cost of full DFA construction while maintaining near-DFA speed for most patterns. For multi-file searches, ripgrep uses memory-mapped I/O (<span class="ic">mmap</span>) and parallel directory traversal via the <span class="ic">crossbeam</span> crate, searching multiple files simultaneously across CPU cores.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ grep — Essential Patterns ═══</span>
+
+<span class="c"># Basic: find lines containing a string</span>
+<span class="g">grep</span> <span class="y">"error"</span> <span class="b">/var/log/syslog</span>
+
+<span class="c"># Case-insensitive</span>
+<span class="g">grep</span> <span class="o">-i</span> <span class="y">"warning"</span> <span class="b">/var/log/pacman.log</span>
+
+<span class="c"># Show line numbers</span>
+<span class="g">grep</span> <span class="o">-n</span> <span class="y">"TODO"</span> <span class="b">src/*.py</span>
+
+<span class="c"># Recursive search (all files in tree)</span>
+<span class="g">grep</span> <span class="o">-rn</span> <span class="y">"import polars"</span> <span class="b">src/</span>
+
+<span class="c"># Invert — show lines that do NOT match</span>
+<span class="g">grep</span> <span class="o">-v</span> <span class="y">"^#"</span> <span class="b">/etc/pacman.conf</span>        <span class="c"># remove comment lines</span>
+<span class="g">grep</span> <span class="o">-v</span> <span class="y">"^$"</span> <span class="b">config.txt</span>              <span class="c"># remove empty lines</span>
+
+<span class="c"># Count matches</span>
+<span class="g">grep</span> <span class="o">-c</span> <span class="y">"installed"</span> <span class="b">/var/log/pacman.log</span>
+
+<span class="c"># Context — show lines around matches</span>
+<span class="g">grep</span> <span class="o">-C 3</span> <span class="y">"FATAL"</span> <span class="b">app.log</span>            <span class="c"># 3 lines before AND after each match</span>
+
+<span class="c"># Regex: match IP addresses</span>
+<span class="g">grep</span> <span class="o">-oP</span> <span class="y">'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}'</span> <span class="b">access.log</span>
+
+<span class="c"># Multiple patterns (OR)</span>
+<span class="g">grep</span> <span class="o">-E</span> <span class="y">"error|warning|critical"</span> <span class="b">syslog</span>
+
+<span class="c"># Quiet mode — for scripts (exit code only)</span>
+<span class="k">if</span> <span class="g">grep</span> <span class="o">-q</span> <span class="y">"blackarch"</span> <span class="b">/etc/pacman.conf</span>; <span class="k">then</span>
+    <span class="g">echo</span> <span class="y">"BlackArch repo is configured"</span>
+<span class="k">fi</span>
+
+<span class="c"># ═══ ripgrep (rg) — Modern Replacement ═══</span>
+
+<span class="g">rg</span> <span class="y">"TODO"</span> <span class="b">src/</span>                          <span class="c"># recursive by default, respects .gitignore</span>
+<span class="g">rg</span> <span class="o">-i</span> <span class="y">"password"</span> <span class="o">--type py</span>              <span class="c"># only in Python files</span>
+<span class="g">rg</span> <span class="y">"fn\s+\w+"</span> <span class="o">--type rust</span>               <span class="c"># find Rust function definitions</span>
+<span class="g">rg</span> <span class="o">-l</span> <span class="y">"import pandas"</span>                   <span class="c"># list filenames only</span>
+<span class="g">rg</span> <span class="o">--stats</span> <span class="y">"error"</span> <span class="b">logs/</span>               <span class="c"># show match statistics</span>
+<span class="g">rg</span> <span class="o">-c</span> <span class="y">"def "</span> <span class="b">src/</span> | <span class="g">sort</span> <span class="o">-t: -k2 -rn</span>  <span class="c"># files with most function definitions</span></pre>
+<div class="out"><div class="outl">Expected Output (rg -c "def " src/ | sort -t: -k2 -rn)</div><pre>src/models/user.py:18
+src/routes/api.py:14
+src/utils/helpers.py:11
+src/main.py:6
+src/config.py:2</pre></div></div>
+
+<div class="cm">
+<div class="cm-do"><b>✅ grep + rg power combo:</b><p>Use <span class="ic">rg</span> for searching codebases (fast, respects .gitignore, colorized). Use <span class="ic">grep</span> inside pipelines (<span class="ic">command | grep pattern</span>), in scripts that need POSIX portability, and when you need the <span class="ic">-P</span> flag for Perl regex features like lookaround assertions.</p></div>
+<div class="cm-x"><b>❌ Common mistake — unquoted regex:</b><p><span class="ic">grep *.py file</span> does NOT search for the pattern "*.py" — the shell expands <span class="ic">*.py</span> to matching filenames before grep sees it. Always quote your patterns: <span class="ic">grep "*.py" file</span> or better yet <span class="ic">grep '\.py$' file</span> (single quotes prevent any expansion).</p></div>
+</div>
+
+<div class="qz"><div class="qz-q">🧪 What does <span class="ic">grep -v "^#" file.conf | grep -v "^$"</span> do?</div>
+<div class="qo" onclick="ck(this,true)">Removes all comment lines (starting with #) and all empty lines, showing only the actual configuration content</div>
+<div class="qo" onclick="ck(this,false)">Searches for lines containing # and empty lines</div>
+<div class="qo" onclick="ck(this,false)">Deletes comments and empty lines from the file</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 3: sed                                 -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s2"><small>ARCH-CMD02.3 of 8 · ⏱ ~12 min</small></div>
+<h2>ARCH-CMD02.3 — sed: The Stream Editor</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+<button class="tab" onclick="sw(this,'de')">⚙️ Deep</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p><span class="ic">sed</span> (stream editor) reads text line by line and applies transformations to it. The most common use is find-and-replace: <span class="ic">sed 's/old/new/g'</span> replaces every occurrence of "old" with "new" on every line. But sed can do much more: delete lines, insert text, extract specific lines by number or pattern, and transform text with regex captures. Think of sed as an automated editor that processes your text with a script of editing commands, without ever opening a file in an editor.</p>
+<p>The <span class="ic">s</span> command (substitute) is what you will use 90% of the time. The syntax is <span class="ic">s/pattern/replacement/flags</span> where the pattern is a regex and the flags control behavior (like <span class="ic">g</span> for global — replace all occurrences on the line, not just the first).</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Sed processes input line by line through a two-buffer model: the pattern space (holds the current line being processed) and the hold space (a secondary buffer for advanced operations). For each line, sed applies all commands in sequence, then prints the pattern space (unless <span class="ic">-n</span> suppresses auto-print). The <span class="ic">-i</span> flag edits the file in place (actually creates a temp file, writes the modified content, then renames it over the original). Common commands: <span class="ic">s/pat/repl/g</span> (substitute), <span class="ic">d</span> (delete line), <span class="ic">/pat/d</span> (delete lines matching pattern), <span class="ic">Nd</span> (delete line N), <span class="ic">N,Md</span> (delete lines N through M), <span class="ic">a\text</span> (append after), <span class="ic">i\text</span> (insert before), <span class="ic">p</span> (print — used with <span class="ic">-n</span>), <span class="ic">y/abc/xyz/</span> (transliterate characters). Regex groups are captured with <span class="ic">\( \)</span> (basic regex) or <span class="ic">( )</span> (extended regex with <span class="ic">-E</span>) and referenced in the replacement with <span class="ic">\1, \2</span>, etc.</p>
+</div>
+<div class="pan de" data-l="de">
+<p>Sed compiles its command script into an internal representation (a linked list of <span class="ic">struct sed_cmd</span>), then enters the main loop: read a line into the pattern space via <span class="ic">getline()</span>, execute each command in the list against the pattern space (checking address conditions first), then output the pattern space via <span class="ic">write()</span> to stdout. The <span class="ic">s</span> command uses POSIX BRE (Basic Regular Expression) by default, or ERE (Extended) with <span class="ic">-E</span>. The regex is compiled to an NFA via <span class="ic">regcomp()</span> and matched via <span class="ic">regexec()</span>, both from the C library's <span class="ic"><regex.h></span>. For <span class="ic">-i</span> (in-place editing), sed calls <span class="ic">mkstemp()</span> to create a temp file in the same directory (ensuring same filesystem for atomic rename), writes all output to it, then calls <span class="ic">rename()</span> to atomically replace the original. The <span class="ic">-i.bak</span> variant first creates a backup by hard-linking the original before replacing it.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ sed — Substitution (the 90% use case) ═══</span>
+
+<span class="c"># Replace first occurrence on each line</span>
+<span class="g">echo</span> <span class="y">"hello world hello"</span> | <span class="g">sed</span> <span class="y">'s/hello/hi/'</span>
+<span class="c"># Output: hi world hello  (only first "hello" replaced)</span>
+
+<span class="c"># Replace ALL occurrences (g = global)</span>
+<span class="g">echo</span> <span class="y">"hello world hello"</span> | <span class="g">sed</span> <span class="y">'s/hello/hi/g'</span>
+<span class="c"># Output: hi world hi</span>
+
+<span class="c"># Case-insensitive replace</span>
+<span class="g">echo</span> <span class="y">"Error: big ERROR found"</span> | <span class="g">sed</span> <span class="y">'s/error/warning/gI'</span>
+<span class="c"># Output: warning: big warning found</span>
+
+<span class="c"># Use different delimiters (when pattern contains /)</span>
+<span class="g">echo</span> <span class="y">"/home/mari/old"</span> | <span class="g">sed</span> <span class="y">'s|/home/mari|/home/galaxy|'</span>
+<span class="c"># Output: /home/galaxy/old</span>
+
+<span class="c"># ═══ sed — Deleting Lines ═══</span>
+
+<span class="c"># Delete lines matching a pattern</span>
+<span class="g">sed</span> <span class="y">'/^#/d'</span> <span class="b">config.conf</span>                <span class="c"># remove comments</span>
+<span class="g">sed</span> <span class="y">'/^$/d'</span> <span class="b">file.txt</span>                    <span class="c"># remove empty lines</span>
+<span class="g">sed</span> <span class="y">'/^#/d; /^$/d'</span> <span class="b">config.conf</span>         <span class="c"># remove both at once</span>
+
+<span class="c"># Delete specific lines</span>
+<span class="g">sed</span> <span class="y">'1d'</span> <span class="b">data.csv</span>                        <span class="c"># remove first line (header)</span>
+<span class="g">sed</span> <span class="y">'$d'</span> <span class="b">file.txt</span>                        <span class="c"># remove last line</span>
+<span class="g">sed</span> <span class="y">'1,5d'</span> <span class="b">file.txt</span>                      <span class="c"># remove lines 1 through 5</span>
+
+<span class="c"># ═══ sed — Extract / Print Specific Lines ═══</span>
+
+<span class="g">sed</span> <span class="o">-n</span> <span class="y">'5p'</span> <span class="b">file.txt</span>                    <span class="c"># print only line 5</span>
+<span class="g">sed</span> <span class="o">-n</span> <span class="y">'10,20p'</span> <span class="b">file.txt</span>                <span class="c"># print lines 10-20</span>
+<span class="g">sed</span> <span class="o">-n</span> <span class="y">'/START/,/END/p'</span> <span class="b">file.txt</span>        <span class="c"># print between two patterns</span>
+
+<span class="c"># ═══ sed — Regex Capture Groups ═══</span>
+
+<span class="c"># Swap first and last name</span>
+<span class="g">echo</span> <span class="y">"Mari Galaxy"</span> | <span class="g">sed</span> <span class="o">-E</span> <span class="y">'s/(\w+) (\w+)/\2, \1/'</span>
+<span class="c"># Output: Galaxy, Mari</span>
+
+<span class="c"># Extract version numbers from text</span>
+<span class="g">echo</span> <span class="y">"Python 3.12.1"</span> | <span class="g">sed</span> <span class="o">-E</span> <span class="y">'s/.*([0-9]+\.[0-9]+\.[0-9]+)/\1/'</span>
+<span class="c"># Output: 3.12.1</span>
+
+<span class="c"># ═══ sed — Edit Files In Place ═══</span>
+
+<span class="c"># Replace in file (creates .bak backup first)</span>
+<span class="g">sed</span> <span class="o">-i.bak</span> <span class="y">'s/localhost/0.0.0.0/g'</span> <span class="b">config.yaml</span>
+
+<span class="c"># Replace without backup (⚠️ no undo!)</span>
+<span class="g">sed</span> <span class="o">-i</span> <span class="y">'s/DEBUG=true/DEBUG=false/'</span> <span class="b">.env</span></pre>
+<div class="out"><div class="outl">Expected Output (examples combined)</div><pre>hi world hello
+hi world hi
+warning: big warning found
+/home/galaxy/old
+Galaxy, Mari
+3.12.1</pre></div></div>
+
+<div class="qz"><div class="qz-q">🧪 What does the <span class="ic">g</span> flag in <span class="ic">sed 's/old/new/g'</span> do?</div>
+<div class="qo" onclick="ck(this,false)">Makes the substitution case-insensitive</div>
+<div class="qo" onclick="ck(this,true)">Replaces ALL occurrences on each line — without g, only the FIRST occurrence per line is replaced</div>
+<div class="qo" onclick="ck(this,false)">Processes all files in the directory</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 4: awk                                 -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s3"><small>ARCH-CMD02.4 of 8 · ⏱ ~14 min</small></div>
+<h2>ARCH-CMD02.4 — awk: The Column Processor</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+<button class="tab" onclick="sw(this,'de')">⚙️ Deep</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p><span class="ic">awk</span> is the most powerful text processing tool in the Unix toolkit — it is actually a complete programming language specialized for processing structured text. While grep finds lines and sed transforms text, awk excels at working with <strong>columnar data</strong> — data organized into fields separated by whitespace (or any delimiter). Each line is automatically split into fields: <span class="ic">$1</span> is the first column, <span class="ic">$2</span> the second, <span class="ic">$0</span> is the entire line, and <span class="ic">NF</span> is the number of fields. This makes awk perfect for processing command output, CSV files, log files, and any data that has a consistent column structure.</p>
+<p>The basic pattern is <span class="ic">awk '{print $1, $3}'</span> which prints the first and third columns of every line. You can add conditions before the block: <span class="ic">awk '$3 > 100 {print $1}'</span> prints the first column only for lines where the third column is greater than 100.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Awk programs have the structure <span class="ic">pattern { action }</span> applied to each line. Special patterns: <span class="ic">BEGIN</span> (runs once before processing), <span class="ic">END</span> (runs once after processing). Built-in variables: <span class="ic">$0</span> (whole line), <span class="ic">$1..$NF</span> (fields), <span class="ic">NR</span> (current line number across all files), <span class="ic">NF</span> (number of fields on current line), <span class="ic">FS</span> (field separator, default: whitespace), <span class="ic">OFS</span> (output field separator), <span class="ic">RS</span> (record separator), <span class="ic">FILENAME</span> (current input file). Awk supports variables, arrays (associative), arithmetic, string functions (<span class="ic">substr</span>, <span class="ic">split</span>, <span class="ic">gsub</span>, <span class="ic">match</span>, <span class="ic">sprintf</span>), printf formatting, if/else, for/while loops, and user-defined functions. The <span class="ic">-F</span> flag sets the field separator (e.g., <span class="ic">-F:</span> for colon-separated data like <span class="ic">/etc/passwd</span>, <span class="ic">-F,</span> for CSV).</p>
+</div>
+<div class="pan de" data-l="de">
+<p>GNU awk (gawk, the default on Arch Linux) compiles the awk program into an internal bytecode representation, then interprets it in a register-based virtual machine. For each input record (line), the engine: (1) reads a line into a buffer using the record separator (<span class="ic">RS</span>), (2) splits the line into fields by calling <span class="ic">field_splitting()</span> which uses the field separator (<span class="ic">FS</span>) to tokenize the buffer into <span class="ic">$1..$NF</span>, (3) evaluates each pattern-action pair against the current record. Pattern evaluation uses the compiled regex engine for regex patterns or the expression evaluator for conditional patterns. The associative arrays are implemented as hash tables (open addressing with double hashing). Gawk also supports network I/O (<span class="ic">/inet/tcp</span>), two-way pipes, and loadable extensions in C — making it capable of far more than simple text processing.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ awk — Column Extraction (the 80% use case) ═══</span>
+
+<span class="c"># Print specific columns</span>
+<span class="g">ls</span> <span class="o">-lh</span> | <span class="g">awk</span> <span class="y">'{print $5, $9}'</span>         <span class="c"># size and filename</span>
+<span class="g">df</span> <span class="o">-h</span> | <span class="g">awk</span> <span class="y">'{print $1, $5}'</span>          <span class="c"># device and usage%</span>
+<span class="g">ps</span> <span class="o">aux</span> | <span class="g">awk</span> <span class="y">'{print $1, $3, $11}'</span>    <span class="c"># user, CPU%, command</span>
+
+<span class="c"># Print last column (NF = number of fields)</span>
+<span class="g">echo</span> <span class="y">"path/to/my/file.py"</span> | <span class="g">awk</span> <span class="o">-F/</span> <span class="y">'{print $NF}'</span>
+<span class="c"># Output: file.py</span>
+
+<span class="c"># ═══ awk — Filtering with Conditions ═══</span>
+
+<span class="c"># Show processes using > 5% CPU</span>
+<span class="g">ps</span> <span class="o">aux</span> | <span class="g">awk</span> <span class="y">'$3 > 5.0 {print $1, $3"%", $11}'</span>
+
+<span class="c"># Show large files (> 1MB) from ls output</span>
+<span class="g">ls</span> <span class="o">-l</span> | <span class="g">awk</span> <span class="y">'$5 > 1048576 {printf "%-10s %s\n", $5, $9}'</span>
+
+<span class="c"># Parse /etc/passwd — show users with bash shell</span>
+<span class="g">awk</span> <span class="o">-F:</span> <span class="y">'$7 ~ /bash/ {print $1, $6}'</span> <span class="b">/etc/passwd</span>
+
+<span class="c"># ═══ awk — Computation ═══</span>
+
+<span class="c"># Sum a column of numbers</span>
+<span class="g">echo</span> <span class="y">-e</span> <span class="y">"10\n20\n30\n40"</span> | <span class="g">awk</span> <span class="y">'{sum += $1} END {print "Total:", sum}'</span>
+<span class="c"># Output: Total: 100</span>
+
+<span class="c"># Average</span>
+<span class="g">echo</span> <span class="y">-e</span> <span class="y">"10\n20\n30\n40"</span> | <span class="g">awk</span> <span class="y">'{sum+=$1; n++} END {print "Avg:", sum/n}'</span>
+<span class="c"># Output: Avg: 25</span>
+
+<span class="c"># Count unique values (like a mini GROUP BY)</span>
+<span class="g">awk</span> <span class="o">-F:</span> <span class="y">'{shells[$7]++} END {for (s in shells) print shells[s], s}'</span> <span class="b">/etc/passwd</span> | <span class="g">sort</span> <span class="o">-rn</span>
+
+<span class="c"># ═══ awk — BEGIN/END Blocks ═══</span>
+
+<span class="c"># Formatted table with header</span>
+<span class="g">df</span> <span class="o">-h</span> | <span class="g">awk</span> <span class="y">'
+  BEGIN { printf "%-20s %-8s %-8s\n", "DEVICE", "SIZE", "USED%" }
+  NR>1 && $5+0 > 0 { printf "%-20s %-8s %-8s\n", $1, $2, $5 }
+  END { print NR-1, "filesystems total" }
+'</span></pre>
+<div class="out"><div class="outl">Expected Output (df formatted)</div><pre>DEVICE               SIZE     USED%
+/dev/nvme0n1p3       60G      32%
+/dev/nvme0n1p4       170G     18%
+/dev/nvme0n1p1       512M     12%
+tmpfs                8.0G     1%
+4 filesystems total</pre></div></div>
+
+<div class="cm">
+<div class="cm-do"><b>✅ awk's killer feature: associative arrays</b><p>The pattern <span class="ic">awk '{count[$1]++} END {for (k in count) print count[k], k}'</span> is an entire GROUP BY + COUNT query in one line. It counts occurrences of each unique value in column 1 using a hash table. Combined with <span class="ic">sort -rn</span>, this replaces SQL queries, Python pandas groupby, and spreadsheet pivot tables for quick analysis.</p></div>
+<div class="cm-x"><b>❌ Common mistake: quoting</b><p>Always single-quote awk programs: <span class="ic">awk '{print $1}'</span>. If you double-quote, bash interprets <span class="ic">$1</span> as a bash variable (probably empty) before awk sees it. This is the most common awk bug — the program silently prints nothing because bash ate the column references.</p></div>
+</div>
+
+<div class="qz"><div class="qz-q">🧪 Why must awk programs be enclosed in SINGLE quotes?</div>
+<div class="qo" onclick="ck(this,true)">Because awk uses $1, $2, etc. for column references — if you use double quotes, bash expands them as bash variables (probably empty) before awk ever sees the program text</div>
+<div class="qo" onclick="ck(this,false)">Because awk requires single quotes in its syntax</div>
+<div class="qo" onclick="ck(this,false)">Because double quotes make awk run slower</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 5: sort / uniq / wc / cut / tr         -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s4"><small>ARCH-CMD02.5 of 8 · ⏱ ~10 min</small></div>
+<h2>ARCH-CMD02.5 — The Pipeline Toolkit: sort, uniq, wc, cut, tr</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>These five commands are the supporting cast that make grep, sed, and awk truly powerful. Each one does exactly one thing. <span class="ic">sort</span> orders lines alphabetically or numerically. <span class="ic">uniq</span> removes adjacent duplicate lines (which is why you almost always pipe through sort first). <span class="ic">wc</span> counts lines, words, and characters. <span class="ic">cut</span> extracts specific columns by delimiter or character position. <span class="ic">tr</span> translates or deletes individual characters. They are the glue that holds complex pipelines together, and you will combine them in countless ways.</p>
+</div>
+<div class="pan te" data-l="te">
+<p><strong>sort</strong> key flags: <span class="ic">-n</span> (numeric), <span class="ic">-r</span> (reverse), <span class="ic">-h</span> (human-numeric: understands K, M, G), <span class="ic">-k N</span> (sort by column N), <span class="ic">-t CHAR</span> (field separator), <span class="ic">-u</span> (unique — sort + deduplicate in one step). <strong>uniq</strong> only removes ADJACENT duplicates, so always <span class="ic">sort | uniq</span>. Flags: <span class="ic">-c</span> (prefix count), <span class="ic">-d</span> (only duplicated lines), <span class="ic">-u</span> (only unique lines). <strong>wc</strong> flags: <span class="ic">-l</span> (lines), <span class="ic">-w</span> (words), <span class="ic">-c</span> (bytes), <span class="ic">-m</span> (characters — different from bytes for UTF-8). <strong>cut</strong> flags: <span class="ic">-d DELIM</span> (delimiter), <span class="ic">-f N</span> (field N), <span class="ic">-f N-M</span> (fields N through M), <span class="ic">-c N-M</span> (characters N through M). <strong>tr</strong> flags: <span class="ic">-d 'chars'</span> (delete characters), <span class="ic">-s 'char'</span> (squeeze repeated chars into one), character classes like <span class="ic">[:upper:]</span>, <span class="ic">[:lower:]</span>, <span class="ic">[:digit:]</span>, <span class="ic">[:punct:]</span>.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ sort ═══</span>
+<span class="g">sort</span> <span class="b">names.txt</span>                         <span class="c"># alphabetical</span>
+<span class="g">sort</span> <span class="o">-n</span> <span class="b">numbers.txt</span>                    <span class="c"># numeric (1, 2, 10 instead of 1, 10, 2)</span>
+<span class="g">sort</span> <span class="o">-rn</span> <span class="b">scores.txt</span>                    <span class="c"># reverse numeric (highest first)</span>
+<span class="g">sort</span> <span class="o">-t: -k3 -n</span> <span class="b">/etc/passwd</span>           <span class="c"># sort by UID (column 3, colon-separated)</span>
+<span class="g">du</span> <span class="o">-sh</span> <span class="b">*</span> | <span class="g">sort</span> <span class="o">-rh</span>                   <span class="c"># sort by human-readable size (10G > 500M > 2K)</span>
+
+<span class="c"># ═══ uniq (must sort first!) ═══</span>
+<span class="g">sort</span> <span class="b">data.txt</span> | <span class="g">uniq</span>                   <span class="c"># remove duplicates</span>
+<span class="g">sort</span> <span class="b">data.txt</span> | <span class="g">uniq</span> <span class="o">-c</span>                <span class="c"># count occurrences of each line</span>
+<span class="g">sort</span> <span class="b">data.txt</span> | <span class="g">uniq</span> <span class="o">-c</span> | <span class="g">sort</span> <span class="o">-rn</span>    <span class="c"># top occurrences first</span>
+<span class="g">sort</span> <span class="b">data.txt</span> | <span class="g">uniq</span> <span class="o">-d</span>                <span class="c"># show ONLY lines that appear more than once</span>
+
+<span class="c"># Shortcut: sort -u = sort + uniq in one step</span>
+<span class="g">sort</span> <span class="o">-u</span> <span class="b">data.txt</span>
+
+<span class="c"># ═══ wc — Count ═══</span>
+<span class="g">wc</span> <span class="o">-l</span> <span class="b">*.py</span>                             <span class="c"># count lines in each Python file</span>
+<span class="g">find</span> <span class="b">src/</span> <span class="o">-name</span> <span class="y">"*.py"</span> | <span class="g">wc</span> <span class="o">-l</span>       <span class="c"># count Python files</span>
+<span class="g">cat</span> <span class="b">essay.md</span> | <span class="g">wc</span> <span class="o">-w</span>                  <span class="c"># count words</span>
+
+<span class="c"># ═══ cut — Extract Columns ═══</span>
+<span class="c"># Useful for simple delimited data (CSV, /etc/passwd, etc.)</span>
+<span class="g">cut</span> <span class="o">-d:</span> <span class="o">-f1</span> <span class="b">/etc/passwd</span>               <span class="c"># extract usernames (field 1)</span>
+<span class="g">cut</span> <span class="o">-d:</span> <span class="o">-f1,6</span> <span class="b">/etc/passwd</span>             <span class="c"># username and home directory</span>
+<span class="g">cut</span> <span class="o">-d,</span> <span class="o">-f2</span> <span class="b">data.csv</span>                   <span class="c"># second column of CSV</span>
+<span class="g">echo</span> <span class="y">"2026-03-15"</span> | <span class="g">cut</span> <span class="o">-d-</span> <span class="o">-f1</span>     <span class="c"># extract year: 2026</span>
+
+<span class="c"># ═══ tr — Translate/Delete Characters ═══</span>
+<span class="g">echo</span> <span class="y">"Hello World"</span> | <span class="g">tr</span> <span class="y">'[:upper:]'</span> <span class="y">'[:lower:]'</span>    <span class="c"># hello world</span>
+<span class="g">echo</span> <span class="y">"hello world"</span> | <span class="g">tr</span> <span class="y">'[:lower:]'</span> <span class="y">'[:upper:]'</span>    <span class="c"># HELLO WORLD</span>
+<span class="g">echo</span> <span class="y">"hello   world"</span> | <span class="g">tr</span> <span class="o">-s</span> <span class="y">' '</span>                   <span class="c"># squeeze: "hello world"</span>
+<span class="g">echo</span> <span class="y">"p@ssw0rd!"</span> | <span class="g">tr</span> <span class="o">-d</span> <span class="y">'[:punct:][:digit:]'</span>    <span class="c"># psswr (delete punctuation+digits)</span>
+<span class="c"># Split words onto separate lines (for word-counting pipelines)</span>
+<span class="g">echo</span> <span class="y">"the quick brown fox"</span> | <span class="g">tr</span> <span class="y">' '</span> <span class="y">'\n'</span></pre>
+<div class="out"><div class="outl">Expected Output (tr space to newline)</div><pre>the
+quick
+brown
+fox</pre></div></div>
+
+<div class="qz"><div class="qz-q">🧪 Why does <span class="ic">uniq</span> only work correctly after <span class="ic">sort</span>?</div>
+<div class="qo" onclick="ck(this,true)">Because uniq only removes ADJACENT duplicate lines — if duplicates are scattered throughout the file, uniq misses them. Sorting puts all identical lines next to each other first.</div>
+<div class="qo" onclick="ck(this,false)">Because uniq requires sorted input for performance reasons</div>
+<div class="qo" onclick="ck(this,false)">Because sort and uniq are always used together by convention</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 6: xargs                               -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s5"><small>ARCH-CMD02.6 of 8 · ⏱ ~8 min</small></div>
+<h2>ARCH-CMD02.6 — xargs: Building Commands from Input</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p><span class="ic">xargs</span> solves a specific problem: some commands do not read from stdin. For example, <span class="ic">rm</span> expects filenames as arguments, not from a pipe. So <span class="ic">find . -name "*.tmp" | rm</span> does not work. But <span class="ic">find . -name "*.tmp" | xargs rm</span> does — xargs reads the filenames from stdin and passes them as arguments to rm. Think of xargs as a translator that converts a stream of text into command arguments. It is the bridge between commands that produce output (find, grep -l, etc.) and commands that expect arguments (rm, mv, chmod, etc.).</p>
+</div>
+<div class="pan te" data-l="te">
+<p>By default, xargs reads whitespace-delimited items from stdin and appends them to the specified command, executing it once (or in batches if the argument list exceeds <span class="ic">ARG_MAX</span>). Key flags: <span class="ic">-I {}</span> (replace-string mode — runs the command once per item, replacing <span class="ic">{}</span> with the item), <span class="ic">-0</span> (null-delimited input — pair with <span class="ic">find -print0</span> to handle filenames with spaces), <span class="ic">-P N</span> (parallel execution with N processes), <span class="ic">-n N</span> (use at most N arguments per command invocation), <span class="ic">-p</span> (prompt before each execution — useful for destructive operations). The <span class="ic">find -print0 | xargs -0</span> pattern is the gold standard for safely processing filenames that may contain spaces, newlines, or special characters.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ xargs — Basic Usage ═══</span>
+
+<span class="c"># Delete all .tmp files found by find</span>
+<span class="g">find</span> <span class="b">.</span> <span class="o">-name</span> <span class="y">"*.tmp"</span> | <span class="g">xargs</span> <span class="g">rm</span>
+
+<span class="c"># Safe version (handles spaces in filenames)</span>
+<span class="g">find</span> <span class="b">.</span> <span class="o">-name</span> <span class="y">"*.tmp"</span> <span class="o">-print0</span> | <span class="g">xargs</span> <span class="o">-0</span> <span class="g">rm</span>
+
+<span class="c"># Count lines in all Python files</span>
+<span class="g">find</span> <span class="b">src/</span> <span class="o">-name</span> <span class="y">"*.py"</span> | <span class="g">xargs</span> <span class="g">wc</span> <span class="o">-l</span>
+
+<span class="c"># ═══ xargs -I {} — One Item at a Time ═══</span>
+
+<span class="c"># Rename files: add .bak extension</span>
+<span class="g">ls</span> <span class="b">*.conf</span> | <span class="g">xargs</span> <span class="o">-I{}</span> <span class="g">cp</span> <span class="b">{}</span> <span class="b">{}.bak</span>
+
+<span class="c"># Create a directory for each project name in a list</span>
+<span class="g">cat</span> <span class="b">project_names.txt</span> | <span class="g">xargs</span> <span class="o">-I{}</span> <span class="g">mkdir</span> <span class="o">-p</span> <span class="b">"projects/{}"</span>
+
+<span class="c"># Download multiple URLs</span>
+<span class="g">cat</span> <span class="b">urls.txt</span> | <span class="g">xargs</span> <span class="o">-I{}</span> <span class="g">curl</span> <span class="o">-sO</span> <span class="b">{}</span>
+
+<span class="c"># ═══ xargs -P — Parallel Execution ═══</span>
+
+<span class="c"># Compress files in parallel (4 processes)</span>
+<span class="g">find</span> <span class="b">.</span> <span class="o">-name</span> <span class="y">"*.log"</span> | <span class="g">xargs</span> <span class="o">-P 4</span> <span class="g">gzip</span>
+
+<span class="c"># Ping multiple hosts in parallel</span>
+<span class="g">echo</span> <span class="y">-e</span> <span class="y">"google.com\ngithub.com\narchlinux.org"</span> | \
+  <span class="g">xargs</span> <span class="o">-I{} -P 3</span> <span class="g">ping</span> <span class="o">-c 1 -W 1</span> <span class="b">{}</span>
+
+<span class="c"># ═══ Practical: grep -l → xargs (act on files containing a pattern) ═══</span>
+
+<span class="c"># Find all files containing "DEBUG" and replace with "INFO"</span>
+<span class="g">grep</span> <span class="o">-rl</span> <span class="y">"DEBUG"</span> <span class="b">src/</span> | <span class="g">xargs</span> <span class="g">sed</span> <span class="o">-i</span> <span class="y">'s/DEBUG/INFO/g'</span></pre></div>
+
+<div class="qz"><div class="qz-q">🧪 Why is <span class="ic">find -print0 | xargs -0</span> safer than <span class="ic">find | xargs</span>?</div>
+<div class="qo" onclick="ck(this,true)">Because -print0 separates filenames with null bytes instead of newlines, and -0 tells xargs to expect null-separated input — this correctly handles filenames containing spaces, newlines, quotes, and other special characters</div>
+<div class="qo" onclick="ck(this,false)">Because -print0 is faster</div>
+<div class="qo" onclick="ck(this,false)">Because -0 enables parallel execution</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 7: Real-World Pipelines                -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s6"><small>ARCH-CMD02.7 of 8 · ⏱ ~10 min</small></div>
+<h2>ARCH-CMD02.7 — Real-World Pipelines (10 Practical Examples)</h2>
+
+<p>These are pipelines you will actually use in your daily work on your Arch Linux system. Each one combines multiple tools from this module to accomplish a real task in a single line.</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash — 10 real pipelines</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># 1. Top 10 largest files in your home directory</span>
+<span class="g">find</span> <span class="b">~</span> <span class="o">-type f</span> <span class="o">-exec</span> <span class="g">du</span> <span class="o">-h</span> {} + 2>/dev/null | <span class="g">sort</span> <span class="o">-rh</span> | <span class="g">head</span> <span class="o">-10</span>
+
+<span class="c"># 2. Most frequently installed packages (from pacman log)</span>
+<span class="g">grep</span> <span class="y">"\[ALPM\] installed"</span> <span class="b">/var/log/pacman.log</span> | <span class="g">awk</span> <span class="y">'{print $4}'</span> | <span class="g">sort</span> | <span class="g">uniq</span> <span class="o">-c</span> | <span class="g">sort</span> <span class="o">-rn</span> | <span class="g">head</span> <span class="o">-10</span>
+
+<span class="c"># 3. Count lines of code by language in a project</span>
+<span class="g">find</span> <span class="b">src/</span> <span class="o">-type f</span> | <span class="g">sed</span> <span class="y">'s/.*\.//'</span> | <span class="g">sort</span> | <span class="g">uniq</span> <span class="o">-c</span> | <span class="g">sort</span> <span class="o">-rn</span>
+
+<span class="c"># 4. Show all unique IP addresses from a web server log</span>
+<span class="g">awk</span> <span class="y">'{print $1}'</span> <span class="b">access.log</span> | <span class="g">sort</span> <span class="o">-u</span>
+
+<span class="c"># 5. Find the 10 most common words in a document</span>
+<span class="g">tr</span> <span class="y">' '</span> <span class="y">'\n'</span> < <span class="b">doc.txt</span> | <span class="g">tr</span> <span class="o">-d</span> <span class="y">'[:punct:]'</span> | <span class="g">tr</span> <span class="y">'[:upper:]'</span> <span class="y">'[:lower:]'</span> | <span class="g">sort</span> | <span class="g">uniq</span> <span class="o">-c</span> | <span class="g">sort</span> <span class="o">-rn</span> | <span class="g">head</span> <span class="o">-10</span>
+
+<span class="c"># 6. Active network connections grouped by state</span>
+<span class="g">ss</span> <span class="o">-t</span> | <span class="g">awk</span> <span class="y">'NR>1 {print $1}'</span> | <span class="g">sort</span> | <span class="g">uniq</span> <span class="o">-c</span> | <span class="g">sort</span> <span class="o">-rn</span>
+
+<span class="c"># 7. Disk usage by top-level directories (sorted)</span>
+<span class="g">du</span> <span class="o">-sh</span> <span class="b">/*</span> 2>/dev/null | <span class="g">sort</span> <span class="o">-rh</span> | <span class="g">head</span> <span class="o">-15</span>
+
+<span class="c"># 8. Extract all email addresses from a file</span>
+<span class="g">grep</span> <span class="o">-oP</span> <span class="y">'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'</span> <span class="b">contacts.txt</span> | <span class="g">sort</span> <span class="o">-u</span>
+
+<span class="c"># 9. Replace a string across all Python files in a project</span>
+<span class="g">grep</span> <span class="o">-rl</span> <span class="y">"old_function"</span> <span class="b">src/</span> <span class="o">--include</span> <span class="y">"*.py"</span> | <span class="g">xargs</span> <span class="g">sed</span> <span class="o">-i</span> <span class="y">'s/old_function/new_function/g'</span>
+
+<span class="c"># 10. System health one-liner</span>
+<span class="g">echo</span> <span class="y">"CPU:$(grep 'cpu ' /proc/stat|awk '{u=$2+$4;t=$2+$4+$5;printf "%.0f%%",u/t*100}') MEM:$(free|awk '/Mem/{printf "%.0f%%",$3/$2*100}') DISK:$(df /|awk 'NR==2{print $5}')"</span></pre>
+<div class="out"><div class="outl">Expected Output (pipeline 10)</div><pre>CPU:23% MEM:41% DISK:32%</pre></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 8: Practice                            -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s7"><small>ARCH-CMD02.8 of 8 · ⏱ ~15 min</small></div>
+<h2>ARCH-CMD02.8 — Practice Exercises</h2>
+
+<h3>Exercise 1 (Easy) — Config Cleaner</h3>
+<p>Write a pipeline that reads <span class="ic">/etc/pacman.conf</span>, removes all comment lines (starting with #) and empty lines, and counts the remaining configuration lines.</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">solution</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="g">grep</span> <span class="o">-v</span> <span class="y">'^#'</span> <span class="b">/etc/pacman.conf</span> | <span class="g">grep</span> <span class="o">-v</span> <span class="y">'^$'</span> | <span class="g">tee</span> <span class="b">/dev/stderr</span> | <span class="g">wc</span> <span class="o">-l</span>
+<span class="c"># tee /dev/stderr shows the content on screen AND passes it to wc for counting</span></pre></div>
+
+<h3>Exercise 2 (Medium) — Log Analyzer</h3>
+<p>Write a pipeline that reads <span class="ic">/var/log/pacman.log</span> and produces a report showing: (a) how many packages were installed, upgraded, and removed total, (b) the 5 most recently installed packages, (c) the date of the last system update.</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">solution</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="v">log</span>=<span class="y">"/var/log/pacman.log"</span>
+
+<span class="g">echo</span> <span class="y">"═══ Pacman Log Analysis ═══"</span>
+<span class="g">echo</span> <span class="y">""</span>
+
+<span class="g">echo</span> <span class="y">"--- Operations Count ---"</span>
+<span class="g">grep</span> <span class="y">"\[ALPM\]"</span> <span class="y">"$log"</span> | <span class="g">awk</span> <span class="y">'{print $3}'</span> | <span class="g">sort</span> | <span class="g">uniq</span> <span class="o">-c</span> | <span class="g">sort</span> <span class="o">-rn</span>
+
+<span class="g">echo</span> <span class="y">""</span>
+<span class="g">echo</span> <span class="y">"--- 5 Most Recent Installs ---"</span>
+<span class="g">grep</span> <span class="y">"\[ALPM\] installed"</span> <span class="y">"$log"</span> | <span class="g">tail</span> <span class="o">-5</span> | <span class="g">awk</span> <span class="y">'{print $1, $4}'</span> | <span class="g">sed</span> <span class="y">'s/\[//;s/\]//'</span>
+
+<span class="g">echo</span> <span class="y">""</span>
+<span class="g">echo</span> <span class="y">"--- Last System Update ---"</span>
+<span class="g">grep</span> <span class="y">"starting full system upgrade"</span> <span class="y">"$log"</span> | <span class="g">tail</span> <span class="o">-1</span> | <span class="g">cut</span> <span class="o">-d]</span> <span class="o">-f1</span> | <span class="g">tr</span> <span class="o">-d</span> <span class="y">'['</span></pre></div>
+
+<h3>Exercise 3 (Hard) — Codebase Statistics Generator</h3>
+<p>Write a script that analyzes a project directory and produces: lines of code per file extension (sorted), files with the most TODO/FIXME comments, the 10 longest lines in the codebase, and average line length per file type. Use only the tools from this module — no Python, no external tools.</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">solution</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="g">set</span> <span class="o">-euo</span> <span class="y">pipefail</span>
+<span class="v">dir</span>=<span class="y">"${1:-.}"</span>
+
+<span class="g">echo</span> <span class="y">"═══ Codebase Statistics: $dir ═══"</span>
+
+<span class="g">echo</span> <span class="y">""</span>
+<span class="g">echo</span> <span class="y">"--- Lines of Code by Extension ---"</span>
+<span class="g">find</span> <span class="y">"$dir"</span> <span class="o">-type f</span> <span class="o">-not -path</span> <span class="y">'*/.git/*'</span> <span class="o">-not -path</span> <span class="y">'*/node_modules/*'</span> | \
+  <span class="k">while</span> IFS= <span class="g">read</span> <span class="o">-r</span> <span class="v">f</span>; <span class="k">do</span>
+    <span class="v">ext</span>=<span class="y">"${f##*.}"</span>
+    <span class="v">lines</span>=<span class="p">$(</span><span class="g">wc</span> <span class="o">-l</span> < <span class="y">"$f"</span> 2>/dev/null || <span class="g">echo</span> <span class="y">0</span><span class="p">)</span>
+    <span class="g">echo</span> <span class="y">"$ext $lines"</span>
+  <span class="k">done</span> | <span class="g">awk</span> <span class="y">'{loc[$1]+=$2} END {for (e in loc) printf "%8d  .%s\n", loc[e], e}'</span> | <span class="g">sort</span> <span class="o">-rn</span> | <span class="g">head</span> <span class="o">-10</span>
+
+<span class="g">echo</span> <span class="y">""</span>
+<span class="g">echo</span> <span class="y">"--- Files with Most TODO/FIXME ---"</span>
+<span class="g">grep</span> <span class="o">-rcE</span> <span class="y">"TODO|FIXME"</span> <span class="y">"$dir"</span> <span class="o">--include</span>=<span class="y">'*.py'</span> <span class="o">--include</span>=<span class="y">'*.sh'</span> <span class="o">--include</span>=<span class="y">'*.js'</span> 2>/dev/null | \
+  <span class="g">grep</span> <span class="o">-v</span> <span class="y">':0$'</span> | <span class="g">sort</span> <span class="o">-t: -k2 -rn</span> | <span class="g">head</span> <span class="o">-5</span>
+
+<span class="g">echo</span> <span class="y">""</span>
+<span class="g">echo</span> <span class="y">"--- 10 Longest Lines ---"</span>
+<span class="g">find</span> <span class="y">"$dir"</span> <span class="o">-type f</span> <span class="o">-not -path</span> <span class="y">'*/.git/*'</span> | \
+  <span class="g">xargs</span> <span class="g">awk</span> <span class="y">'{print length, FILENAME":"NR, substr($0,1,80)}'</span> 2>/dev/null | \
+  <span class="g">sort</span> <span class="o">-rn</span> | <span class="g">head</span> <span class="o">-10</span> | <span class="g">awk</span> <span class="y">'{printf "%4d chars  %s  %s\n", $1, $2, substr($0, index($0,$3))}'</span></pre></div>
+
+<div class="note gn">
+<b>🌸 Module Complete!</b> You now command the full Unix text processing pipeline: <span class="ic">grep</span>/<span class="ic">rg</span> for searching, <span class="ic">sed</span> for transforming, <span class="ic">awk</span> for column processing and computation, <span class="ic">sort</span>/<span class="ic">uniq</span>/<span class="ic">wc</span>/<span class="ic">cut</span>/<span class="ic">tr</span> for the supporting operations, and <span class="ic">xargs</span> for converting pipe output into command arguments. Combined with pipes, these tools let you do in one line what would take dozens of lines in Python or hundreds of clicks in a spreadsheet. This is the Unix philosophy in action — small, sharp tools chained together to solve any text processing problem. Next module: ARCH-CMD03 (Permissions & Users) — controlling who can access what.
+</div>
+
+</div>
+<div class="sf"><button onclick="svB()">💾 Save Brick 10</button></div>
+<script>
+function sw(btn,lv){let el=btn.parentElement.nextElementSibling;while(el&&!el.classList.contains('sd')&&!el.classList.contains('qz')&&!el.classList.contains('cm')&&!el.classList.contains('cw')&&el.tagName!=='H3'&&el.tagName!=='TABLE'){if(el.classList.contains('pan'))el.classList.toggle('on',el.dataset.l===lv);el=el.nextElementSibling;}btn.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');}
+function ck(btn,ok){const box=btn.closest('.qz');box.querySelectorAll('.qo').forEach(o=>o.disabled=true);btn.classList.add(ok?'y':'n');const fb=box.querySelector('.qfb');fb.classList.add('s');fb.className=ok?'qfb s w':'qfb s l';fb.textContent=ok?'✓ Correct! +10 XP':'✗ Review the section above.';}
+function cpC(b){const pre=b.closest('.cw').querySelector('pre');navigator.clipboard.writeText(pre.textContent).then(()=>{b.textContent='✓';setTimeout(()=>b.textContent='Copy',1500);});}
+function svB(){const blob=new Blob(['<!DOCTYPE html>\n'+document.documentElement.outerHTML],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='brick10_ARCHCMD02_textprocessing_'+new Date().toISOString().slice(0,10)+'.html';a.click();}
+</script>
+</body>
+</html>

@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌸 Pink Galaxy Platform — Your Learning Operating System</title>
+<style>
+:root{--p:#e91e63;--pl:#f8bbd0;--pd:#880e4f;--pg:rgba(233,30,99,.25);--g:#2e7d32;--gl:#a5d6a7;--gd:#1b5e20;--gg:rgba(46,125,50,.25);--bg:#0a0a12;--s1:#0f0f1e;--s2:#1a1a2e;--s3:#242440;--tx:#e8e6f0;--t2:#a8a6b8;--mt:#6c6a7e;--bd:rgba(233,30,99,.18);--bdg:rgba(46,125,50,.2);--r:12px;--purple:#9c27b0;--blue:#5c6bc0;--cyan:#00acc1;--orange:#ff9800;--yellow:#ffd600;--danger:#ff5252;--font:Calibri,"Segoe UI",sans-serif;--mono:"Courier New",monospace;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font);background:var(--bg);color:var(--tx);font-size:11pt;line-height:1.6;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 15% 50%,rgba(233,30,99,.05),transparent 50%),radial-gradient(ellipse at 85% 25%,rgba(46,125,50,.04),transparent 50%);}
+a{color:var(--p);text-decoration:none;}a:hover{color:var(--pl);}
+::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-thumb{background:var(--pd);border-radius:3px;}
+
+/* ═══ TOP BAR ═══ */
+.top{position:fixed;top:0;left:0;right:0;height:48px;background:rgba(15,15,30,.95);border-bottom:1px solid var(--bd);z-index:9000;display:flex;align-items:center;padding:0 14px;gap:8px;backdrop-filter:blur(16px);}
+.logo{font-weight:bold;font-size:13pt;color:var(--p);white-space:nowrap;}
+.vtabs{display:flex;gap:2px;margin-left:12px;overflow-x:auto;}
+.vtab{padding:5px 14px;border-radius:8px;cursor:pointer;font-size:8.5pt;color:var(--t2);border:1px solid transparent;transition:all .2s;font-family:inherit;background:none;white-space:nowrap;}
+.vtab:hover{color:var(--pl);background:rgba(233,30,99,.05);}
+.vtab.on{color:#fff;border-color:var(--p);background:rgba(233,30,99,.15);}
+.tright{margin-left:auto;display:flex;gap:6px;align-items:center;}
+.srch{padding:5px 12px 5px 28px;background:var(--s2);border:1px solid var(--bd);border-radius:18px;color:var(--tx);font-size:9pt;width:180px;outline:none;font-family:inherit;transition:width .3s;}
+.srch:focus{border-color:var(--p);width:260px;box-shadow:0 0 10px var(--pg);}
+.srch::placeholder{color:var(--mt);}
+.xp-pill{display:flex;align-items:center;gap:4px;padding:3px 10px;background:linear-gradient(135deg,var(--pd),var(--p));border-radius:14px;font-size:8pt;font-weight:bold;color:#fff;}
+.streak-pill{padding:3px 8px;background:rgba(255,214,0,.12);border:1px solid rgba(255,214,0,.25);border-radius:14px;font-size:8pt;color:var(--yellow);}
+.lvl-pill{padding:3px 8px;background:rgba(156,39,176,.15);border:1px solid rgba(156,39,176,.3);border-radius:14px;font-size:8pt;color:#ce93d8;}
+.tb{background:none;border:1px solid var(--bd);color:var(--t2);padding:4px 8px;border-radius:6px;cursor:pointer;font-size:14px;}
+.tb:hover{background:var(--p);color:#fff;border-color:var(--p);}
+
+/* ═══ CONTAINER ═══ */
+.main{margin-top:48px;min-height:calc(100vh - 48px);position:relative;z-index:1;}
+.view{display:none;padding:16px 20px 60px;}
+.view.on{display:block;animation:fi .25s;}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ═══ DASHBOARD ═══ */
+.dash-head{text-align:center;padding:24px 10px 16px;}
+.dash-head h1{font-size:22pt;color:var(--p);text-shadow:0 0 20px var(--pg);margin-bottom:4px;}
+.dash-head p{color:var(--t2);font-size:10pt;}
+.stats{display:flex;justify-content:center;gap:12px;margin:14px 0;flex-wrap:wrap;}
+.stat{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:10px 16px;text-align:center;min-width:100px;}
+.stat b{display:block;font-size:18pt;color:var(--p);}
+.stat small{font-size:7.5pt;color:var(--mt);text-transform:uppercase;letter-spacing:1px;}
+.stat.gn b{color:var(--gl);}
+
+/* Universe selector pills */
+.uni-row{display:flex;justify-content:center;gap:6px;margin:14px 0;flex-wrap:wrap;}
+.uni-pill{padding:5px 16px;border-radius:20px;border:1px solid var(--bd);cursor:pointer;font-size:8.5pt;font-family:inherit;transition:all .15s;display:flex;align-items:center;gap:5px;background:none;color:var(--t2);}
+.uni-pill:hover{transform:translateY(-1px);}
+.uni-pill.on{color:#fff;}
+.uni-pill[data-u="all"].on{background:var(--p);border-color:var(--p);}
+.uni-pill[data-u="ARCH"].on{background:#c62828;border-color:#c62828;}
+.uni-pill[data-u="BASH"].on{background:var(--g);border-color:var(--g);}
+.uni-pill[data-u="PYTHON"].on{background:#1565c0;border-color:#1565c0;}
+.uni-pill[data-u="SEC"].on{background:var(--danger);border-color:var(--danger);}
+.uni-pill[data-u="CLOUD"].on{background:var(--orange);border-color:var(--orange);}
+.uni-pill[data-u="REF"].on{background:var(--purple);border-color:var(--purple);}
+.uni-pill[data-u="GUIDES"].on{background:var(--p);border-color:var(--p);}
+
+/* Filter row */
+.frow{display:flex;justify-content:center;gap:4px;margin:6px 0;flex-wrap:wrap;}
+.fp{padding:3px 10px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:none;color:var(--mt);font-size:7.5pt;cursor:pointer;font-family:inherit;}
+.fp:hover,.fp.on{background:rgba(233,30,99,.12);color:var(--pl);border-color:var(--bd);}
+
+/* Cards grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;padding:10px 0 40px;max-width:1400px;margin:0 auto;}
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:14px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.card:hover{border-color:var(--p);transform:translateY(-2px);box-shadow:0 6px 20px rgba(233,30,99,.12);}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.card[data-u="ARCH"]::before{background:linear-gradient(90deg,#c62828,#e53935);}
+.card[data-u="BASH"]::before{background:linear-gradient(90deg,var(--gd),var(--g));}
+.card[data-u="PYTHON"]::before{background:linear-gradient(90deg,#0d47a1,#1976d2);}
+.card[data-u="SEC"]::before{background:linear-gradient(90deg,#b71c1c,var(--danger));}
+.card[data-u="CLOUD"]::before{background:linear-gradient(90deg,#e65100,var(--orange));}
+.card[data-u="REF"]::before{background:linear-gradient(90deg,#6a1b9a,var(--purple));}
+.card[data-u="GUIDES"]::before{background:linear-gradient(90deg,var(--pd),var(--p));}
+.card-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.card-id{font-size:7.5pt;color:var(--mt);font-family:var(--mono);letter-spacing:1px;}
+.card-diff{font-size:6.5pt;padding:2px 7px;border-radius:8px;font-weight:bold;text-transform:uppercase;}
+.cd-b{background:rgba(46,125,50,.2);color:var(--gl);}
+.cd-i{background:rgba(255,152,0,.2);color:var(--orange);}
+.cd-a{background:rgba(233,30,99,.2);color:var(--pl);}
+.card h3{font-size:10.5pt;color:var(--tx);margin-bottom:4px;line-height:1.3;}
+.card-desc{font-size:8.5pt;color:var(--t2);margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.card-tags{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:8px;}
+.tg{padding:1px 6px;border-radius:6px;font-size:6.5pt;}
+.tg-p{background:rgba(233,30,99,.08);color:var(--pl);}
+.tg-g{background:rgba(46,125,50,.08);color:var(--gl);}
+.tg-b{background:rgba(92,107,192,.1);color:var(--blue);}
+.card-bar{display:flex;align-items:center;gap:6px;}
+.bar{flex:1;height:5px;background:rgba(255,255,255,.04);border-radius:3px;overflow:hidden;}
+.fill{height:100%;background:linear-gradient(90deg,var(--p),var(--g));border-radius:3px;transition:width .4s;}
+.pct{font-size:7.5pt;color:var(--mt);min-width:24px;text-align:right;}
+
+/* ═══ MINDMAP ═══ */
+.map-bar{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px;align-items:center;}
+.mt-btn{padding:5px 12px;border-radius:8px;border:1px solid var(--bd);background:none;color:var(--t2);cursor:pointer;font-size:8.5pt;font-family:inherit;display:flex;align-items:center;gap:4px;transition:all .15s;}
+.mt-btn:hover,.mt-btn.on{background:var(--p);color:#fff;border-color:var(--p);}
+.map-c{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);min-height:500px;position:relative;overflow:hidden;}
+.mn{position:absolute;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:7pt;text-align:center;font-weight:bold;color:#fff;line-height:1.1;padding:3px;transition:all .15s;z-index:10;}
+.mn:hover{transform:scale(1.2);box-shadow:0 0 16px rgba(233,30,99,.4);z-index:100;}
+.mn[data-u="ARCH"]{background:#c62828;}.mn[data-u="BASH"]{background:var(--g);}.mn[data-u="PYTHON"]{background:#1565c0;}.mn[data-u="SEC"]{background:var(--danger);}.mn[data-u="CLOUD"]{background:var(--orange);}.mn[data-u="REF"]{background:var(--purple);}.mn[data-u="GUIDES"]{background:var(--p);}
+.ml{position:absolute;background:rgba(255,255,255,.06);height:1px;transform-origin:0 50%;pointer-events:none;}
+.map-legend{display:flex;gap:10px;padding:6px 0;font-size:7.5pt;color:var(--mt);flex-wrap:wrap;}
+.ld{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:3px;vertical-align:middle;}
+
+/* ═══ MODULE VIEW ═══ */
+.mod-back{display:inline-flex;align-items:center;gap:5px;color:var(--t2);font-size:9pt;cursor:pointer;padding:6px 0;margin-bottom:10px;}
+.mod-back:hover{color:var(--p);}
+.mod-hdr{background:linear-gradient(135deg,var(--s1),var(--s2));border:1px solid var(--bd);border-radius:var(--r);padding:20px;margin-bottom:16px;}
+.mod-hdr h1{font-size:18pt;color:var(--p);margin:0 0 6px;border:none;padding:0;}
+.mod-meta{display:flex;gap:12px;flex-wrap:wrap;font-size:8.5pt;color:var(--t2);margin-bottom:8px;}
+.mod-desc{color:var(--t2);font-size:9.5pt;}
+
+/* Section cards */
+.secs{display:flex;flex-direction:column;gap:10px;max-width:900px;}
+.sec{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;transition:border-color .2s;}
+.sec:hover{border-color:rgba(233,30,99,.35);}
+.sec-h{padding:12px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;}
+.sec-h:hover{background:rgba(233,30,99,.02);}
+.sec-dot{width:26px;height:26px;border-radius:50%;border:2px solid var(--mt);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;cursor:pointer;transition:all .2s;}
+.sec-dot.done{border-color:var(--g);background:var(--g);color:#fff;}
+.sec-dot.active{border-color:var(--p);background:rgba(233,30,99,.12);color:var(--p);}
+.sec-info{flex:1;}
+.sec-info h3{font-size:10.5pt;color:var(--tx);margin:0;}
+.sec-info small{font-size:7.5pt;color:var(--mt);}
+.sec-time{font-size:7.5pt;color:var(--mt);white-space:nowrap;}
+.sec-arr{color:var(--mt);font-size:12px;transition:transform .2s;}
+.sec.open .sec-arr{transform:rotate(180deg);}
+.sec-body{display:none;padding:0 16px 16px;border-top:1px solid rgba(255,255,255,.04);}
+.sec.open .sec-body{display:block;animation:fi .25s;}
+
+/* Explanation tabs */
+.etabs{display:flex;gap:2px;margin:10px 0 6px;}
+.etab{padding:4px 10px;border-radius:6px 6px 0 0;border:1px solid transparent;background:none;color:var(--mt);cursor:pointer;font-size:8pt;font-family:inherit;transition:all .15s;}
+.etab:hover{color:var(--pl);}
+.etab.on{background:var(--s2);color:var(--p);border-color:var(--bd);border-bottom-color:var(--s2);}
+.epanel{display:none;background:var(--s2);border:1px solid var(--bd);border-radius:0 8px 8px 8px;padding:12px 14px;font-size:10pt;line-height:1.65;}
+.epanel.on{display:block;}
+.epanel.simple{border-left:3px solid var(--gl);}
+.epanel.tech{border-left:3px solid var(--p);}
+.epanel.deep{border-left:3px solid var(--purple);}
+.epanel p{margin:6px 0;}
+.ic{font-family:var(--mono);font-size:9pt;background:rgba(233,30,99,.08);padding:1px 5px;border-radius:3px;color:var(--pl);}
+.cmap{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;}
+.cmap>div{border-radius:8px;padding:10px;font-size:9pt;}
+.cm-do{background:rgba(46,125,50,.05);border:1px solid var(--bdg);}
+.cm-do b{color:var(--gl);}
+.cm-dont{background:rgba(233,30,99,.04);border:1px solid var(--bd);}
+.cm-dont b{color:var(--pl);}
+.cmap p{margin:3px 0;color:var(--t2);}
+
+/* Quiz */
+.quiz{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:12px;margin:10px 0;}
+.quiz-q{color:var(--tx);font-size:10pt;margin-bottom:8px;}
+.qopts{display:flex;flex-direction:column;gap:5px;}
+.qopt{padding:7px 12px;border:1px solid var(--bd);border-radius:8px;cursor:pointer;font-size:9pt;color:var(--t2);background:none;font-family:inherit;width:100%;text-align:left;transition:all .15s;}
+.qopt:hover:not(:disabled){border-color:var(--p);color:var(--pl);}
+.qopt.yes{border-color:var(--g);background:rgba(46,125,50,.1);color:var(--gl);}
+.qopt.no{border-color:var(--danger);background:rgba(255,82,82,.06);color:var(--danger);}
+.qfb{margin-top:6px;font-size:9pt;padding:8px;border-radius:6px;display:none;}
+.qfb.show{display:block;}
+.qfb.win{background:rgba(46,125,50,.08);color:var(--gl);border:1px solid var(--bdg);}
+.qfb.lose{background:rgba(255,82,82,.05);color:var(--danger);border:1px solid rgba(255,82,82,.15);}
+
+/* Code blocks */
+.cw{margin:10px 0;border:1px solid var(--bdg);border-radius:8px;overflow:hidden;background:#10101c;}
+.cwt{display:flex;justify-content:space-between;align-items:center;padding:3px 10px;background:rgba(46,125,50,.1);border-bottom:1px solid var(--bdg);font-size:7pt;}
+.cwl{color:var(--g);font-family:var(--mono);font-weight:bold;text-transform:uppercase;letter-spacing:1px;}
+.cwb{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--t2);padding:2px 7px;border-radius:4px;cursor:pointer;font-size:7pt;font-family:var(--mono);}
+.cwb:hover{background:var(--p);color:#fff;}
+pre{font-family:var(--mono);font-size:9.5pt;padding:10px;overflow-x:auto;white-space:pre;line-height:1.5;margin:0;color:var(--tx);background:#10101c;}
+pre .c{color:#555;font-style:italic;}pre .g{color:#a5d6a7;}pre .y{color:#fff59d;}pre .b{color:#90caf9;}pre .o{color:#ffcc80;}pre .p{color:#f48fb1;}pre .v{color:#ce93d8;}
+.out{background:rgba(46,125,50,.05);border-top:2px solid var(--g);padding:6px 10px;font-family:var(--mono);font-size:8.5pt;color:#a5d6a7;}
+.outl{color:var(--g);font-weight:bold;font-size:7pt;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;}
+
+/* ═══ CHEATSHEETS VIEW ═══ */
+.cs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;max-width:1400px;margin:0 auto;}
+.cs-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;}
+.cs-head{padding:10px 14px;border-bottom:1px solid var(--bd);cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
+.cs-head h3{font-size:10pt;color:var(--p);margin:0;}
+.cs-body{display:none;padding:10px;font-family:var(--mono);font-size:8.5pt;color:var(--t2);max-height:300px;overflow-y:auto;}
+.cs-card.open .cs-body{display:block;}
+.cs-item{padding:4px 0;border-bottom:1px solid rgba(255,255,255,.03);}
+
+/* ═══ FLOATING ACTIONS ═══ */
+.fl{position:fixed;bottom:14px;right:14px;z-index:9999;display:flex;gap:6px;}
+.fl button{padding:7px 12px;border:none;border-radius:8px;font-weight:bold;font-size:9pt;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(0,0,0,.3);}
+.fl .sv{background:var(--g);color:#fff;}.fl .sv:hover{background:var(--gl);color:#000;}
+.fl .pi{background:var(--p);color:#fff;}.fl .pi:hover{background:var(--pl);color:#000;}
+
+@media(max-width:700px){.grid{grid-template-columns:1fr;}.vtabs{display:none;}.cmap{grid-template-columns:1fr;}}
+@media print{.top,.fl{display:none!important;}.main{margin:0;}body{background:#fff;color:#333;}@page{size:A4;margin:1.5cm;}}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top">
+<div class="logo">🌸 Pink Galaxy</div>
+<div class="vtabs">
+<button class="vtab on" onclick="go('dash')">🏠 Home</button>
+<button class="vtab" onclick="go('map')">🧠 Mindmap</button>
+<button class="vtab" onclick="go('mod')">📖 Module</button>
+<button class="vtab" onclick="go('cs')">⚡ Cheats</button>
+</div>
+<div class="tright">
+<input class="srch" placeholder="🔍 Search… Ctrl+K" onkeydown="if(event.key==='Enter')doSearch(this.value)">
+<div class="xp-pill">⭐ <span id="xpN">0</span></div>
+<div class="streak-pill">🔥 <span id="skN">0</span></div>
+<div class="lvl-pill" id="lvlN">🌱 Lv1</div>
+<button class="tb" onclick="saveAll()" title="Save">💾</button>
+</div>
+</div>
+
+<!-- ═══ VIEWS ═══ -->
+<div class="main">
+
+<!-- DASHBOARD -->
+<div class="view on" id="v-dash">
+<div class="dash-head">
+<h1>🌸 Pink Galaxy Platform</h1>
+<p>Arch Linux · BlackArch · Bash · Python · Cloud · Security — everything, interconnected</p>
+</div>
+<div class="stats">
+<div class="stat"><b id="sM">0</b><small>Modules Done</small></div>
+<div class="stat gn"><b id="sS">0</b><small>Sections</small></div>
+<div class="stat"><b id="sX">0</b><small>XP Earned</small></div>
+<div class="stat gn"><b id="sK">0</b><small>Day Streak 🔥</small></div>
+</div>
+<div class="uni-row" id="uniRow"></div>
+<div class="frow" id="diffRow"></div>
+<div class="grid" id="grid"></div>
+</div>
+
+<!-- MINDMAP -->
+<div class="view" id="v-map">
+<div class="map-bar" id="mapBar"></div>
+<div class="map-c" id="mapC" style="height:560px;"></div>
+<div class="map-legend" id="mapLeg"></div>
+</div>
+
+<!-- MODULE DETAIL -->
+<div class="view" id="v-mod">
+<div id="modBox"><div class="mod-back" onclick="go('dash')">← Dashboard</div><div class="mod-hdr"><h1 id="mT">Select a module</h1><div class="mod-meta" id="mM"></div><div class="mod-desc" id="mD"></div><div class="card-bar" style="margin-top:10px;"><div class="bar"><div class="fill" id="mP" style="width:0%"></div></div><span class="pct" id="mPn">0%</span></div></div><div class="secs" id="mSecs"></div></div>
+</div>
+
+<!-- CHEATSHEETS -->
+<div class="view" id="v-cs">
+<div style="max-width:1200px;margin:0 auto;">
+<h1 style="color:var(--p);border-bottom:2px solid var(--p);padding-bottom:8px;margin-bottom:16px;">⚡ Quick Reference</h1>
+<div class="cs-grid" id="csGrid"></div>
+</div>
+</div>
+
+</div>
+
+<div class="fl">
+<button class="pi" onclick="addPostit()">📌</button>
+<button class="sv" onclick="saveAll()">💾 Save</button>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   PINK GALAXY PLATFORM — ENGINE v3
+   All modules across all universes in one data structure
+   ═══════════════════════════════════════════════════════ */
+
+const U={
+  ARCH:{name:'Arch Linux',icon:'🐧',color:'#c62828'},
+  BASH:{name:'Bash & Scripting',icon:'🐚',color:'#2e7d32'},
+  PYTHON:{name:'Python',icon:'🐍',color:'#1565c0'},
+  SEC:{name:'Security & BlackArch',icon:'🔒',color:'#ff5252'},
+  CLOUD:{name:'Cloud & DevOps',icon:'☁️',color:'#ff9800'},
+  REF:{name:'Tools & Reference',icon:'📚',color:'#9c27b0'},
+  GUIDES:{name:'Installation Guides',icon:'🌸',color:'#e91e63'}
+};
+
+const M=[
+// ═══ GUIDES (your existing Parts 1-4) ═══
+{id:'G-PART1',u:'GUIDES',title:'Part 1: Foundation (BIOS → Base Install)',diff:'b',mins:120,desc:'Dell anonymization, disk wipe, partitioning, pacstrap, bootloader, first boot.',tags:['arch','install'],secs:['BIOS Setup','Bootable USB','Disk Wipe','Partitioning','pacstrap','System Config','Bootloader','Post-Install'],xp:200},
+{id:'G-PART2',u:'GUIDES',title:'Part 2: Desktop & Peripherals',diff:'b',mins:90,desc:'Hyprland, Kitty, Zsh, PipeWire, Bluetooth, Stream Deck, Logitech, HDMI.',tags:['hyprland','audio','bluetooth'],secs:['Hyprland Install','Hyprland Config','Launch','Kitty','Zsh+Starship','tmux','PipeWire','Bluetooth','Stream Deck','Logitech','HDMI Monitors'],xp:180},
+{id:'G-PART3',u:'GUIDES',title:'Part 3: Dev, Cloud & BlackArch',diff:'i',mins:120,desc:'Python, Docker, VS Code, Claude Code, AWS, Azure, Databricks, BlackArch setup.',tags:['python','docker','aws','blackarch'],secs:['Python/pyenv/Poetry','Node/nvm/Rust','Docker','VS Code','Claude Code','GitHub CLI','Neovim','Databases','Productivity','AWS CLI','Azure CLI','Databricks','BlackArch Setup','BlackArch Tools','Security Lab'],xp:250},
+{id:'G-PART4',u:'GUIDES',title:'Part 4: Rice, Hardening & Maintenance',diff:'i',mins:90,desc:'Pink Galaxy rice, firewall, fail2ban, backups, Timeshift, system maintenance.',tags:['rice','security','backup'],secs:['Color Palette','Waybar','Wofi','Wallpapers','GTK/Qt Theme','Lock Screen','Firewall','fail2ban','Kernel Hardening','SSH Hardening','Timeshift','Borg Backups','Dotfiles','Maintenance Script','SSD TRIM','fwupd','Pacman Tips','Kernel Mgmt'],xp:220},
+{id:'G-TOOLS',u:'GUIDES',title:'Complete Software Manifest',diff:'b',mins:60,desc:'150+ packages organized by category with install commands and GitHub links.',tags:['packages','tools'],secs:['Core System','CLI Tools','Display/Compositor','Audio/HW','Dev Environment','Productivity','Security Arsenal','Cloud/Data','BlackArch Groups','Peripherals','Rice/Theming'],xp:100},
+
+// ═══ BASH ═══
+{id:'BASH-F01',u:'BASH',title:'Your First Script',diff:'b',mins:45,desc:'Write, save, and run your first bash script. Shebang, chmod, execution.',tags:['bash','beginner','scripting'],secs:['What is a Script?','The Shebang Line','Writing Your First Script','Making it Executable','Running It','Script Organization','Practice'],xp:80,
+// THIS MODULE HAS FULL CONTENT (template)
+fullContent:true},
+{id:'BASH-F02',u:'BASH',title:'Variables & Data Types',diff:'b',mins:50,desc:'Strings, integers, arrays. Variable assignment, expansion, scope.',tags:['bash','variables'],secs:['Variable Assignment','Strings','Integers & Arithmetic','Arrays','Environment Variables','Scope (local/export)','Practice'],xp:90},
+{id:'BASH-F03',u:'BASH',title:'Quoting & Expansion',diff:'b',mins:40,desc:'Single quotes, double quotes, backticks, $(), parameter expansion.',tags:['bash','quoting'],secs:['Single vs Double Quotes','Command Substitution','Brace Expansion','Tilde Expansion','Parameter Expansion Basics','Practice'],xp:80},
+{id:'BASH-F04',u:'BASH',title:'Conditionals',diff:'b',mins:50,desc:'if/elif/else, test, [[ ]], case statements, logical operators.',tags:['bash','conditionals'],secs:['if/elif/else','test and [ ]','[[ ]] vs [ ]','case Statements','Logical Operators','Practice'],xp:90},
+{id:'BASH-F05',u:'BASH',title:'Loops',diff:'b',mins:50,desc:'for, while, until, select. Loop control with break and continue.',tags:['bash','loops'],secs:['for Loops','while Loops','until Loops','select Menus','break & continue','Practice'],xp:90},
+{id:'BASH-F06',u:'BASH',title:'Functions',diff:'i',mins:45,desc:'Defining functions, arguments, return values, local variables.',tags:['bash','functions'],secs:['Defining Functions','Arguments ($1 $2 $@)','Return Values','Local Variables','Recursive Functions','Practice'],xp:100},
+{id:'BASH-F07',u:'BASH',title:'Input/Output',diff:'b',mins:40,desc:'read, echo, printf, heredocs, redirection.',tags:['bash','io'],secs:['read','echo vs printf','Heredocs','File Redirection','Pipes','Practice'],xp:80},
+{id:'BASH-F08',u:'BASH',title:'Error Handling',diff:'i',mins:50,desc:'Exit codes, set -e, trap, defensive scripting patterns.',tags:['bash','errors'],secs:['Exit Codes','set -euo pipefail','trap','Error Functions','Defensive Patterns','Practice'],xp:110},
+
+// ═══ ARCH COMMANDS ═══
+{id:'ARCH-CMD01',u:'ARCH',title:'Navigation & Files',diff:'b',mins:45,desc:'pwd, cd, ls, mkdir, cp, mv, rm, ln, find — with modern replacements.',tags:['linux','files','navigation'],secs:['pwd/cd/ls','mkdir/rmdir','cp/mv','rm (danger zone!)','ln (links)','find/fd','Practice'],xp:80},
+{id:'ARCH-CMD02',u:'ARCH',title:'Text Processing',diff:'i',mins:60,desc:'grep, sed, awk, sort, uniq, wc, cut, tr, xargs — the pipeline toolkit.',tags:['linux','text','pipes'],secs:['Pipes & Redirection','grep/ripgrep','sed','awk','sort/uniq/wc','cut/tr','xargs','Practice'],xp:120},
+{id:'ARCH-CMD03',u:'ARCH',title:'Permissions & Users',diff:'i',mins:40,desc:'chmod, chown, umask, sudo, su, groups — who can do what.',tags:['linux','permissions'],secs:['chmod','chown','umask','sudo','User Management','Practice'],xp:90},
+{id:'ARCH-CMD04',u:'ARCH',title:'Process Management',diff:'i',mins:50,desc:'ps, kill, jobs, bg/fg, systemctl, journalctl, cron.',tags:['linux','processes','systemd'],secs:['ps/top/htop','kill/signals','bg/fg/jobs','systemctl','journalctl','cron/timers','Practice'],xp:110},
+{id:'ARCH-CMD05',u:'ARCH',title:'Networking',diff:'i',mins:50,desc:'ip, ss, ping, traceroute, curl, ssh, scp, dig.',tags:['linux','networking'],secs:['ip addr/link/route','ss','ping/traceroute','curl','ssh/scp','dig/DNS','Practice'],xp:110},
+{id:'ARCH-CMD06',u:'ARCH',title:'pacman & paru',diff:'b',mins:35,desc:'Install, update, remove, search, clean — the complete pacman reference.',tags:['arch','pacman'],secs:['Install (-S)','Update (-Syu)','Remove (-Rns)','Search (-Ss/-Qs)','Info (-Qi/-Ql)','Maintenance','paru/AUR'],xp:70},
+{id:'ARCH-CMD07',u:'ARCH',title:'Disk & Storage',diff:'i',mins:40,desc:'lsblk, fdisk, df, du, mount, fstab — managing your storage.',tags:['linux','disk'],secs:['lsblk/fdisk','df/du/dust','mount/umount','fstab','SMART','Practice'],xp:90},
+
+// ═══ PYTHON ═══
+{id:'PY-F01',u:'PYTHON',title:'Python Setup (pyenv + Poetry)',diff:'b',mins:30,desc:'Install Python, manage versions with pyenv, manage deps with Poetry.',tags:['python','setup'],secs:['Why pyenv?','Installing pyenv','Installing Python Versions','Poetry Setup','First Project','Practice'],xp:60},
+{id:'PY-F02',u:'PYTHON',title:'Data Types & Variables',diff:'b',mins:50,desc:'int, float, str, list, dict, tuple, set, bool — Python building blocks.',tags:['python','basics'],secs:['Numbers','Strings','Lists','Dicts','Tuples & Sets','Type Hints','Practice'],xp:90},
+{id:'PY-DE01',u:'PYTHON',title:'Polars Fundamentals',diff:'i',mins:60,desc:'Lightning-fast DataFrames: create, filter, group, join, write.',tags:['polars','data-engineering'],secs:['Why Polars?','Create DataFrames','Select & Filter','GroupBy & Agg','Joins','Read/Write Files','Practice'],xp:130},
+{id:'PY-DE02',u:'PYTHON',title:'Polars Advanced',diff:'a',mins:80,desc:'Lazy evaluation, expressions, streaming, window functions, plugins.',tags:['polars','advanced'],secs:['Lazy vs Eager','Expressions','Window Functions','Streaming','Custom Plugins','Spark Bridge','Practice'],xp:180},
+
+// ═══ SECURITY ═══
+{id:'SEC-F01',u:'SEC',title:'Security Foundations',diff:'b',mins:40,desc:'CIA triad, threat modeling, MITRE ATT&CK, legal framework, lab setup.',tags:['security','theory'],secs:['CIA Triad','Threat Modeling','Kill Chain','MITRE ATT&CK','Legal (§202a StGB)','Lab Setup'],xp:80},
+{id:'SEC-REC01',u:'SEC',title:'Passive Recon & OSINT',diff:'i',mins:50,desc:'Google dorks, Shodan, theHarvester, social media OSINT, metadata.',tags:['recon','osint'],secs:['Google Dorks','Shodan','theHarvester','Social Media','Metadata','Practice'],xp:100},
+{id:'SEC-REC02',u:'SEC',title:'nmap Mastery',diff:'i',mins:60,desc:'Scan types, scripts, timing, output formats, evasion techniques.',tags:['nmap','scanning'],secs:['TCP/SYN/UDP Scans','Service Detection','NSE Scripts','Timing & Performance','Output Formats','Evasion','Practice'],xp:130},
+{id:'SEC-EXP01',u:'SEC',title:'OWASP Top 10',diff:'i',mins:90,desc:'Every OWASP Top 10 vulnerability explained, demonstrated, and defended.',tags:['owasp','web'],secs:['Injection','Broken Auth','Sensitive Data','XXE','Broken Access','Misconfig','XSS','Deserialization','Components','Logging','Practice'],xp:200},
+
+// ═══ CLOUD ═══
+{id:'CLOUD-AWS01',u:'CLOUD',title:'AWS IAM & Security',diff:'i',mins:45,desc:'Users, roles, policies, MFA, least privilege — securing your AWS account.',tags:['aws','iam','security'],secs:['IAM Concepts','Users & Groups','Roles','Policies (JSON)','MFA','Best Practices','Practice'],xp:100},
+{id:'CLOUD-DB01',u:'CLOUD',title:'Databricks Workspace',diff:'i',mins:50,desc:'Notebooks, clusters, DBFS, Unity Catalog — your Databricks home base.',tags:['databricks','workspace'],secs:['Workspace Overview','Notebooks','Clusters','DBFS','Unity Catalog','CLI','Practice'],xp:110},
+{id:'CLOUD-DO03',u:'CLOUD',title:'Terraform',diff:'i',mins:60,desc:'Infrastructure as code: providers, resources, variables, state, modules.',tags:['terraform','iac'],secs:['Why IaC?','First Config','Providers','Resources','Variables','State','Modules','Practice'],xp:130},
+
+// ═══ REFERENCE ═══
+{id:'REF-CS01',u:'REF',title:'Bash One-Liners (100+)',diff:'b',mins:15,desc:'The most useful bash one-liners for daily work, organized by category.',tags:['cheatsheet','bash'],secs:['File Operations','Text Processing','System Info','Networking','Git Shortcuts','Data Processing'],xp:30},
+{id:'REF-CS05',u:'REF',title:'nmap Cheatsheet',diff:'b',mins:10,desc:'Every nmap scan type, script category, and timing template.',tags:['cheatsheet','nmap'],secs:['Scan Types','Service Detection','Scripts','Timing','Output','Evasion'],xp:20},
+{id:'REF-RES01',u:'REF',title:'Learning Platforms',diff:'b',mins:10,desc:'HTB, THM, OverTheWire, PicoCTF, Coursera, and more — where to learn.',tags:['resources','learning'],secs:['CTF Platforms','Courses','Practice Labs','Communities','Certifications'],xp:20},
+];
+
+// ═══ STATE ═══
+const K='pgp_v3';let S;
+try{S=JSON.parse(localStorage.getItem(K))||{};}catch{S={};}
+if(!S.d)S.d={};if(!S.xp)S.xp=0;if(!S.sk)S.sk=0;if(!S.lv)S.lv='';
+function sv(){localStorage.setItem(K,JSON.stringify(S));}
+function getLvl(xp){if(xp>=25000)return['🪐 Universe',50];if(xp>=10000)return['✨ Supernova',30];if(xp>=5000)return['🌌 Galaxy',20];if(xp>=1500)return['🌸 Bloom',10];if(xp>=500)return['🌿 Sprout',5];return['🌱 Seedling',1];}
+
+// ═══ VIEWS ═══
+window.go=function(v){
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('on'));
+  document.getElementById('v-'+v).classList.add('on');
+  document.querySelectorAll('.vtab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.vtab').forEach((t,i)=>{if(['dash','map','mod','cs'][i]===v)t.classList.add('on');});
+  if(v==='map')renderMap('clusters');
+};
+
+// ═══ DASHBOARD ═══
+function renderDash(){
+  // Universe pills
+  const ur=document.getElementById('uniRow');
+  ur.innerHTML='<button class="uni-pill on" data-u="all" onclick="filterU(this)">🌸 All</button>';
+  Object.entries(U).forEach(([k,v])=>{ur.innerHTML+=`<button class="uni-pill" data-u="${k}" onclick="filterU(this)">${v.icon} ${v.name}</button>`;});
+  // Diff pills
+  const dr=document.getElementById('diffRow');
+  dr.innerHTML='<button class="fp on" data-d="all" onclick="filterD(this)">All</button><button class="fp" data-d="b" onclick="filterD(this)">Beginner</button><button class="fp" data-d="i" onclick="filterD(this)">Intermediate</button><button class="fp" data-d="a" onclick="filterD(this)">Advanced</button>';
+  renderCards();
+}
+function renderCards(){
+  const g=document.getElementById('grid');g.innerHTML='';
+  M.forEach(m=>{
+    const dn=S.d[m.id]||{};const t=m.secs.length;const c=Object.values(dn).filter(Boolean).length;
+    const pct=t?Math.round(c/t*100):0;
+    const dl={b:'Beginner',i:'Intermediate',a:'Advanced'}[m.diff];
+    const dc={b:'cd-b',i:'cd-i',a:'cd-a'}[m.diff];
+    const card=document.createElement('div');card.className='card';card.dataset.u=m.u;card.dataset.d=m.diff;
+    card.onclick=()=>openMod(m.id);
+    card.innerHTML=`<div class="card-row"><span class="card-id">${m.id}</span><span class="card-diff ${dc}">${dl}</span></div><h3>${m.title}</h3><div class="card-desc">${m.desc}</div><div class="card-tags">${m.tags.map(t=>`<span class="tg tg-p">${t}</span>`).join('')}</div><div style="font-size:7.5pt;color:var(--mt);margin-bottom:5px;">${c}/${t} · ${m.mins}min · ${m.xp}XP</div><div class="card-bar"><div class="bar"><div class="fill" style="width:${pct}%"></div></div><span class="pct">${pct}%</span></div>`;
+    g.appendChild(card);
+  });
+  updStats();
+}
+let curU='all',curD='all';
+window.filterU=function(b){
+  curU=b.dataset.u;
+  document.querySelectorAll('.uni-pill').forEach(p=>p.classList.toggle('on',p.dataset.u===curU));
+  applyFilters();
+};
+window.filterD=function(b){
+  curD=b.dataset.d;
+  document.querySelectorAll('.fp').forEach(p=>p.classList.toggle('on',p.dataset.d===curD));
+  applyFilters();
+};
+function applyFilters(){
+  document.querySelectorAll('.card').forEach(c=>{
+    let show=true;
+    if(curU!=='all'&&c.dataset.u!==curU)show=false;
+    if(curD!=='all'&&c.dataset.d!==curD)show=false;
+    c.style.display=show?'':'none';
+  });
+}
+function updStats(){
+  const [lvlName,lvlNum]=getLvl(S.xp);
+  document.getElementById('xpN').textContent=S.xp;
+  document.getElementById('sX').textContent=S.xp;
+  document.getElementById('skN').textContent=S.sk;
+  document.getElementById('sK').textContent=S.sk;
+  document.getElementById('lvlN').textContent=lvlName+' Lv'+lvlNum;
+  let doneM=0,doneS=0;
+  M.forEach(m=>{const dn=S.d[m.id]||{};const c=Object.values(dn).filter(Boolean).length;doneS+=c;if(c===m.secs.length&&m.secs.length>0)doneM++;});
+  document.getElementById('sM').textContent=doneM+'/'+M.length;
+  document.getElementById('sS').textContent=doneS;
+  const today=new Date().toISOString().slice(0,10);
+  if(S.lv!==today){const yest=new Date(Date.now()-864e5).toISOString().slice(0,10);S.sk=S.lv===yest?S.sk+1:1;S.lv=today;sv();}
+}
+
+// ═══ MODULE DETAIL ═══
+window.openMod=function(id){
+  const m=M.find(x=>x.id===id);if(!m)return;
+  go('mod');
+  document.getElementById('mT').textContent=m.id+' — '+m.title;
+  document.getElementById('mM').innerHTML=`<span>${U[m.u]?.icon||''} ${U[m.u]?.name||m.u}</span><span>${{b:'Beginner',i:'Intermediate',a:'Advanced'}[m.diff]}</span><span>⏱ ${m.mins} min</span><span>⭐ ${m.xp} XP</span>`;
+  document.getElementById('mD').textContent=m.desc;
+  const dn=S.d[id]||{};const t=m.secs.length;const c=Object.values(dn).filter(Boolean).length;
+  const pct=t?Math.round(c/t*100):0;
+  document.getElementById('mP').style.width=pct+'%';
+  document.getElementById('mPn').textContent=pct+'%';
+  const box=document.getElementById('mSecs');box.innerHTML='';
+  m.secs.forEach((sec,i)=>{
+    const sk=id+'_'+i;const done=dn[sk];
+    const el=document.createElement('div');el.className='sec';
+    let bodyHTML='';
+    // Check if this module has full content (BASH-F01 template)
+    if(m.id==='BASH-F01'&&i===0){
+      bodyHTML=buildBASHF01_S0();
+    }else if(m.id==='BASH-F01'&&i===2){
+      bodyHTML=buildBASHF01_S2();
+    }else{
+      bodyHTML=buildPlaceholder(sec,m.id);
+    }
+    el.innerHTML=`<div class="sec-h" onclick="this.parentElement.classList.toggle('open')"><div class="sec-dot ${done?'done':''}" onclick="event.stopPropagation();togSec('${id}','${sk}',this)">${done?'✓':(i+1)}</div><div class="sec-info"><h3>${m.id}.${i+1} — ${sec}</h3><small>${done?'Completed ✓':'Click to expand'}</small></div><span class="sec-time">⏱ ~${Math.max(5,Math.round(m.mins/t))}min</span><span class="sec-arr">▼</span></div><div class="sec-body">${bodyHTML}</div>`;
+    box.appendChild(el);
+  });
+};
+window.togSec=function(mid,sk,el){
+  if(!S.d[mid])S.d[mid]={};S.d[mid][sk]=!S.d[mid][sk];
+  el.classList.toggle('done');el.textContent=S.d[mid][sk]?'✓':el.textContent;
+  if(S.d[mid][sk]){S.xp+=15;sv();}updStats();
+};
+window.switchE=function(btn,lv){
+  const body=btn.closest('.sec-body');
+  body.querySelectorAll('.etab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');
+  body.querySelectorAll('.epanel').forEach(p=>p.classList.toggle('on',p.dataset.lv===lv));
+};
+window.checkQ=function(btn,ok){
+  const box=btn.closest('.quiz');
+  box.querySelectorAll('.qopt').forEach(o=>{o.disabled=true;});
+  btn.classList.add(ok?'yes':'no');
+  const fb=box.querySelector('.qfb');fb.classList.add('show');
+  if(ok){fb.className='qfb show win';fb.textContent='✓ Correct! +10 XP';S.xp+=10;sv();updStats();}
+  else{fb.className='qfb show lose';fb.textContent='✗ Review the section above and try again.';}
+};
+window.cpC=function(b){const pre=b.closest('.cw').querySelector('pre');navigator.clipboard.writeText(pre.textContent).then(()=>{b.textContent='✓';setTimeout(()=>b.textContent='Copy',1500);});};
+
+// ═══ FULL CONTENT: BASH-F01 Section 0 (What is a Script?) ═══
+function buildBASHF01_S0(){return`
+<div class="etabs">
+<button class="etab on" onclick="switchE(this,'simple')">🧑 Simple</button>
+<button class="etab" onclick="switchE(this,'tech')">🔧 Technical</button>
+<button class="etab" onclick="switchE(this,'deep')">⚙️ Deep Dive</button>
+</div>
+<div class="epanel simple on" data-lv="simple">
+<p><b>Imagine you have a morning routine:</b> wake up, make coffee, check email, open your code editor. You do the same thing every single day. Now imagine you could press ONE button and all of that happens automatically. That is what a bash script is — a text file that contains a list of commands, and when you run it, the computer executes them one by one, exactly as if you typed them yourself, but instantly.</p>
+<p>A script turns repetitive work into a single click. Instead of typing 15 commands to deploy your project, you type <span class="ic">./deploy.sh</span> and go make coffee. Instead of manually checking logs on 5 servers, you run <span class="ic">./check-all.sh</span> and get a summary in 2 seconds.</p>
+<p><b>Key takeaway:</b> A bash script is just a text file full of commands that run automatically when you execute the file.</p>
+</div>
+<div class="epanel tech" data-lv="tech">
+<p>A bash script is a plain text file containing a sequence of shell commands interpreted by the Bash shell (<span class="ic">/bin/bash</span>). When you execute a script, the shell opens the file, reads it line by line, parses each line into tokens (command + arguments), and executes them in sequence. The script runs in a child process (subshell) of your current shell, meaning it inherits the environment variables but changes to variables inside the script do not affect the parent shell (unless you <span class="ic">source</span> it).</p>
+<p>Scripts support all the programming constructs you would expect: variables, conditionals (<span class="ic">if/else</span>), loops (<span class="ic">for/while</span>), functions, and error handling. They can accept command-line arguments via positional parameters (<span class="ic">$1, $2, $@</span>), read from stdin, write to stdout/stderr, and return exit codes (0 = success, non-zero = failure).</p>
+<p><b>Key takeaway:</b> A script is a program written in shell syntax, executed by the bash interpreter in a child process.</p>
+</div>
+<div class="epanel deep" data-lv="deep">
+<p>When you run <span class="ic">./script.sh</span>, the kernel performs these steps at the syscall level: (1) Your current shell calls <span class="ic">fork()</span> → the kernel duplicates the process descriptor (task_struct), creates a new PID, and sets up copy-on-write page table entries. (2) The child process calls <span class="ic">execve("./script.sh", ...)</span>. The kernel reads the first 2 bytes of the file — if they are <span class="ic">#!</span> (the shebang magic number, 0x23 0x21), it extracts the interpreter path from that first line (e.g., <span class="ic">/bin/bash</span>). (3) The kernel then calls <span class="ic">execve("/bin/bash", ["bash", "./script.sh"], environ)</span> — it replaces the child's memory image with the bash binary, sets up the ELF segments (text, data, bss, heap, stack), and starts execution at bash's entry point. (4) Bash opens <span class="ic">script.sh</span> as a file descriptor, reads it into an internal buffer, and enters its main read-eval loop: read a line → lex → parse → expand → execute. Each command in the script triggers another fork/exec cycle (unless it is a bash builtin like <span class="ic">cd</span> or <span class="ic">echo</span>, which execute within the bash process itself).</p>
+<p><b>Key takeaway:</b> The kernel uses the shebang to determine the interpreter, then the interpreter reads the file and executes commands via recursive fork/exec calls.</p>
+</div>
+<div class="cmap"><div class="cm-do"><b>✅ If you learn scripting:</b><p>You automate hours of repetitive work into seconds. You build deployment pipelines, monitoring tools, and data processing workflows. Every DevOps, sysadmin, and security role requires bash scripting. It is the universal glue of Linux.</p></div><div class="cm-dont"><b>❌ If you skip this:</b><p>You type the same commands manually every day. You cannot automate backups, deployments, or monitoring. You are locked out of CI/CD pipelines (GitHub Actions, Jenkins — all based on shell scripts). You remain a tool user instead of a tool builder.</p></div></div>
+<div class="quiz"><div class="quiz-q">🧪 What is the primary purpose of a bash script?</div><div class="qopts">
+<button class="qopt" onclick="checkQ(this,true)">To automate a sequence of commands that would otherwise be typed manually</button>
+<button class="qopt" onclick="checkQ(this,false)">To make your terminal look prettier</button>
+<button class="qopt" onclick="checkQ(this,false)">To replace Python for all programming tasks</button>
+</div><div class="qfb"></div></div>`;}
+
+// ═══ FULL CONTENT: BASH-F01 Section 2 (Writing Your First Script) ═══
+function buildBASHF01_S2(){return`
+<div class="etabs">
+<button class="etab on" onclick="switchE(this,'simple')">🧑 Simple</button>
+<button class="etab" onclick="switchE(this,'tech')">🔧 Technical</button>
+<button class="etab" onclick="switchE(this,'deep')">⚙️ Deep Dive</button>
+</div>
+<div class="epanel simple on" data-lv="simple">
+<p>Let's build your very first script. Open your terminal, create a new file, write some commands in it, and run it. That's it — three steps to becoming a script writer.</p>
+</div>
+<div class="epanel tech" data-lv="tech">
+<p>We will create a script that prints system information: hostname, kernel version, uptime, disk usage, and IP address. This demonstrates variable assignment, command substitution, and formatted output — the building blocks of every useful script.</p>
+</div>
+<div class="epanel deep" data-lv="deep">
+<p>Each command in the script triggers a fork/exec cycle. The <span class="ic">$(hostname)</span> syntax is command substitution: bash forks a subshell, executes <span class="ic">hostname</span> in it (which reads <span class="ic">/proc/sys/kernel/hostname</span>), captures its stdout via a pipe, and substitutes the output into the parent shell's command line before executing <span class="ic">echo</span>.</p>
+</div>
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="c"># sysinfo.sh — My first Pink Galaxy script 🌸</span>
+<span class="c"># Shows useful system information at a glance</span>
+
+<span class="v">PINK</span>=<span class="y">'\\033[1;35m'</span>    <span class="c"># bold pink color code</span>
+<span class="v">GREEN</span>=<span class="y">'\\033[1;32m'</span>   <span class="c"># bold green color code</span>
+<span class="v">NC</span>=<span class="y">'\\033[0m'</span>        <span class="c"># no color (reset)</span>
+
+<span class="g">echo</span> <span class="y">-e</span> <span class="y">"${PINK}═══ System Info ═══${NC}"</span>
+<span class="g">echo</span> <span class="y">-e</span> <span class="y">"${GREEN}Hostname:${NC}  $(hostname)"</span>
+<span class="g">echo</span> <span class="y">-e</span> <span class="y">"${GREEN}Kernel:${NC}    $(uname -r)"</span>
+<span class="g">echo</span> <span class="y">-e</span> <span class="y">"${GREEN}Uptime:${NC}    $(uptime -p)"</span>
+<span class="g">echo</span> <span class="y">-e</span> <span class="y">"${GREEN}Disk:${NC}      $(df -h / | awk 'NR==2{print $3 "/" $2 " (" $5 " used)"}')"</span>
+<span class="g">echo</span> <span class="y">-e</span> <span class="y">"${GREEN}IP:${NC}        $(ip -4 addr show wlan0 2>/dev/null | awk '/inet/{print $2}' || echo 'N/A')"</span>
+<span class="g">echo</span> <span class="y">-e</span> <span class="y">"${PINK}════════════════════${NC}"</span></pre>
+<div class="out"><div class="outl">Expected Output</div><pre>═══ System Info ═══
+Hostname:  pinkgalaxy
+Kernel:    6.12.8-arch1-1
+Uptime:    up 3 hours, 22 minutes
+Disk:      18G/60G (30% used)
+IP:        192.168.178.42/24
+════════════════════</pre></div></div>
+<p style="margin-top:10px;">Now make it executable and run it:</p>
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># Make it executable</span>
+<span class="g">chmod</span> <span class="o">+x</span> <span class="b">sysinfo.sh</span>
+
+<span class="c"># Run it!</span>
+<span class="g">./sysinfo.sh</span></pre></div>
+<div class="cmap"><div class="cm-do"><b>✅ You now know how to:</b><p>Create a file, add commands, make it executable, and run it. This is the foundation of every automation task you will ever build. From here, you add variables, loops, and conditionals to make scripts that make decisions.</p></div><div class="cm-dont"><b>❌ Common mistake:</b><p>Forgetting <span class="ic">chmod +x</span> and getting "Permission denied". Or forgetting the <span class="ic">./</span> prefix and getting "command not found" (bash searches PATH, not the current directory, by default).</p></div></div>
+<div class="quiz"><div class="quiz-q">🧪 You wrote a script called backup.sh but when you type <span class="ic">backup.sh</span> you get "command not found". Why?</div><div class="qopts">
+<button class="qopt" onclick="checkQ(this,false)">The script has a syntax error</button>
+<button class="qopt" onclick="checkQ(this,true)">You need to use ./backup.sh because the current directory is not in PATH</button>
+<button class="qopt" onclick="checkQ(this,false)">Bash cannot run .sh files</button>
+</div><div class="qfb"></div></div>`;}
+
+// ═══ PLACEHOLDER for unfilled sections ═══
+function buildPlaceholder(sec,modId){return`
+<div class="etabs">
+<button class="etab on" onclick="switchE(this,'simple')">🧑 Simple</button>
+<button class="etab" onclick="switchE(this,'tech')">🔧 Technical</button>
+<button class="etab" onclick="switchE(this,'deep')">⚙️ Deep Dive</button>
+</div>
+<div class="epanel simple on" data-lv="simple"><p style="color:var(--mt);font-style:italic;">📦 Content for "${sec}" is ready to be filled. Use the Blueprint v2 to generate this module's content with any AI assistant. Attach BLUEPRINT_v2.md and request: "Fill section ${modId} — ${sec}"</p></div>
+<div class="epanel tech" data-lv="tech"><p style="color:var(--mt);font-style:italic;">Technical explanation — awaiting content generation.</p></div>
+<div class="epanel deep" data-lv="deep"><p style="color:var(--mt);font-style:italic;">Deep dive — awaiting content generation.</p></div>`;}
+
+// ═══ MINDMAP ═══
+function renderMap(type){
+  const c=document.getElementById('mapC');const W=c.offsetWidth,H=c.offsetHeight||560;c.innerHTML='';
+  if(type==='clusters'){
+    const groups={};M.forEach(m=>{if(!groups[m.u])groups[m.u]=[];groups[m.u].push(m);});
+    const ukeys=Object.keys(groups);const cols=Math.ceil(Math.sqrt(ukeys.length));
+    ukeys.forEach((uk,gi)=>{
+      const col=gi%cols,row=Math.floor(gi/cols);
+      const cx=W/(cols+1)*(col+1);const cy=H/(Math.ceil(ukeys.length/cols)+1)*(row+1);
+      const mods=groups[uk];const r=Math.min(W/(cols+1)*0.35,H/3*0.4);
+      mods.forEach((m,i)=>{
+        const a=(i/mods.length)*Math.PI*2-Math.PI/2;
+        const sz=22+m.xp/12;
+        const x=cx+Math.cos(a)*r-sz/2;const y=cy+Math.sin(a)*r-sz/2;
+        const n=document.createElement('div');n.className='mn';n.dataset.u=m.u;
+        n.style.cssText=`left:${x}px;top:${y}px;width:${sz}px;height:${sz}px;`;
+        n.textContent=m.id.split('-').pop().replace(/^[A-Z]+/,'');
+        n.title=m.title;n.onclick=()=>openMod(m.id);c.appendChild(n);
+      });
+    });
+  }else if(type==='radial'){
+    const cx=W/2,cy=H/2;
+    M.forEach((m,i)=>{
+      const a=(i/M.length)*Math.PI*2-Math.PI/2;const r=Math.min(W,H)*0.38;
+      const x=cx+Math.cos(a)*r-18;const y=cy+Math.sin(a)*r-18;
+      const n=document.createElement('div');n.className='mn';n.dataset.u=m.u;
+      n.style.cssText=`left:${x}px;top:${y}px;width:36px;height:36px;font-size:6.5pt;`;
+      n.textContent=m.id.split('-').pop();n.title=m.title;n.onclick=()=>openMod(m.id);c.appendChild(n);
+      const l=document.createElement('div');l.className='ml';
+      const dx=x+18-cx,dy=y+18-cy,len=Math.sqrt(dx*dx+dy*dy);
+      l.style.cssText=`left:${cx}px;top:${cy}px;width:${len}px;transform:rotate(${Math.atan2(dy,dx)}rad);`;
+      c.appendChild(l);
+    });
+    const cn=document.createElement('div');cn.className='mn';cn.dataset.u='GUIDES';
+    cn.style.cssText=`left:${cx-24}px;top:${cy-24}px;width:48px;height:48px;font-size:16px;`;
+    cn.textContent='🌸';c.appendChild(cn);
+  }else if(type==='heatmap'){
+    const cols=Math.ceil(Math.sqrt(M.length));const cw=Math.floor(W/cols)-4;const ch=Math.floor(H/Math.ceil(M.length/cols))-4;
+    M.forEach((m,i)=>{
+      const col=i%cols,row=Math.floor(i/cols);
+      const dn=S.d[m.id]||{};const t=m.secs.length;const done=Object.values(dn).filter(Boolean).length;
+      const pct=t?done/t:0;
+      const r=Math.round(255*(1-pct)),g=Math.round(180*pct);
+      const n=document.createElement('div');n.className='mn';n.dataset.u=m.u;
+      n.style.cssText=`left:${col*(cw+4)+2}px;top:${row*(ch+4)+2}px;width:${cw}px;height:${ch}px;border-radius:4px;background:rgba(${r},${g},80,0.7);font-size:7pt;`;
+      n.textContent=m.id;n.title=m.title+' ('+Math.round(pct*100)+'%)';n.onclick=()=>openMod(m.id);c.appendChild(n);
+    });
+  }else{
+    M.forEach(m=>{
+      const x=40+Math.random()*(W-80);const y=30+Math.random()*(H-60);const sz=24+m.xp/10;
+      const n=document.createElement('div');n.className='mn';n.dataset.u=m.u;
+      n.style.cssText=`left:${x}px;top:${y}px;width:${sz}px;height:${sz}px;font-size:${Math.max(6,sz/5)}pt;`;
+      n.textContent=m.id.split('-').pop();n.title=m.title;n.onclick=()=>openMod(m.id);c.appendChild(n);
+    });
+  }
+}
+// Map controls
+(function(){
+  const bar=document.getElementById('mapBar');
+  const types=[['🧩','Clusters','clusters'],['🕸️','Network','network'],['🎯','Radial','radial'],['📊','Heatmap','heatmap'],['📅','Timeline','timeline'],['🫧','Bubbles','bubbles']];
+  types.forEach(([icon,label,type])=>{
+    bar.innerHTML+=`<button class="mt-btn${type==='clusters'?' on':''}" data-t="${type}" onclick="document.querySelectorAll('.mt-btn').forEach(b=>b.classList.remove('on'));this.classList.add('on');renderMap('${type}')">${icon} ${label}</button>`;
+  });
+  // Legend
+  const leg=document.getElementById('mapLeg');
+  Object.entries(U).forEach(([k,v])=>{leg.innerHTML+=`<span><span class="ld" style="background:${v.color}"></span>${v.name}</span>`;});
+})();
+
+// ═══ CHEATSHEETS ═══
+const CS=[
+{t:'🐚 Bash One-Liners',items:['find . -name "*.py" -exec wc -l {} +','ps aux | sort -nrk 4 | head','du -sh * | sort -rh | head','grep -rn "TODO" --include="*.py" .','tar czf bak.tar.gz --exclude=node_modules dir/','awk \'{s+=$1}END{print s}\' nums.txt','for f in *.jpg; do convert "$f" "${f%.jpg}.png"; done','while read -r line; do echo "$line"; done < file.txt']},
+{t:'🔀 Git',items:['git log --oneline --graph --all','git stash && git pull && git stash pop','git reset --soft HEAD~1','git cherry-pick <hash>','git reflog','git bisect start/bad/good','git diff --staged','git rebase -i HEAD~3']},
+{t:'🔍 nmap',items:['nmap -sC -sV -oN scan.txt <ip>','nmap -p- --min-rate 5000 <ip>','nmap -sU --top-ports 100 <ip>','nmap --script vuln <ip>','nmap -sn 192.168.1.0/24','nmap -A -T4 <ip>']},
+{t:'🐳 Docker',items:['docker ps -a','docker exec -it <id> bash','docker compose up -d','docker logs -f <id>','docker system prune -af','docker build -t name:tag .','docker network ls']},
+{t:'💀 Metasploit',items:['msfconsole','search <term>','use exploit/...','show options','set RHOSTS <ip>','exploit / run','sessions -l','msfvenom -p ... -f ...']},
+{t:'🔤 Regex',items:['. any char, * 0+, + 1+, ? 0|1','^start $end','\\d digit \\w word \\s space','[a-z] class [^a-z] negated','(group|alt)','(?:non-capture)','(?=lookahead) (?<=lookbehind)']},
+{t:'📝 Vim',items:['i=insert Esc=normal :wq=save&quit','dd=del line yy=copy p=paste u=undo','/search n=next N=prev',':%s/old/new/g = replace all','v=visual V=visual line Ctrl+v=block','ciw=change inner word','gg=top G=bottom','Ctrl+r=redo']},
+{t:'🌐 Ports',items:['21=FTP 22=SSH 23=Telnet 25=SMTP','53=DNS 80=HTTP 110=POP3 143=IMAP','443=HTTPS 445=SMB 993=IMAPS','3306=MySQL 5432=PostgreSQL 6379=Redis','8080=HTTP-alt 3389=RDP 5900=VNC','27017=MongoDB 9200=Elasticsearch']},
+{t:'☁️ AWS CLI',items:['aws configure','aws s3 ls / aws s3 cp / aws s3 sync','aws lambda invoke --function-name X out.json','aws dynamodb scan --table-name X','aws ec2 describe-instances','aws sts get-caller-identity','aws amplify list-apps']},
+{t:'🔷 Azure CLI',items:['az login','az account show','az group list -o table','az storage blob upload','az vm list -o table','az aks get-credentials']},
+{t:'🧱 Databricks',items:['databricks configure --token','databricks workspace ls /Users/','databricks fs ls dbfs:/','databricks fs cp local.csv dbfs:/data/','databricks clusters list','databricks jobs run-now --job-id X']},
+{t:'🐍 Python Security',items:['import socket; s=socket.socket()','import requests; r=requests.get(url)','from scapy.all import *; sniff(count=10)','import hashlib; hashlib.sha256(b"x").hexdigest()','from pwn import *; r=remote("ip",port)','import paramiko; ssh=paramiko.SSHClient()']},
+];
+(function(){
+  const g=document.getElementById('csGrid');
+  CS.forEach(ch=>{
+    const card=document.createElement('div');card.className='cs-card';
+    card.innerHTML=`<div class="cs-head" onclick="this.parentElement.classList.toggle('open')"><h3>${ch.t}</h3><span style="color:var(--mt);font-size:8pt">${ch.items.length} items</span></div><div class="cs-body">${ch.items.map(it=>`<div class="cs-item">${it}</div>`).join('')}</div>`;
+    g.appendChild(card);
+  });
+})();
+
+// ═══ SEARCH ═══
+window.doSearch=function(q){if(!q)return;go('dash');document.querySelectorAll('.card').forEach(c=>{c.style.display=c.textContent.toLowerCase().includes(q.toLowerCase())?'':'none';});};
+document.addEventListener('keydown',e=>{if(e.ctrlKey&&e.key==='k'){e.preventDefault();document.querySelector('.srch').focus();}});
+
+// ═══ POSTIT ═══
+window.addPostit=function(){
+  const s=document.createElement('div');
+  s.style.cssText='position:fixed;bottom:60px;right:60px;width:180px;min-height:100px;background:#f8bbd0;border-radius:6px;box-shadow:2px 4px 14px rgba(0,0,0,.4);z-index:8000;padding:4px;';
+  s.innerHTML='<div style="display:flex;justify-content:space-between;cursor:grab;font-size:10px;padding:2px 4px;" onmousedown="dragP(event,this.parentElement)"><span>📌</span><span><button style="border:none;background:none;cursor:pointer;font-size:10px;" onclick="const c=[\'#f8bbd0\',\'#c8e6c9\',\'#fff9c4\',\'#e1bee7\'];const p=this.closest(\'div[style*=fixed]\');const i=c.indexOf(p.style.background);p.style.background=c[(i+1)%4];">🎨</button><button style="border:none;background:none;cursor:pointer;font-size:10px;" onclick="this.closest(\'div[style*=fixed]\').remove()">✕</button></span></div><textarea style="width:100%;min-height:70px;border:none;background:transparent;padding:4px;font-family:Calibri;font-size:9pt;color:#333;outline:none;" placeholder="Note…"></textarea>';
+  document.body.appendChild(s);
+};
+window.dragP=function(e,el){e.preventDefault();let sx=e.clientX,sy=e.clientY,ol=el.offsetLeft,ot=el.offsetTop;function mv(ev){el.style.left=(ol+ev.clientX-sx)+'px';el.style.top=(ot+ev.clientY-sy)+'px';el.style.right='auto';el.style.bottom='auto';}function up(){document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);}document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);};
+
+// ═══ SAVE ═══
+window.saveAll=function(){sv();const b=new Blob(['<!DOCTYPE html>\n'+document.documentElement.outerHTML],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='pink_galaxy_platform_'+new Date().toISOString().slice(0,10)+'.html';a.click();};
+
+// ═══ INIT ═══
+renderDash();
+</script>
+</body>
+</html>

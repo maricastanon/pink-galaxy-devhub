@@ -1,0 +1,11 @@
+{
+  "name": "saveuserprogresslambda",
+  "version": "2.0.0",
+  "description": "Lambda function for saving user progress in Pink Galaxy DevHub",
+  "main": "index.js",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "aws-sdk": "^2.1691.0",
+    "uuid": "^9.0.0"
+  }
+}

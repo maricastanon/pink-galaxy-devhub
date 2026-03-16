@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧱 Brick 12 — ARCH-CMD04: Process Management</title>
+<style>
+:root{--p:#e91e63;--pl:#f8bbd0;--g:#2e7d32;--gl:#a5d6a7;--bg:#0a0a12;--s2:#1a1a2e;--tx:#e8e6f0;--t2:#a8a6b8;--mt:#6c6a7e;--bd:rgba(233,30,99,.18);--bdg:rgba(46,125,50,.2);--purple:#9c27b0;--mono:"Courier New",monospace;--dn:#ff5252;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Calibri,"Segoe UI",sans-serif;background:var(--bg);color:var(--tx);font-size:11pt;line-height:1.65;padding:20px;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 20% 50%,rgba(233,30,99,.05),transparent 50%);}
+.w{max-width:900px;margin:0 auto;position:relative;z-index:1;}
+h1{color:var(--p);font-size:20pt;margin:30px 0 12px;border-bottom:2px solid var(--p);padding-bottom:8px;}
+h2{color:var(--g);font-size:15pt;margin:28px 0 10px;border-left:4px solid var(--g);padding-left:12px;}
+h3{color:var(--p);font-size:12pt;margin:20px 0 8px;}
+p{margin:8px 0;text-align:justify;}
+.ic{font-family:var(--mono);font-size:9pt;background:rgba(233,30,99,.08);padding:1px 5px;border-radius:3px;color:var(--pl);}
+.note{background:var(--s2);border-left:3px solid var(--p);padding:12px;border-radius:0 8px 8px 0;margin:14px 0;font-size:9.5pt;}.note b{color:var(--p);}.note.gn{border-left-color:var(--g);}.note.gn b{color:var(--gl);}.note.dn{border-left-color:var(--dn);}.note.dn b{color:var(--dn);}
+.tabs{display:flex;gap:2px;margin:14px 0 6px;}
+.tab{padding:5px 12px;border-radius:6px 6px 0 0;border:1px solid transparent;background:none;color:var(--mt);cursor:pointer;font-size:8.5pt;font-family:inherit;}.tab.on{background:var(--s2);color:var(--p);border-color:var(--bd);border-bottom-color:var(--s2);}
+.pan{display:none;background:var(--s2);border:1px solid var(--bd);border-radius:0 8px 8px 8px;padding:14px;font-size:10pt;}.pan.on{display:block;}.pan.si{border-left:3px solid var(--gl);}.pan.te{border-left:3px solid var(--p);}.pan.de{border-left:3px solid var(--purple);}
+.cw{margin:10px 0;border:1px solid var(--bdg);border-radius:8px;overflow:hidden;background:#10101c;}
+.cwt{display:flex;justify-content:space-between;align-items:center;padding:3px 10px;background:rgba(46,125,50,.1);border-bottom:1px solid var(--bdg);font-size:7pt;}
+.cwl{color:var(--g);font-family:var(--mono);font-weight:bold;text-transform:uppercase;letter-spacing:1px;}
+.cwb{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--t2);padding:2px 7px;border-radius:4px;cursor:pointer;font-size:7pt;font-family:var(--mono);}.cwb:hover{background:var(--p);color:#fff;}
+pre{font-family:var(--mono);font-size:9.5pt;padding:10px;overflow-x:auto;white-space:pre;line-height:1.5;margin:0;color:var(--tx);background:#10101c;}
+pre .c{color:#555;font-style:italic;}pre .g{color:#a5d6a7;}pre .y{color:#fff59d;}pre .b{color:#90caf9;}pre .o{color:#ffcc80;}pre .p{color:#f48fb1;}pre .v{color:#ce93d8;}
+.out{background:rgba(46,125,50,.05);border-top:2px solid var(--g);padding:6px 10px;font-family:var(--mono);font-size:8.5pt;color:#a5d6a7;}
+.outl{color:var(--g);font-weight:bold;font-size:7pt;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;}
+.cm{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;}.cm>div{border-radius:8px;padding:10px;font-size:9pt;}
+.cm-do{background:rgba(46,125,50,.05);border:1px solid var(--bdg);}.cm-do b{color:var(--gl);}
+.cm-x{background:rgba(233,30,99,.04);border:1px solid var(--bd);}.cm-x b{color:var(--pl);}
+.cm p{margin:3px 0;color:var(--t2);}
+.qz{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:12px;margin:12px 0;}.qz-q{color:var(--tx);font-size:10pt;margin-bottom:8px;}
+.qo{padding:7px 12px;border:1px solid var(--bd);border-radius:8px;cursor:pointer;font-size:9pt;color:var(--t2);background:none;font-family:inherit;width:100%;text-align:left;transition:all .15s;display:block;margin-bottom:5px;}.qo:hover:not(:disabled){border-color:var(--p);color:var(--pl);}.qo.y{border-color:var(--g);background:rgba(46,125,50,.1);color:var(--gl);}.qo.n{border-color:var(--dn);background:rgba(255,82,82,.06);color:var(--dn);}
+.qfb{margin-top:6px;font-size:9pt;padding:8px;border-radius:6px;display:none;}.qfb.s{display:block;}.qfb.w{background:rgba(46,125,50,.08);color:var(--gl);border:1px solid var(--bdg);}.qfb.l{background:rgba(255,82,82,.05);color:var(--dn);border:1px solid rgba(255,82,82,.15);}
+.sd{margin:40px 0 0;padding:16px 0 8px;border-top:1px solid rgba(233,30,99,.1);}.sd small{color:var(--mt);font-size:8pt;text-transform:uppercase;letter-spacing:2px;}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:9.5pt;}
+th{background:rgba(233,30,99,.1);color:var(--pl);padding:8px 10px;text-align:left;border-bottom:2px solid var(--p);}
+td{padding:6px 10px;border-bottom:1px solid var(--bd);color:var(--t2);}
+td code{font-family:var(--mono);font-size:9pt;color:var(--pl);background:rgba(233,30,99,.06);padding:1px 4px;border-radius:2px;}
+.sf{position:fixed;bottom:14px;right:14px;z-index:9999;}.sf button{padding:8px 16px;background:var(--g);color:#fff;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(0,0,0,.3);}
+.cover{text-align:center;padding:30px;margin-bottom:20px;background:linear-gradient(135deg,#1a0533,#0d1b2a);border:2px solid #c62828;border-radius:14px;position:relative;overflow:hidden;}.cover h1{border:none;color:#ef9a9a;font-size:16pt;margin:0;}.cover p{color:var(--t2);font-size:10pt;}.cover::after{content:'⚙️';position:absolute;font-size:80pt;opacity:0.04;right:10px;top:-10px;}
+@media print{body{background:#fff;color:#333;}h1{color:#e91e63!important;}h2{color:#2e7d32!important;}pre{background:#f5f5f5!important;color:#333;}.sf{display:none;}@page{size:A4;margin:1.5cm 1cm;}}
+</style>
+</head>
+<body>
+<div class="w">
+
+<div class="cover">
+<h1>🧱 Brick 12 — ARCH-CMD04: Process Management</h1>
+<p>Seeing, controlling, and automating everything running on your system</p>
+<p style="font-size:8pt;color:var(--mt);margin-top:6px;">🐧 ARCH Commands Track · 7 sections · systemd mastery included</p>
+</div>
+
+<div class="note">
+<b>🎯 Why this matters:</b> Your Arch Linux system runs hundreds of processes simultaneously — your shell, Hyprland, Waybar, PipeWire, Docker, NetworkManager, SSH, and everything you launch. Understanding how to see what is running, stop misbehaving programs, manage background tasks, control system services, read logs, and schedule automated jobs is what transforms you from a user who "uses Linux" into an administrator who "controls Linux." Every troubleshooting session starts here.
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 1: ps / top / htop / btop              -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s0"><small>ARCH-CMD04.1 of 7 · ⏱ ~12 min</small></div>
+<h2>ARCH-CMD04.1 — Viewing Processes: ps, top, htop, btop</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+<button class="tab" onclick="sw(this,'de')">⚙️ Deep</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>A process is a running program. Every command you type, every application you open, every system service running in the background is a process with a unique ID number (PID). Think of your computer as a hotel: each process is a guest with a room number (PID), a check-in time, a resource budget (CPU and memory), and a status (active, sleeping, or checked out). The process viewing tools are your front desk monitors — they show you who is in the hotel, how much they are consuming, and whether anyone is causing trouble.</p>
+<p><span class="ic">ps</span> gives you a snapshot (a photograph of the current moment). <span class="ic">top</span> gives you a live dashboard (a security camera feed that updates continuously). <span class="ic">htop</span> and <span class="ic">btop</span> are modern replacements with better visuals — htop shows colorful CPU/memory bars and lets you scroll and search, while btop (installed on your Arch system) adds network and disk I/O monitoring with a beautiful terminal UI.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>The <span class="ic">ps</span> command reads process information from the <span class="ic">/proc</span> virtual filesystem — each process has a directory <span class="ic">/proc/PID/</span> containing files like <span class="ic">status</span> (state, memory), <span class="ic">cmdline</span> (command that started it), <span class="ic">fd/</span> (open file descriptors), and <span class="ic">maps</span> (memory mappings). Common ps invocations: <span class="ic">ps aux</span> (BSD-style: all processes, user-oriented, including those without a terminal), <span class="ic">ps -ef</span> (POSIX-style: full format with PPID), <span class="ic">ps --forest</span> (show process tree). Process states in the STAT column: <span class="ic">R</span> (running/runnable), <span class="ic">S</span> (sleeping — waiting for an event), <span class="ic">D</span> (uninterruptible sleep — usually disk I/O), <span class="ic">T</span> (stopped by signal), <span class="ic">Z</span> (zombie — exited but parent has not called wait()). The <span class="ic">top</span> command refreshes every 3 seconds by default and sorts by CPU usage. Key bindings inside top: <span class="ic">M</span> (sort by memory), <span class="ic">P</span> (sort by CPU), <span class="ic">k</span> (kill a process), <span class="ic">q</span> (quit).</p>
+</div>
+<div class="pan de" data-l="de">
+<p>The <span class="ic">/proc</span> filesystem is a virtual filesystem (procfs) that does not exist on disk — it is generated on-the-fly by the kernel when you read from it. Each <span class="ic">/proc/PID/status</span> file is produced by <span class="ic">proc_pid_status()</span> in <span class="ic">fs/proc/array.c</span>, which reads fields directly from the process's <span class="ic">task_struct</span> in kernel memory. The <span class="ic">task_struct</span> (defined in <span class="ic">include/linux/sched.h</span>, approximately 700 bytes) is the kernel's complete representation of a process: it contains the process state, PID, parent PID, scheduling priority, CPU time counters, memory descriptor pointer (<span class="ic">mm_struct</span>), file descriptor table pointer, signal handlers, credentials (UID/GID), cgroup membership, namespace references, and much more. On your Dell 7420's 12th Gen Intel with P-cores and E-cores, the CFS (Completely Fair Scheduler) makes scheduling decisions using a red-black tree of runnable tasks, weighted by nice value and cgroup constraints, with awareness of the heterogeneous core topology — preferring P-cores for CPU-bound tasks and E-cores for background tasks (via the Intel Thread Director hardware, exposed to the kernel through the HFI interface).</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ ps — Process Snapshot ═══</span>
+
+<span class="c"># Show all processes (the most common invocation)</span>
+<span class="g">ps</span> <span class="o">aux</span>
+
+<span class="c"># Show process tree (parent → child relationships)</span>
+<span class="g">ps</span> <span class="o">aux</span> <span class="o">--forest</span>
+
+<span class="c"># Find a specific process</span>
+<span class="g">ps</span> <span class="o">aux</span> | <span class="g">grep</span> <span class="y">"docker"</span>              <span class="c"># find Docker processes</span>
+<span class="g">pgrep</span> <span class="o">-a</span> <span class="y">docker</span>                     <span class="c"># cleaner: list PIDs + command lines</span>
+
+<span class="c"># Show only your processes</span>
+<span class="g">ps</span> <span class="o">-u</span> <span class="y">mari</span> <span class="o">-f</span>
+
+<span class="c"># Top CPU consumers (snapshot — not live)</span>
+<span class="g">ps</span> <span class="o">aux</span> <span class="o">--sort=-%cpu</span> | <span class="g">head</span> <span class="o">-10</span>
+
+<span class="c"># Top memory consumers</span>
+<span class="g">ps</span> <span class="o">aux</span> <span class="o">--sort=-%mem</span> | <span class="g">head</span> <span class="o">-10</span>
+
+<span class="c"># ═══ Live Monitors ═══</span>
+
+<span class="g">top</span>                                    <span class="c"># classic live process viewer</span>
+<span class="c"># Inside top: P=sort by CPU, M=sort by memory, k=kill, q=quit</span>
+
+<span class="g">htop</span>                                   <span class="c"># colorful, scrollable, searchable</span>
+<span class="c"># Inside htop: F4=filter, F5=tree view, F6=sort by, F9=kill, F10=quit</span>
+
+<span class="g">btop</span>                                   <span class="c"># beautiful dashboard: CPU, mem, disk, network</span>
+<span class="c"># The most informative terminal monitor — shows everything at a glance</span>
+
+<span class="c"># ═══ Quick Process Info ═══</span>
+
+<span class="c"># How many processes are running?</span>
+<span class="g">ps</span> <span class="o">aux</span> | <span class="g">wc</span> <span class="o">-l</span>                      <span class="c"># total count</span>
+
+<span class="c"># What is a PID doing?</span>
+<span class="g">cat</span> <span class="b">/proc/1234/cmdline</span> | <span class="g">tr</span> <span class="y">'\0'</span> <span class="y">' '</span>  <span class="c"># see the full command line of PID 1234</span>
+
+<span class="c"># Process tree from a specific PID</span>
+<span class="g">pstree</span> <span class="o">-p</span> <span class="y">1234</span>                       <span class="c"># show children of PID 1234</span></pre>
+<div class="out"><div class="outl">Expected Output (ps aux | head -5)</div><pre>USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root         1  0.0  0.1 168632 12288 ?        Ss   10:00   0:02 /sbin/init
+root         2  0.0  0.0      0     0 ?        S    10:00   0:00 [kthreadd]
+mari      1842  0.3  1.2 842960 98304 ?        Sl   10:01   0:45 /usr/lib/Hyprland
+mari      1901  0.1  0.4 328448 32768 ?        Sl   10:01   0:12 waybar</pre></div></div>
+
+<div class="cm">
+<div class="cm-do"><b>✅ The daily workflow:</b><p>Use <span class="ic">btop</span> for a quick visual health check of your system (CPU, memory, disk, network all in one view). Use <span class="ic">ps aux | grep name</span> or <span class="ic">pgrep -a name</span> to find a specific process. Use <span class="ic">ps aux --sort=-%cpu | head</span> to quickly find what is eating your CPU. Use <span class="ic">pstree -p PID</span> to see the parent/child relationships of a process.</p></div>
+<div class="cm-x"><b>❌ Common confusion: STAT column letters</b><p><span class="ic">S</span> (sleeping) does NOT mean the process is broken — most processes spend 99.9% of their time sleeping, waiting for input. <span class="ic">D</span> (uninterruptible sleep) usually means disk I/O — if a process is stuck in D state for a long time, the disk or filesystem might have a problem. <span class="ic">Z</span> (zombie) means the process has exited but its parent has not read its exit code yet — a few zombies are normal, hundreds indicate a buggy parent process.</p></div>
+</div>
+
+<div class="qz"><div class="qz-q">🧪 Where does <span class="ic">ps</span> actually get process information from?</div>
+<div class="qo" onclick="ck(this,true)">The /proc virtual filesystem — the kernel generates files like /proc/PID/status on-the-fly from its internal task_struct data structures when you read them</div>
+<div class="qo" onclick="ck(this,false)">A database file at /var/lib/processes.db</div>
+<div class="qo" onclick="ck(this,false)">It asks each process directly using inter-process communication</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 2: kill & Signals                      -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s1"><small>ARCH-CMD04.2 of 7 · ⏱ ~12 min</small></div>
+<h2>ARCH-CMD04.2 — kill &amp; Signals: Talking to Processes</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+<button class="tab" onclick="sw(this,'de')">⚙️ Deep</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>Despite its name, <span class="ic">kill</span> does not always kill processes — it sends them messages called "signals." Think of signals as different types of taps on the shoulder. <span class="ic">SIGTERM</span> (signal 15) is a polite tap: "Please shut down gracefully when you are ready." The process can clean up its resources, save its state, and exit orderly. <span class="ic">SIGKILL</span> (signal 9) is being carried out by security guards: the kernel terminates the process immediately with no chance to clean up. You should almost always try SIGTERM first and only use SIGKILL as a last resort, because SIGKILL can leave behind lock files, corrupt partially-written data, and orphan child processes.</p>
+<p>When you press <span class="ic">Ctrl+C</span> in the terminal, you are actually sending <span class="ic">SIGINT</span> (signal 2, "interrupt") to the foreground process. When you press <span class="ic">Ctrl+Z</span>, you send <span class="ic">SIGTSTP</span> (signal 20, "terminal stop") which pauses the process. These are the signals you use most often without even thinking about it.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Signals are asynchronous notifications delivered by the kernel to processes. There are 31 standard signals (1-31) plus real-time signals (32-64). Key signals and their default actions: <span class="ic">SIGHUP</span> (1) — terminal disconnected; many daemons reload config on SIGHUP. <span class="ic">SIGINT</span> (2) — keyboard interrupt (Ctrl+C); terminates process. <span class="ic">SIGQUIT</span> (3) — keyboard quit (Ctrl+\); terminates with core dump. <span class="ic">SIGKILL</span> (9) — force kill; cannot be caught, blocked, or ignored. <span class="ic">SIGTERM</span> (15) — graceful termination; default signal sent by <span class="ic">kill</span>. <span class="ic">SIGSTOP</span> (19) — pause process; cannot be caught. <span class="ic">SIGCONT</span> (18) — resume paused process. <span class="ic">SIGTSTP</span> (20) — terminal stop (Ctrl+Z); can be caught. Processes can register signal handlers with <span class="ic">sigaction()</span> to perform custom cleanup when receiving catchable signals. Only SIGKILL and SIGSTOP cannot be caught or ignored.</p>
+</div>
+<div class="pan de" data-l="de">
+<p>Signal delivery works through the kernel's signal infrastructure in <span class="ic">kernel/signal.c</span>. When you call <span class="ic">kill(pid, sig)</span>, the kernel sets a bit in the target process's <span class="ic">pending</span> signal bitmask (inside the <span class="ic">task_struct</span>). The signal is not delivered immediately — it is delivered the next time the target process returns from kernel space to user space (at the end of a syscall, interrupt, or exception). At that point, <span class="ic">do_signal()</span> checks the pending bitmask, finds the highest-priority pending signal, and either executes the registered handler (by modifying the process's user-space stack to call the handler function when it returns) or performs the default action (terminate, terminate+core dump, stop, or ignore). For SIGKILL, the kernel calls <span class="ic">do_group_exit()</span> which sets the process state to <span class="ic">TASK_DEAD</span> and releases all resources — the process has no opportunity to execute any user-space code, which is why SIGKILL cannot be caught. On your Alder Lake CPU, signal delivery latency is typically under 10 microseconds because the kernel checks pending signals on every return-to-userspace path.</p>
+</div>
+
+<table>
+<tr><th>Signal</th><th>Number</th><th>Keyboard</th><th>Default Action</th><th>Catchable?</th><th>Use When</th></tr>
+<tr><td><code>SIGHUP</code></td><td>1</td><td>—</td><td>Terminate</td><td>Yes</td><td>Reload daemon config</td></tr>
+<tr><td><code>SIGINT</code></td><td>2</td><td>Ctrl+C</td><td>Terminate</td><td>Yes</td><td>Cancel running command</td></tr>
+<tr><td><code>SIGQUIT</code></td><td>3</td><td>Ctrl+\</td><td>Core dump</td><td>Yes</td><td>Debug crashed program</td></tr>
+<tr><td><code>SIGKILL</code></td><td>9</td><td>—</td><td>Terminate (FORCE)</td><td><strong>No</strong></td><td>Last resort — frozen process</td></tr>
+<tr><td><code>SIGTERM</code></td><td>15</td><td>—</td><td>Terminate (graceful)</td><td>Yes</td><td>Normal process shutdown</td></tr>
+<tr><td><code>SIGSTOP</code></td><td>19</td><td>—</td><td>Pause</td><td><strong>No</strong></td><td>Force-pause a process</td></tr>
+<tr><td><code>SIGTSTP</code></td><td>20</td><td>Ctrl+Z</td><td>Pause</td><td>Yes</td><td>Suspend foreground job</td></tr>
+<tr><td><code>SIGCONT</code></td><td>18</td><td>—</td><td>Resume</td><td>Yes</td><td>Resume paused process</td></tr>
+</table>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ Sending Signals ═══</span>
+
+<span class="c"># Graceful termination (SIGTERM — the default, always try this first)</span>
+<span class="g">kill</span> <span class="y">1234</span>                     <span class="c"># sends SIGTERM to PID 1234</span>
+<span class="g">kill</span> <span class="o">-15</span> <span class="y">1234</span>                  <span class="c"># same thing, explicitly</span>
+<span class="g">kill</span> <span class="o">-SIGTERM</span> <span class="y">1234</span>             <span class="c"># same thing, by name</span>
+
+<span class="c"># Force kill (SIGKILL — only if SIGTERM didn't work after ~5 seconds)</span>
+<span class="g">kill</span> <span class="o">-9</span> <span class="y">1234</span>                   <span class="c"># ☠️ immediate, no cleanup</span>
+<span class="g">kill</span> <span class="o">-SIGKILL</span> <span class="y">1234</span>             <span class="c"># same thing</span>
+
+<span class="c"># Kill by name (no need to find the PID first)</span>
+<span class="g">pkill</span> <span class="y">firefox</span>                   <span class="c"># SIGTERM all processes named "firefox"</span>
+<span class="g">pkill</span> <span class="o">-9</span> <span class="y">firefox</span>                <span class="c"># SIGKILL all firefox processes</span>
+<span class="g">killall</span> <span class="y">waybar</span>                  <span class="c"># SIGTERM all processes named exactly "waybar"</span>
+
+<span class="c"># Reload config without restarting (SIGHUP — many daemons support this)</span>
+<span class="g">sudo</span> <span class="g">kill</span> <span class="o">-HUP</span> <span class="p">$(</span><span class="g">pgrep</span> <span class="y">nginx</span><span class="p">)</span>  <span class="c"># nginx reloads its config</span>
+
+<span class="c"># Pause and resume a process</span>
+<span class="g">kill</span> <span class="o">-STOP</span> <span class="y">1234</span>                <span class="c"># freeze the process</span>
+<span class="g">kill</span> <span class="o">-CONT</span> <span class="y">1234</span>                <span class="c"># unfreeze it</span>
+
+<span class="c"># ═══ The Correct Kill Sequence ═══</span>
+<span class="c"># 1. Try SIGTERM first (graceful):</span>
+<span class="g">kill</span> <span class="y">1234</span>
+<span class="c"># 2. Wait 5 seconds</span>
+<span class="g">sleep</span> <span class="y">5</span>
+<span class="c"># 3. Check if it's still running:</span>
+<span class="g">ps</span> <span class="o">-p</span> <span class="y">1234</span> > /dev/null 2>&1 && <span class="g">echo</span> <span class="y">"still alive"</span> || <span class="g">echo</span> <span class="y">"dead"</span>
+<span class="c"># 4. Only if still alive, SIGKILL:</span>
+<span class="g">kill</span> <span class="o">-9</span> <span class="y">1234</span></pre></div>
+
+<div class="cm">
+<div class="cm-do"><b>✅ Always SIGTERM before SIGKILL:</b><p>SIGTERM gives the process a chance to close files cleanly, flush buffers to disk, release locks, notify connected clients, and remove temporary files. SIGKILL does none of this — it is instant death. A database killed with SIGKILL may corrupt its data files. A web server killed with SIGKILL drops all active connections without sending error responses. Always be polite first.</p></div>
+<div class="cm-x"><b>❌ When SIGKILL does not work:</b><p>A process in D state (uninterruptible sleep — usually waiting for disk I/O) cannot be killed even with SIGKILL because the kernel does not deliver signals to processes in this state. The only fix is to resolve the I/O issue (unmount the stuck filesystem, reboot the machine, or fix the failing disk). Zombie (Z) processes also cannot be killed because they are already dead — their parent needs to call <span class="ic">wait()</span> to reap them.</p></div>
+</div>
+
+<div class="qz"><div class="qz-q">🧪 Why should you try <span class="ic">kill 1234</span> (SIGTERM) before <span class="ic">kill -9 1234</span> (SIGKILL)?</div>
+<div class="qo" onclick="ck(this,true)">SIGTERM lets the process clean up gracefully — close files, flush data, release locks. SIGKILL terminates instantly with no cleanup, which can corrupt data, leave lock files behind, and orphan child processes.</div>
+<div class="qo" onclick="ck(this,false)">SIGTERM is faster than SIGKILL</div>
+<div class="qo" onclick="ck(this,false)">SIGKILL does not actually stop the process</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 3: Job Control                         -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s2"><small>ARCH-CMD04.3 of 7 · ⏱ ~8 min</small></div>
+<h2>ARCH-CMD04.3 — Job Control: bg, fg, jobs, &amp;, nohup, disown</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>Job control lets you manage multiple tasks from a single terminal. When you press <span class="ic">Ctrl+Z</span>, the current command pauses (stops, but stays in memory). You can then start a new command, and later bring the paused one back. The <span class="ic">&</span> at the end of a command runs it in the background immediately, giving you your prompt back while it works. <span class="ic">bg</span> resumes a paused job in the background. <span class="ic">fg</span> brings a background job to the foreground. <span class="ic">jobs</span> lists all jobs in the current shell session.</p>
+<p>The really useful trick is <span class="ic">nohup</span> and <span class="ic">disown</span>: normally, when you close your terminal, all jobs started in that terminal are killed (they receive SIGHUP). If you want a job to survive the terminal closing (e.g., a long download or a script that should keep running after you log out of SSH), wrap it with <span class="ic">nohup</span> or use <span class="ic">disown</span> after starting it.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Bash's job control is built on process groups and the terminal's foreground process group. Each pipeline is assigned a process group ID (PGID). The terminal (TTY) has one foreground process group — only processes in this group receive keyboard signals (SIGINT from Ctrl+C, SIGTSTP from Ctrl+Z). When you run <span class="ic">cmd &</span>, bash puts the process in a background process group. When you type <span class="ic">fg %1</span>, bash calls <span class="ic">tcsetpgrp()</span> to make job 1's process group the terminal's foreground group. The <span class="ic">nohup</span> command sets the SIGHUP handler to SIG_IGN (ignore) and redirects stdout/stderr to <span class="ic">nohup.out</span>. The <span class="ic">disown</span> builtin removes a job from bash's job table so bash does not send SIGHUP to it when the shell exits. For long-running tasks, <span class="ic">tmux</span> (which you set up in Part 2) is the professional solution — it detaches the entire terminal session from the physical terminal, so everything survives logout.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ Background & Foreground ═══</span>
+
+<span class="c"># Run a command in the background (append &)</span>
+<span class="g">sleep</span> <span class="y">300</span> &                   <span class="c"># starts in background, prompt returns immediately</span>
+<span class="c"># [1] 5678                    ← job number [1], PID 5678</span>
+
+<span class="c"># List background jobs</span>
+<span class="g">jobs</span>                           <span class="c"># shows all jobs in this shell</span>
+<span class="c"># [1]+  Running    sleep 300 &</span>
+
+<span class="c"># Bring background job to foreground</span>
+<span class="g">fg</span> <span class="y">%1</span>                          <span class="c"># %1 = job number 1</span>
+
+<span class="c"># Pause a running foreground command</span>
+<span class="c"># Press Ctrl+Z while it's running</span>
+<span class="c"># [1]+  Stopped    sleep 300</span>
+
+<span class="c"># Resume it in the background</span>
+<span class="g">bg</span> <span class="y">%1</span>
+
+<span class="c"># ═══ Surviving Terminal Close ═══</span>
+
+<span class="c"># nohup: immune to hangup signal, output goes to nohup.out</span>
+<span class="g">nohup</span> <span class="b">./long_running_script.sh</span> &
+
+<span class="c"># disown: remove from job table (no SIGHUP on terminal close)</span>
+<span class="b">./background_task.sh</span> &
+<span class="g">disown</span> <span class="y">%1</span>
+
+<span class="c"># Best solution: use tmux (from Part 2 of your Arch Guide)</span>
+<span class="g">tmux</span> <span class="o">new</span> <span class="o">-s</span> <span class="y">work</span>              <span class="c"># create a named session</span>
+<span class="c"># ... run commands ...</span>
+<span class="c"># Ctrl+B, D → detach (session keeps running)</span>
+<span class="g">tmux</span> <span class="o">attach</span> <span class="o">-t</span> <span class="y">work</span>           <span class="c"># reconnect later (even from different SSH session!)</span></pre></div>
+
+<div class="qz"><div class="qz-q">🧪 You are connected via SSH and start a long backup script. You need to close your laptop and leave. What is the safest way to keep the script running?</div>
+<div class="qo" onclick="ck(this,false)">Just close the terminal — Linux will keep it running</div>
+<div class="qo" onclick="ck(this,false)">Press Ctrl+Z to pause it</div>
+<div class="qo" onclick="ck(this,true)">Run the script inside a tmux session, then detach with Ctrl+B D — the tmux session continues running even after SSH disconnects, and you can reattach from anywhere later</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 4: systemctl                           -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s3"><small>ARCH-CMD04.4 of 7 · ⏱ ~14 min</small></div>
+<h2>ARCH-CMD04.4 — systemctl: Managing System Services</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+<button class="tab" onclick="sw(this,'de')">⚙️ Deep</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p><span class="ic">systemd</span> is the system manager that runs as PID 1 on your Arch Linux machine — it is the very first process the kernel starts, and it is responsible for starting and managing all other services: your network (NetworkManager), your audio (PipeWire), your firewall (ufw), your Docker daemon, your SSH server, and hundreds of other background services. The <span class="ic">systemctl</span> command is how you talk to systemd — you use it to start, stop, restart, enable (auto-start on boot), and check the status of services. This is arguably the most important system administration command on modern Linux.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Systemd organizes its work into "units" of different types. The most common types: <span class="ic">.service</span> (daemon processes: docker.service, sshd.service), <span class="ic">.timer</span> (scheduled tasks — systemd's replacement for cron), <span class="ic">.socket</span> (network sockets that activate services on demand), <span class="ic">.target</span> (groups of units — like runlevels: multi-user.target, graphical.target), <span class="ic">.mount</span> (filesystem mount points), <span class="ic">.path</span> (file/directory watches). Unit files live in <span class="ic">/usr/lib/systemd/system/</span> (package-installed, do not edit), <span class="ic">/etc/systemd/system/</span> (admin customizations — overrides the former), and <span class="ic">~/.config/systemd/user/</span> (user services). The <span class="ic">enable</span> command creates a symlink in the appropriate <span class="ic">.wants/</span> directory so the unit starts automatically at boot. The <span class="ic">--now</span> flag combines enable+start or disable+stop into one command.</p>
+</div>
+<div class="pan de" data-l="de">
+<p>Systemd (PID 1) communicates with <span class="ic">systemctl</span> via D-Bus (the system message bus — a local IPC mechanism using Unix domain sockets). When you run <span class="ic">systemctl start docker</span>, the systemctl client sends a D-Bus method call to the <span class="ic">org.freedesktop.systemd1</span> service, which is PID 1 itself. Systemd then reads the docker.service unit file, resolves its dependencies (After=, Requires=, Wants=), creates a control group (cgroup) for the service via the cgroup2 filesystem at <span class="ic">/sys/fs/cgroup/</span>, forks a child process within that cgroup, applies resource limits (MemoryMax=, CPUWeight=, etc.), executes the ExecStart= command, and monitors the process. If the process crashes and Restart=on-failure is set, systemd automatically restarts it. The cgroup membership ensures that all child processes spawned by the service are tracked and can be cleanly stopped together (no orphan processes). On your system, every service you configured in Parts 1-4 (NetworkManager, PipeWire, Docker, fail2ban, fstrim.timer) is managed through this mechanism.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ systemctl — The Essential Commands ═══</span>
+
+<span class="c"># Status of a service (the first thing to check when troubleshooting)</span>
+<span class="g">systemctl</span> <span class="o">status</span> <span class="y">docker</span>
+<span class="c"># Shows: active/inactive, PID, memory usage, recent log entries</span>
+
+<span class="c"># Start / Stop / Restart</span>
+<span class="g">sudo</span> <span class="g">systemctl</span> <span class="o">start</span> <span class="y">docker</span>          <span class="c"># start now</span>
+<span class="g">sudo</span> <span class="g">systemctl</span> <span class="o">stop</span> <span class="y">docker</span>           <span class="c"># stop now</span>
+<span class="g">sudo</span> <span class="g">systemctl</span> <span class="o">restart</span> <span class="y">docker</span>        <span class="c"># stop + start</span>
+<span class="g">sudo</span> <span class="g">systemctl</span> <span class="o">reload</span> <span class="y">nginx</span>          <span class="c"># reload config without restarting</span>
+
+<span class="c"># Enable / Disable auto-start on boot</span>
+<span class="g">sudo</span> <span class="g">systemctl</span> <span class="o">enable</span> <span class="y">docker</span>          <span class="c"># start on every boot</span>
+<span class="g">sudo</span> <span class="g">systemctl</span> <span class="o">disable</span> <span class="y">docker</span>         <span class="c"># don't start on boot</span>
+<span class="g">sudo</span> <span class="g">systemctl</span> <span class="o">enable</span> <span class="o">--now</span> <span class="y">docker</span>    <span class="c"># enable AND start (one command!)</span>
+
+<span class="c"># Check if a service is active (for scripts)</span>
+<span class="g">systemctl</span> <span class="o">is-active</span> <span class="o">--quiet</span> <span class="y">docker</span> && <span class="g">echo</span> <span class="y">"running"</span> || <span class="g">echo</span> <span class="y">"stopped"</span>
+<span class="g">systemctl</span> <span class="o">is-enabled</span> <span class="y">docker</span>            <span class="c"># "enabled" or "disabled"</span>
+
+<span class="c"># ═══ Listing and Inspecting ═══</span>
+
+<span class="c"># All running services</span>
+<span class="g">systemctl</span> <span class="o">list-units</span> <span class="o">--type=service</span> <span class="o">--state=running</span>
+
+<span class="c"># All failed services (🚨 check this regularly!)</span>
+<span class="g">systemctl</span> <span class="o">--failed</span>
+
+<span class="c"># All enabled timers (scheduled tasks)</span>
+<span class="g">systemctl</span> <span class="o">list-timers</span>
+
+<span class="c"># View the unit file for a service</span>
+<span class="g">systemctl</span> <span class="o">cat</span> <span class="y">docker.service</span>
+
+<span class="c"># Show all dependencies of a service</span>
+<span class="g">systemctl</span> <span class="o">list-dependencies</span> <span class="y">docker.service</span>
+
+<span class="c"># ═══ Your Arch System's Key Services (from Parts 1-4) ═══</span>
+<span class="g">systemctl</span> <span class="o">status</span> <span class="y">NetworkManager</span>        <span class="c"># Wi-Fi and networking</span>
+<span class="g">systemctl</span> <span class="o">status</span> <span class="y">pipewire</span> <span class="o">--user</span>      <span class="c"># audio (user service)</span>
+<span class="g">systemctl</span> <span class="o">status</span> <span class="y">bluetooth</span>             <span class="c"># Bluetooth</span>
+<span class="g">systemctl</span> <span class="o">status</span> <span class="y">docker</span>                <span class="c"># container engine</span>
+<span class="g">systemctl</span> <span class="o">status</span> <span class="y">sshd</span>                  <span class="c"># SSH server</span>
+<span class="g">systemctl</span> <span class="o">status</span> <span class="y">ufw</span>                   <span class="c"># firewall</span>
+<span class="g">systemctl</span> <span class="o">status</span> <span class="y">fail2ban</span>              <span class="c"># intrusion prevention</span>
+<span class="g">systemctl</span> <span class="o">status</span> <span class="y">postgresql</span>            <span class="c"># database</span>
+<span class="g">systemctl</span> <span class="o">status</span> <span class="y">redis</span>                 <span class="c"># cache</span>
+<span class="g">systemctl</span> <span class="o">list-timers</span>                  <span class="c"># fstrim.timer should be here</span></pre>
+<div class="out"><div class="outl">Expected Output (systemctl status docker)</div><pre>● docker.service - Docker Application Container Engine
+     Loaded: loaded (/usr/lib/systemd/system/docker.service; enabled; preset: disabled)
+     Active: active (running) since Sat 2026-03-15 10:01:22 CET; 6h ago
+   Main PID: 432 (dockerd)
+      Tasks: 14
+     Memory: 128.4M
+        CPU: 2.341s
+     CGroup: /system.slice/docker.service
+             └─432 /usr/bin/dockerd -H fd://
+
+Mar 15 10:01:22 pinkgalaxy systemd[1]: Started Docker Application Container Engine.</pre></div></div>
+
+<div class="cm">
+<div class="cm-do"><b>✅ The troubleshooting workflow:</b><p>Service not working? Step 1: <span class="ic">systemctl status servicename</span> — is it active, failed, or inactive? Step 2: <span class="ic">journalctl -u servicename -n 50</span> — read the last 50 log lines (next section). Step 3: Fix the issue. Step 4: <span class="ic">sudo systemctl restart servicename</span>. This four-step workflow solves 90% of service problems.</p></div>
+<div class="cm-x"><b>❌ Common mistake: enable vs start</b><p><span class="ic">enable</span> only configures auto-start on boot — it does NOT start the service right now. <span class="ic">start</span> starts it right now but does NOT configure it for boot. You usually want both: <span class="ic">sudo systemctl enable --now servicename</span>. Forgetting <span class="ic">enable</span> means the service works now but disappears after reboot. Forgetting <span class="ic">start</span> means it will work after reboot but not right now.</p></div>
+</div>
+
+<div class="qz"><div class="qz-q">🧪 You run <span class="ic">sudo systemctl start docker</span> and Docker works. But after rebooting, Docker is not running. What did you forget?</div>
+<div class="qo" onclick="ck(this,true)">You forgot to enable it — "start" only runs the service now, "enable" configures it to start automatically at boot. Use "enable --now" to do both.</div>
+<div class="qo" onclick="ck(this,false)">Docker cannot survive reboots</div>
+<div class="qo" onclick="ck(this,false)">You need to add Docker to /etc/rc.local</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 5: journalctl                          -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s4"><small>ARCH-CMD04.5 of 7 · ⏱ ~10 min</small></div>
+<h2>ARCH-CMD04.5 — journalctl: Reading System Logs</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p><span class="ic">journalctl</span> is your window into everything that has happened on your system. Every service, every kernel message, every login attempt, every error — all recorded in the systemd journal. When something goes wrong, journalctl is where you find out what happened and when. Think of it as the flight recorder (black box) of your system — it records everything, and you use journalctl to play back the recording, filtered by time, service, severity, or any combination.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>The systemd journal (<span class="ic">journald</span>) stores logs in a binary format at <span class="ic">/var/log/journal/</span> (persistent) or <span class="ic">/run/log/journal/</span> (volatile — RAM only, lost on reboot). The binary format enables indexed searching by any field (unit, priority, PID, etc.) without grep. Logs are structured: each entry has key-value metadata fields (_SYSTEMD_UNIT, PRIORITY, _PID, MESSAGE, etc.) that enable precise filtering. Priority levels follow syslog convention: 0=emerg, 1=alert, 2=crit, 3=err, 4=warning, 5=notice, 6=info, 7=debug. The journal automatically rotates based on disk usage (configured in <span class="ic">/etc/systemd/journald.conf</span>: SystemMaxUse=, SystemKeepFree=). Boot sessions are identified by a boot ID, making it easy to see logs from previous boots (useful for diagnosing boot failures).</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ journalctl — Essential Queries ═══</span>
+
+<span class="c"># All logs (newest last — scroll with arrow keys, q to quit)</span>
+<span class="g">journalctl</span>
+
+<span class="c"># Follow live (like tail -f) — great for real-time debugging</span>
+<span class="g">journalctl</span> <span class="o">-f</span>
+
+<span class="c"># ═══ Filter by Service ═══</span>
+<span class="g">journalctl</span> <span class="o">-u</span> <span class="y">docker</span>                  <span class="c"># all Docker logs</span>
+<span class="g">journalctl</span> <span class="o">-u</span> <span class="y">docker</span> <span class="o">-n</span> <span class="y">50</span>            <span class="c"># last 50 lines</span>
+<span class="g">journalctl</span> <span class="o">-u</span> <span class="y">docker</span> <span class="o">-f</span>               <span class="c"># follow Docker logs live</span>
+<span class="g">journalctl</span> <span class="o">-u</span> <span class="y">sshd</span> <span class="o">-u</span> <span class="y">fail2ban</span>        <span class="c"># logs from TWO services</span>
+
+<span class="c"># ═══ Filter by Time ═══</span>
+<span class="g">journalctl</span> <span class="o">--since</span> <span class="y">"1 hour ago"</span>
+<span class="g">journalctl</span> <span class="o">--since</span> <span class="y">"today"</span>
+<span class="g">journalctl</span> <span class="o">--since</span> <span class="y">"2026-03-15 14:00"</span> <span class="o">--until</span> <span class="y">"2026-03-15 16:00"</span>
+
+<span class="c"># ═══ Filter by Priority (severity) ═══</span>
+<span class="g">journalctl</span> <span class="o">-p</span> <span class="y">err</span>                     <span class="c"># errors and above only (err, crit, alert, emerg)</span>
+<span class="g">journalctl</span> <span class="o">-p</span> <span class="y">warning</span>                 <span class="c"># warnings and above</span>
+<span class="g">journalctl</span> <span class="o">-p</span> <span class="y">err</span> <span class="o">--since</span> <span class="y">"today"</span>     <span class="c"># today's errors</span>
+
+<span class="c"># ═══ Kernel Messages ═══</span>
+<span class="g">journalctl</span> <span class="o">-k</span>                          <span class="c"># kernel ring buffer (same as dmesg)</span>
+<span class="g">journalctl</span> <span class="o">-k</span> <span class="o">-p</span> <span class="y">err</span>                  <span class="c"># kernel errors only</span>
+
+<span class="c"># ═══ Previous Boot (diagnosing boot problems) ═══</span>
+<span class="g">journalctl</span> <span class="o">-b -1</span>                       <span class="c"># logs from the previous boot</span>
+<span class="g">journalctl</span> <span class="o">-b -1</span> <span class="o">-p</span> <span class="y">err</span>               <span class="c"># errors from previous boot</span>
+<span class="g">journalctl</span> <span class="o">--list-boots</span>                <span class="c"># list all recorded boots</span>
+
+<span class="c"># ═══ Disk Usage ═══</span>
+<span class="g">journalctl</span> <span class="o">--disk-usage</span>                <span class="c"># how much space logs are using</span>
+<span class="g">sudo</span> <span class="g">journalctl</span> <span class="o">--vacuum-size=500M</span>    <span class="c"># reduce logs to 500MB</span>
+<span class="g">sudo</span> <span class="g">journalctl</span> <span class="o">--vacuum-time=7d</span>      <span class="c"># keep only last 7 days</span></pre>
+<div class="out"><div class="outl">Expected Output (journalctl -u docker -n 5)</div><pre>Mar 15 10:01:22 pinkgalaxy systemd[1]: Starting Docker Application Container Engine...
+Mar 15 10:01:22 pinkgalaxy dockerd[432]: time="2026-03-15T10:01:22" level=info msg="Starting up"
+Mar 15 10:01:22 pinkgalaxy dockerd[432]: time="2026-03-15T10:01:22" level=info msg="API listen on /run/docker.sock"
+Mar 15 10:01:22 pinkgalaxy systemd[1]: Started Docker Application Container Engine.
+Mar 15 14:30:05 pinkgalaxy dockerd[432]: time="2026-03-15T14:30:05" level=info msg="Container started"</pre></div></div>
+
+<div class="qz"><div class="qz-q">🧪 Your SSH service stopped working after a system update. What is the fastest way to see what went wrong?</div>
+<div class="qo" onclick="ck(this,false)">Open /var/log/sshd.log in a text editor</div>
+<div class="qo" onclick="ck(this,true)">Run journalctl -u sshd -p err --since "1 hour ago" — this shows only error-level messages from sshd in the last hour, pinpointing the exact failure</div>
+<div class="qo" onclick="ck(this,false)">Restart the service and hope it works</div>
+<div class="qfb"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 6: cron & systemd Timers               -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s5"><small>ARCH-CMD04.6 of 7 · ⏱ ~10 min</small></div>
+<h2>ARCH-CMD04.6 — Scheduled Tasks: cron &amp; systemd Timers</h2>
+
+<div class="tabs">
+<button class="tab on" onclick="sw(this,'si')">🧑 Simple</button>
+<button class="tab" onclick="sw(this,'te')">🔧 Technical</button>
+</div>
+
+<div class="pan si on" data-l="si">
+<p>Scheduled tasks let you automate things that need to happen at specific times — daily backups at 3 AM, weekly system maintenance every Sunday, disk usage reports every hour, or certificate renewal checks twice a day. Linux offers two systems for this: the classic <span class="ic">cron</span> and the modern <span class="ic">systemd timers</span>. On Arch Linux with systemd, timers are the preferred method because they integrate with journalctl for logging, can be managed with systemctl, support calendar expressions, and can trigger on events (not just time schedules). You already set up <span class="ic">fstrim.timer</span> in Part 4 of the Arch guide — that is a systemd timer that runs weekly SSD TRIM operations.</p>
+</div>
+<div class="pan te" data-l="te">
+<p>Cron uses a crontab (cron table) file with lines in the format <span class="ic">minute hour day month weekday command</span>. Edit with <span class="ic">crontab -e</span>, list with <span class="ic">crontab -l</span>. Special values: <span class="ic">*</span> (every), <span class="ic">*/5</span> (every 5th), <span class="ic">1-5</span> (range), <span class="ic">1,15</span> (specific values). Systemd timers consist of two unit files: a <span class="ic">.timer</span> file (defines the schedule) and a matching <span class="ic">.service</span> file (defines what to run). Timer types: <span class="ic">OnCalendar=</span> (absolute: "daily", "weekly", "Mon *-*-* 03:00:00") and <span class="ic">OnBootSec=</span> / <span class="ic">OnUnitActiveSec=</span> (relative: "15min after boot", "1h after last run"). Timers support <span class="ic">Persistent=true</span> which means if the system was off during a scheduled run, the timer fires immediately on next boot. View active timers with <span class="ic">systemctl list-timers</span>.</p>
+</div>
+
+<div class="cw"><div class="cwt"><span class="cwl">bash</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ cron — The Classic Scheduler ═══</span>
+
+<span class="c"># Edit your crontab</span>
+<span class="g">crontab</span> <span class="o">-e</span>
+
+<span class="c"># Crontab format:  minute  hour  day  month  weekday  command</span>
+<span class="c"># ┌───── minute (0-59)</span>
+<span class="c"># │ ┌─── hour (0-23)</span>
+<span class="c"># │ │ ┌─ day of month (1-31)</span>
+<span class="c"># │ │ │ ┌ month (1-12)</span>
+<span class="c"># │ │ │ │ ┌ weekday (0-7, 0&7=Sunday)</span>
+<span class="c"># │ │ │ │ │</span>
+<span class="c"># * * * * *  command to run</span>
+
+<span class="c"># Examples:</span>
+<span class="c"># 0 3 * * *    ~/.local/bin/backup.sh           # daily at 3:00 AM</span>
+<span class="c"># */15 * * * * ~/.local/bin/health-check.sh     # every 15 minutes</span>
+<span class="c"># 0 9 * * 1-5  echo "Start of work day"         # weekdays at 9 AM</span>
+<span class="c"># 0 0 * * 0    ~/.local/bin/maintain.sh          # Sundays at midnight</span>
+
+<span class="c"># List your crontab</span>
+<span class="g">crontab</span> <span class="o">-l</span>
+
+<span class="c"># ═══ systemd Timers — The Modern Way ═══</span>
+
+<span class="c"># Example: Create a daily backup timer</span>
+
+<span class="c"># Step 1: Create the service file (what to run)</span>
+<span class="g">sudo</span> <span class="g">tee</span> <span class="b">/etc/systemd/system/backup.service</span> << <span class="y">'EOF'</span>
+[Unit]
+Description=Daily Backup
+
+[Service]
+Type=oneshot
+ExecStart=/home/mari/.local/bin/backup.sh
+User=mari
+EOF
+
+<span class="c"># Step 2: Create the timer file (when to run)</span>
+<span class="g">sudo</span> <span class="g">tee</span> <span class="b">/etc/systemd/system/backup.timer</span> << <span class="y">'EOF'</span>
+[Unit]
+Description=Run backup daily at 3 AM
+
+[Timer]
+OnCalendar=*-*-* 03:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+EOF
+
+<span class="c"># Step 3: Enable and start the timer</span>
+<span class="g">sudo</span> <span class="g">systemctl</span> <span class="o">enable</span> <span class="o">--now</span> <span class="y">backup.timer</span>
+
+<span class="c"># Check it</span>
+<span class="g">systemctl</span> <span class="o">list-timers</span> | <span class="g">grep</span> <span class="y">backup</span>
+<span class="c"># Shows: next run time, last run time, time until next run</span>
+
+<span class="c"># Test it manually</span>
+<span class="g">sudo</span> <span class="g">systemctl</span> <span class="o">start</span> <span class="y">backup.service</span>   <span class="c"># run the service NOW (timer activates on schedule)</span>
+
+<span class="c"># Check logs</span>
+<span class="g">journalctl</span> <span class="o">-u</span> <span class="y">backup.service</span> <span class="o">-n</span> <span class="y">20</span></pre>
+<div class="out"><div class="outl">Expected Output (systemctl list-timers)</div><pre>NEXT                        LEFT       LAST                        PASSED    UNIT
+Sun 2026-03-16 03:00:00 CET 12h left   Sat 2026-03-15 03:00:00 CET 12h ago  backup.timer
+Mon 2026-03-16 00:00:00 CET 8h left    Mon 2026-03-09 00:00:00 CET 6 days   fstrim.timer</pre></div></div>
+
+<div class="cm">
+<div class="cm-do"><b>✅ Why systemd timers over cron:</b><p>Timers integrate with journalctl (logs are structured and searchable), support <span class="ic">Persistent=true</span> (catches up on missed runs), can depend on other services, have precise calendar expressions, and can be managed with the same systemctl commands you already know. Use systemd timers for all new scheduled tasks on Arch.</p></div>
+<div class="cm-x"><b>❌ Cron gotcha — environment:</b><p>Cron runs with a minimal environment (almost no PATH, no display). Scripts that work in your terminal often fail in cron because commands like <span class="ic">docker</span> or <span class="ic">paru</span> are not in cron's PATH. Always use full paths in cron scripts (<span class="ic">/usr/bin/docker</span> instead of <span class="ic">docker</span>), or set PATH at the top of the crontab.</p></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--          SECTION 7: Practice                            -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="sd" id="s6"><small>ARCH-CMD04.7 of 7 · ⏱ ~15 min</small></div>
+<h2>ARCH-CMD04.7 — Practice Exercises</h2>
+
+<h3>Exercise 1 (Easy) — Process Explorer</h3>
+<p>Find the PID of your Hyprland compositor. Check how much memory it is using. Find all its child processes. Then check the status of three services from your Arch installation (Docker, NetworkManager, sshd).</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">solution</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="c"># Find Hyprland</span>
+<span class="g">pgrep</span> <span class="o">-a</span> <span class="y">Hyprland</span>
+<span class="c"># Check memory (RSS column in kilobytes)</span>
+<span class="g">ps</span> <span class="o">-p</span> <span class="p">$(</span><span class="g">pgrep</span> <span class="y">Hyprland</span><span class="p">)</span> <span class="o">-o</span> <span class="y">pid,rss,vsz,comm</span>
+<span class="c"># Child processes</span>
+<span class="g">pstree</span> <span class="o">-p</span> <span class="p">$(</span><span class="g">pgrep</span> <span class="y">Hyprland</span><span class="p">)</span>
+<span class="c"># Service status</span>
+<span class="k">for</span> <span class="v">svc</span> <span class="k">in</span> docker NetworkManager sshd; <span class="k">do</span>
+    <span class="g">printf</span> <span class="y">"%-20s %s\n"</span> <span class="y">"$svc:"</span> <span class="y">"$(systemctl is-active "$svc")"</span>
+<span class="k">done</span></pre></div>
+
+<h3>Exercise 2 (Medium) — Service Monitor Script</h3>
+<p>Write a script that checks a list of critical services (docker, sshd, NetworkManager, fail2ban, postgresql), reports their status with colored output, and attempts to restart any that are not running. Log all actions with timestamps. Use the logging functions from BASH-F08.</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">solution</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c">#!/bin/bash</span>
+<span class="g">set</span> <span class="o">-euo</span> <span class="y">pipefail</span>
+
+<span class="v">SERVICES</span>=(<span class="y">"docker"</span> <span class="y">"sshd"</span> <span class="y">"NetworkManager"</span> <span class="y">"fail2ban"</span> <span class="y">"postgresql"</span>)
+<span class="v">G</span>=<span class="y">'\033[32m'</span> <span class="v">R</span>=<span class="y">'\033[31m'</span> <span class="v">Y</span>=<span class="y">'\033[33m'</span> <span class="v">N</span>=<span class="y">'\033[0m'</span>
+
+<span class="g">log</span>() { <span class="g">echo</span> <span class="o">-e</span> <span class="y">"[$(date +%H:%M:%S)] $*"</span>; }
+
+<span class="g">log</span> <span class="y">"═══ Service Health Check ═══"</span>
+<span class="v">issues</span>=<span class="y">0</span>
+
+<span class="k">for</span> <span class="v">svc</span> <span class="k">in</span> <span class="y">"${SERVICES[@]}"</span>; <span class="k">do</span>
+    <span class="k">if</span> <span class="g">systemctl</span> <span class="o">is-active</span> <span class="o">--quiet</span> <span class="y">"$svc"</span>; <span class="k">then</span>
+        <span class="g">log</span> <span class="y">"${G}  ✓ $svc${N}"</span>
+    <span class="k">else</span>
+        <span class="g">log</span> <span class="y">"${R}  ✗ $svc is DOWN${N}"</span>
+        <span class="p">((</span>issues++<span class="p">))</span>
+        <span class="g">log</span> <span class="y">"${Y}    → Attempting restart...${N}"</span>
+        <span class="k">if</span> <span class="g">sudo</span> <span class="g">systemctl</span> <span class="o">start</span> <span class="y">"$svc"</span> 2>/dev/null; <span class="k">then</span>
+            <span class="g">log</span> <span class="y">"${G}    → Restarted successfully${N}"</span>
+        <span class="k">else</span>
+            <span class="g">log</span> <span class="y">"${R}    → FAILED to restart! Check: journalctl -u $svc${N}"</span>
+        <span class="k">fi</span>
+    <span class="k">fi</span>
+<span class="k">done</span>
+
+<span class="g">log</span> <span class="y">"Result: $issues issue(s) found"</span></pre>
+<div class="out"><div class="outl">Expected Output</div><pre>[16:42:01] ═══ Service Health Check ═══
+[16:42:01]   ✓ docker
+[16:42:01]   ✓ sshd
+[16:42:01]   ✓ NetworkManager
+[16:42:01]   ✓ fail2ban
+[16:42:01]   ✗ postgresql is DOWN
+[16:42:01]     → Attempting restart...
+[16:42:02]     → Restarted successfully
+[16:42:02] Result: 1 issue(s) found</pre></div></div>
+
+<h3>Exercise 3 (Hard) — Create a System Health Timer</h3>
+<p>Create a complete systemd timer that runs a health check script every 30 minutes. The script should check CPU temperature (from <span class="ic">/sys/class/thermal/</span>), memory usage, disk usage, and failed services, then write a one-line summary to a log file. If any metric exceeds a threshold (temp >80°C, memory >85%, disk >90%), send a desktop notification using <span class="ic">notify-send</span>. Include the .service file, .timer file, and the health check script itself.</p>
+
+<div class="cw"><div class="cwt"><span class="cwl">solution — three files</span><button class="cwb" onclick="cpC(this)">Copy</button></div>
+<pre><span class="c"># ═══ File 1: ~/.local/bin/health-check.sh ═══</span>
+<span class="c">#!/bin/bash</span>
+set -euo pipefail
+
+LOG="/tmp/health.log"
+ALERT=false
+
+<span class="c"># CPU temperature</span>
+temp=$(cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null || echo 0)
+temp_c=$((temp / 1000))
+
+<span class="c"># Memory usage</span>
+mem_pct=$(free | awk '/Mem/{printf "%.0f", $3/$2*100}')
+
+<span class="c"># Disk usage</span>
+disk_pct=$(df / | awk 'NR==2{gsub(/%/,""); print $5}')
+
+<span class="c"># Failed services</span>
+failed=$(systemctl --failed --no-legend | wc -l)
+
+<span class="c"># Log summary</span>
+echo "$(date +%Y-%m-%dT%H:%M:%S) CPU:${temp_c}°C MEM:${mem_pct}% DISK:${disk_pct}% FAILED:${failed}" >> "$LOG"
+
+<span class="c"># Alert on thresholds</span>
+[[ $temp_c -gt 80 ]] && ALERT=true
+[[ $mem_pct -gt 85 ]] && ALERT=true
+[[ $disk_pct -gt 90 ]] && ALERT=true
+[[ $failed -gt 0 ]] && ALERT=true
+
+if $ALERT; then
+    DISPLAY=:0 notify-send "🌸 System Alert" \
+        "CPU:${temp_c}°C MEM:${mem_pct}% DISK:${disk_pct}% Failed:${failed}" \
+        --urgency=critical
+fi
+
+<span class="c"># ═══ File 2: /etc/systemd/system/health-check.service ═══</span>
+[Unit]
+Description=Pink Galaxy Health Check
+
+[Service]
+Type=oneshot
+ExecStart=/home/mari/.local/bin/health-check.sh
+User=mari
+Environment=DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
+
+<span class="c"># ═══ File 3: /etc/systemd/system/health-check.timer ═══</span>
+[Unit]
+Description=Run health check every 30 minutes
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=30min
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+
+<span class="c"># ═══ Activate: ═══</span>
+<span class="c"># chmod +x ~/.local/bin/health-check.sh</span>
+<span class="c"># sudo systemctl enable --now health-check.timer</span>
+<span class="c"># systemctl list-timers | grep health</span></pre></div>
+
+<div class="note gn">
+<b>🌸 Module Complete!</b> You now control everything running on your Arch Linux system. You can see all processes with <span class="ic">ps</span>, <span class="ic">htop</span>, and <span class="ic">btop</span>; communicate with processes using signals (<span class="ic">kill</span>, <span class="ic">pkill</span>, and the SIGTERM-before-SIGKILL rule); manage foreground and background jobs with <span class="ic">Ctrl+Z</span>, <span class="ic">bg</span>, <span class="ic">fg</span>, and <span class="ic">tmux</span> for surviving disconnects; manage system services with <span class="ic">systemctl</span> (start, stop, enable, status — and always <span class="ic">enable --now</span> for new services); read system logs with <span class="ic">journalctl</span> (filtered by service, time, and priority); and schedule automated tasks with systemd timers. The troubleshooting workflow — status → logs → fix → restart — will serve you every single day of your Linux career. This completes the core of the ARCH-CMD track. 🌸
+</div>
+
+</div>
+<div class="sf"><button onclick="svB()">💾 Save Brick 12</button></div>
+<script>
+function sw(btn,lv){let el=btn.parentElement.nextElementSibling;while(el&&!el.classList.contains('sd')&&!el.classList.contains('qz')&&!el.classList.contains('cm')&&!el.classList.contains('cw')&&el.tagName!=='H3'&&el.tagName!=='TABLE'){if(el.classList.contains('pan'))el.classList.toggle('on',el.dataset.l===lv);el=el.nextElementSibling;}btn.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');}
+function ck(btn,ok){const box=btn.closest('.qz');box.querySelectorAll('.qo').forEach(o=>o.disabled=true);btn.classList.add(ok?'y':'n');const fb=box.querySelector('.qfb');fb.classList.add('s');fb.className=ok?'qfb s w':'qfb s l';fb.textContent=ok?'✓ Correct! +10 XP':'✗ Review the section above.';}
+function cpC(b){const pre=b.closest('.cw').querySelector('pre');navigator.clipboard.writeText(pre.textContent).then(()=>{b.textContent='✓';setTimeout(()=>b.textContent='Copy',1500);});}
+function svB(){const blob=new Blob(['<!DOCTYPE html>\n'+document.documentElement.outerHTML],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='brick12_ARCHCMD04_processes_'+new Date().toISOString().slice(0,10)+'.html';a.click();}
+</script>
+</body>
+</html>
