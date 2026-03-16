@@ -41,16 +41,23 @@ class PinkGalaxyEngine {
   }
   
   initializeUniverses() {
-    const universes = [
-      { id: 'arch', name: 'Arch Linux', prefix: 'ARCH-', color: '#2e7d32', icon: '🐧' },
-      { id: 'bash', name: 'Bash & Scripting', prefix: 'BASH-', color: '#ffd600', icon: '⚡' },
-      { id: 'python', name: 'Python', prefix: 'PY-', color: '#5c6bc0', icon: '🐍' },
-      { id: 'security', name: 'Security & BlackArch', prefix: 'SEC-', color: '#ff5252', icon: '🔒' },
-      { id: 'cloud', name: 'Cloud & DevOps', prefix: 'CLOUD-', color: '#ab47bc', icon: '☁️' },
-      { id: 'tools', name: 'Tools & Reference', prefix: 'REF-', color: '#6c6a7e', icon: '🛠️' }
-    ];
-    
-    universes.forEach(u => this.universes.set(u.id, u));
+    // Load universe data from the comprehensive data file
+    if (typeof PINK_GALAXY_UNIVERSES !== 'undefined') {
+      Object.values(PINK_GALAXY_UNIVERSES).forEach(universe => {
+        this.universes.set(universe.id, universe);
+      });
+    } else {
+      // Fallback to basic universe data if bricks-data.js not loaded
+      const universes = [
+        { id: 'arch', name: 'Arch Linux', prefix: 'ARCH-', color: '#2e7d32', icon: '🐧' },
+        { id: 'bash', name: 'Bash & Scripting', prefix: 'BASH-', color: '#ffd600', icon: '⚡' },
+        { id: 'python', name: 'Python', prefix: 'PY-', color: '#5c6bc0', icon: '🐍' },
+        { id: 'security', name: 'Security & BlackArch', prefix: 'SEC-', color: '#ff5252', icon: '🔒' },
+        { id: 'cloud', name: 'Cloud & DevOps', prefix: 'CLOUD-', color: '#ab47bc', icon: '☁️' },
+        { id: 'tools', name: 'Tools & Reference', prefix: 'REF-', color: '#6c6a7e', icon: '🛠️' }
+      ];
+      universes.forEach(u => this.universes.set(u.id, u));
+    }
   }
   
   loadModules() {
@@ -63,244 +70,18 @@ class PinkGalaxyEngine {
   }
   
   loadBuiltInModules() {
-    // This will be populated with all 19 bricks content
-    const builtInModules = [
-      // BASH Fundamentals (F01-F08)
-      {
-        id: 'BASH-F01',
-        title: 'Your First Script',
-        universe: 'bash',
-        difficulty: 'beg',
-        volume: 1,
-        sections: 3,
-        description: 'Learn the fundamentals of bash scripting with your very first executable script.',
-        tags: ['basics', 'scripting', 'executable'],
-        xpReward: 45,
-        progress: this.getModuleProgress('BASH-F01')
-      },
-      {
-        id: 'BASH-F02',
-        title: 'Variables & Data Types',
-        universe: 'bash',
-        difficulty: 'beg',
-        volume: 1,
-        sections: 7,
-        description: 'Master variable assignment, strings, integers, arrays, and scope in bash.',
-        tags: ['variables', 'arrays', 'scope'],
-        xpReward: 105,
-        progress: this.getModuleProgress('BASH-F02')
-      },
-      {
-        id: 'BASH-F03',
-        title: 'Quoting & Expansion',
-        universe: 'bash',
-        difficulty: 'int',
-        volume: 1,
-        sections: 6,
-        description: 'Understand quoting rules, parameter expansion, and brace expansion.',
-        tags: ['quoting', 'expansion', 'parameters'],
-        xpReward: 90,
-        progress: this.getModuleProgress('BASH-F03')
-      },
-      {
-        id: 'BASH-F04',
-        title: 'Conditionals',
-        universe: 'bash',
-        difficulty: 'int',
-        volume: 1,
-        sections: 6,
-        description: 'Learn if/elif/else, test operators, and case statements.',
-        tags: ['conditionals', 'testing', 'logic'],
-        xpReward: 90,
-        progress: this.getModuleProgress('BASH-F04')
-      },
-      {
-        id: 'BASH-F05',
-        title: 'Loops',
-        universe: 'bash',
-        difficulty: 'int',
-        volume: 1,
-        sections: 6,
-        description: 'Master for, while, until loops and loop control.',
-        tags: ['loops', 'iteration', 'control'],
-        xpReward: 90,
-        progress: this.getModuleProgress('BASH-F05')
-      },
-      {
-        id: 'BASH-F06',
-        title: 'Functions',
-        universe: 'bash',
-        difficulty: 'int',
-        volume: 1,
-        sections: 6,
-        description: 'Create reusable functions with proper scope and return values.',
-        tags: ['functions', 'scope', 'patterns'],
-        xpReward: 90,
-        progress: this.getModuleProgress('BASH-F06')
-      },
-      {
-        id: 'BASH-F07',
-        title: 'Input/Output',
-        universe: 'bash',
-        difficulty: 'int',
-        volume: 2,
-        sections: 6,
-        description: 'Handle input/output, files, pipes, and redirection.',
-        tags: ['io', 'pipes', 'redirection'],
-        xpReward: 90,
-        progress: this.getModuleProgress('BASH-F07')
-      },
-      {
-        id: 'BASH-F08',
-        title: 'Error Handling',
-        universe: 'bash',
-        difficulty: 'adv',
-        volume: 2,
-        sections: 6,
-        description: 'Production-ready error handling, logging, and defensive patterns.',
-        tags: ['errors', 'logging', 'production'],
-        xpReward: 90,
-        progress: this.getModuleProgress('BASH-F08')
-      },
-      
-      // ARCH Commands (CMD01-CMD06)
-      {
-        id: 'ARCH-CMD01',
-        title: 'Navigation & Files',
-        universe: 'arch',
-        difficulty: 'beg',
-        volume: 1,
-        sections: 7,
-        description: 'Master navigation, file operations, and modern CLI tools.',
-        tags: ['navigation', 'files', 'tools'],
-        xpReward: 105,
-        progress: this.getModuleProgress('ARCH-CMD01')
-      },
-      {
-        id: 'ARCH-CMD02',
-        title: 'Text Processing',
-        universe: 'arch',
-        difficulty: 'int',
-        volume: 2,
-        sections: 8,
-        description: 'Pipeline mastery with grep, sed, awk, and text tools.',
-        tags: ['text', 'pipes', 'processing'],
-        xpReward: 120,
-        progress: this.getModuleProgress('ARCH-CMD02')
-      },
-      {
-        id: 'ARCH-CMD03',
-        title: 'Permissions & Users',
-        universe: 'arch',
-        difficulty: 'int',
-        volume: 2,
-        sections: 6,
-        description: 'File permissions, ownership, and user management.',
-        tags: ['permissions', 'users', 'security'],
-        xpReward: 90,
-        progress: this.getModuleProgress('ARCH-CMD03')
-      },
-      {
-        id: 'ARCH-CMD04',
-        title: 'Process Management',
-        universe: 'arch',
-        difficulty: 'int',
-        volume: 2,
-        sections: 7,
-        description: 'Process control, systemd, and job management.',
-        tags: ['processes', 'systemd', 'jobs'],
-        xpReward: 105,
-        progress: this.getModuleProgress('ARCH-CMD04')
-      },
-      {
-        id: 'ARCH-CMD05',
-        title: 'Networking',
-        universe: 'arch',
-        difficulty: 'adv',
-        volume: 2,
-        sections: 7,
-        description: 'Network tools, diagnostics, and troubleshooting.',
-        tags: ['networking', 'diagnostics', 'tools'],
-        xpReward: 105,
-        progress: this.getModuleProgress('ARCH-CMD05')
-      },
-      {
-        id: 'ARCH-CMD06',
-        title: 'Package Management',
-        universe: 'arch',
-        difficulty: 'adv',
-        volume: 2,
-        sections: 7,
-        description: 'Master pacman, paru, AUR, and system maintenance.',
-        tags: ['pacman', 'aur', 'maintenance'],
-        xpReward: 105,
-        progress: this.getModuleProgress('ARCH-CMD06')
-      },
-      
-      // Security Modules (SEC-F01, SEC-REC01-02, SEC-WEB01, SEC-NET01)
-      {
-        id: 'SEC-F01',
-        title: 'Security Foundations',
-        universe: 'security',
-        difficulty: 'beg',
-        volume: 2,
-        sections: 7,
-        description: 'CIA triad, threat modeling, defense in depth, and legal framework.',
-        tags: ['foundations', 'legal', 'framework'],
-        xpReward: 105,
-        progress: this.getModuleProgress('SEC-F01')
-      },
-      {
-        id: 'SEC-REC01',
-        title: 'Reconnaissance',
-        universe: 'security',
-        difficulty: 'int',
-        volume: 2,
-        sections: 7,
-        description: 'Intelligence gathering, OSINT, and passive/active recon.',
-        tags: ['recon', 'osint', 'intelligence'],
-        xpReward: 105,
-        progress: this.getModuleProgress('SEC-REC01')
-      },
-      {
-        id: 'SEC-REC02',
-        title: 'nmap Mastery',
-        universe: 'security',
-        difficulty: 'adv',
-        volume: 3,
-        sections: 7,
-        description: 'Complete nmap reference: scans, NSE, timing, and evasion.',
-        tags: ['nmap', 'scanning', 'nse'],
-        xpReward: 105,
-        progress: this.getModuleProgress('SEC-REC02')
-      },
-      {
-        id: 'SEC-WEB01',
-        title: 'Web Application Security',
-        universe: 'security',
-        difficulty: 'adv',
-        volume: 3,
-        sections: 7,
-        description: 'SQL injection, XSS, CSRF, and web vulnerability exploitation.',
-        tags: ['web', 'sqli', 'xss'],
-        xpReward: 105,
-        progress: this.getModuleProgress('SEC-WEB01')
-      },
-      {
-        id: 'SEC-NET01',
-        title: 'Network Analysis',
-        universe: 'security',
-        difficulty: 'adv',
-        volume: 3,
-        sections: 7,
-        description: 'Wireshark, tcpdump, and packet analysis for security.',
-        tags: ['wireshark', 'packets', 'forensics'],
-        xpReward: 105,
-        progress: this.getModuleProgress('SEC-NET01')
-      }
-    ];
-    
-    builtInModules.forEach(mod => this.modules.set(mod.id, mod));
+    // Load all 19 bricks from the comprehensive data file
+    if (typeof PINK_GALAXY_BRICKS !== 'undefined') {
+      Object.values(PINK_GALAXY_BRICKS).forEach(brick => {
+        const module = {
+          ...brick,
+          progress: this.getModuleProgress(brick.id)
+        };
+        this.modules.set(brick.id, module);
+      });
+    } else {
+      console.warn('PINK_GALAXY_BRICKS data not loaded. Please include bricks-data.js');
+    }
   }
   
   getModuleProgress(moduleId) {
