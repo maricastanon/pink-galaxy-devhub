@@ -1,0 +1,156 @@
+/* Pink Galaxy Bible v2 — Mindmap Visualization */
+
+.map-controls {
+  display: flex;
+  gap: 4px;
+  padding: 12px 20px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.map-type {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--bd);
+  background: none;
+  color: var(--t2);
+  cursor: pointer;
+  font-size: 9pt;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.map-type:hover,
+.map-type.active {
+  background: var(--p);
+  color: #fff;
+  border-color: var(--p);
+}
+
+.map-type .icon {
+  font-size: 12px;
+}
+
+.map-canvas {
+  margin: 0 20px;
+  background: var(--s1);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  min-height: calc(100vh - 180px);
+  position: relative;
+  overflow: hidden;
+}
+
+.map-node {
+  position: absolute;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all .2s;
+  font-size: 7.5pt;
+  text-align: center;
+  font-weight: bold;
+  color: #fff;
+  line-height: 1.2;
+  padding: 4px;
+}
+
+.map-node:hover {
+  transform: scale(1.15);
+  z-index: 100;
+  box-shadow: 0 0 20px rgba(233,30,99,.4);
+}
+
+.map-node[data-vol="1"] {
+  background: var(--p);
+}
+
+.map-node[data-vol="2"] {
+  background: var(--danger);
+}
+
+.map-node[data-vol="3"] {
+  background: var(--purple);
+}
+
+.map-line {
+  position: absolute;
+  background: rgba(233,30,99,.15);
+  transform-origin: 0 50%;
+  height: 1px;
+  pointer-events: none;
+}
+
+.map-legend {
+  display: flex;
+  gap: 12px;
+  padding: 8px 20px;
+  font-size: 8pt;
+  color: var(--mt);
+}
+
+.legend-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+/* Mindmap Types */
+.mindmap-clusters .map-node {
+  border-radius: 8px;
+}
+
+.mindmap-network .map-node {
+  box-shadow: 0 0 15px rgba(255,255,255,.1);
+}
+
+.mindmap-radial .map-node {
+  border: 2px solid rgba(255,255,255,.2);
+}
+
+.mindmap-heatmap .map-node {
+  border-radius: 4px;
+}
+
+.mindmap-timeline .map-node {
+  border-radius: 0;
+  padding: 8px 12px;
+  font-size: 8pt;
+}
+
+.mindmap-bubbles .map-node {
+  opacity: 0.8;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+/* Universe-specific mindmap styling */
+.universe-arch .map-node {
+  background: linear-gradient(135deg, var(--g), var(--gl));
+}
+
+.universe-bash .map-node {
+  background: linear-gradient(135deg, var(--yellow), var(--orange));
+}
+
+.universe-python .map-node {
+  background: linear-gradient(135deg, var(--blue), var(--cyan));
+}
+
+.universe-security .map-node {
+  background: linear-gradient(135deg, var(--danger), var(--pl));
+}
+
+.universe-cloud .map-node {
+  background: linear-gradient(135deg, var(--purple), var(--blue));
+}
+
+.universe-tools .map-node {
+  background: linear-gradient(135deg, var(--mt), var(--t2));
+}

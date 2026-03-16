@@ -1,0 +1,266 @@
+/* Pink Galaxy Bible v2 — Dashboard View */
+
+.dash-header {
+  text-align: center;
+  padding: 30px 20px 20px;
+}
+
+.dash-header h1 {
+  font-size: 24pt;
+  color: var(--p);
+  text-shadow: 0 0 30px var(--pg);
+  margin-bottom: 6px;
+}
+
+.dash-header p {
+  color: var(--t2);
+  font-size: 11pt;
+}
+
+.stats-row {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  background: var(--s1);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  padding: 14px 20px;
+  text-align: center;
+  min-width: 120px;
+}
+
+.stat-num {
+  font-size: 22pt;
+  font-weight: bold;
+  color: var(--p);
+}
+
+.stat-label {
+  font-size: 8pt;
+  color: var(--mt);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.stat-card.green .stat-num {
+  color: var(--gl);
+}
+
+/* Filters Bar */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 12px 20px;
+  justify-content: center;
+  align-items: center;
+}
+
+.filter-group {
+  display: flex;
+  gap: 3px;
+}
+
+.fbtn {
+  padding: 4px 12px;
+  border-radius: 16px;
+  border: 1px solid var(--bd);
+  background: none;
+  color: var(--t2);
+  font-size: 8pt;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all .15s;
+}
+
+.fbtn:hover,
+.fbtn.on {
+  background: var(--p);
+  color: #fff;
+  border-color: var(--p);
+}
+
+.fbtn.green:hover,
+.fbtn.green.on {
+  background: var(--g);
+  border-color: var(--g);
+}
+
+.fbtn.purple:hover,
+.fbtn.purple.on {
+  background: var(--purple);
+  border-color: var(--purple);
+}
+
+/* Module Cards Grid */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  padding: 10px 20px 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.card {
+  background: var(--s1);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  padding: 16px;
+  cursor: pointer;
+  transition: all .2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  border-color: var(--p);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(233,30,99,.15);
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+
+.card[data-vol="1"]::before {
+  background: linear-gradient(90deg, var(--p), var(--pl));
+}
+
+.card[data-vol="2"]::before {
+  background: linear-gradient(90deg, var(--danger), var(--orange));
+}
+
+.card[data-vol="3"]::before {
+  background: linear-gradient(90deg, var(--purple), var(--blue));
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.card-id {
+  font-size: 8pt;
+  color: var(--mt);
+  font-family: "Courier New", monospace;
+  letter-spacing: 1px;
+}
+
+.card-diff {
+  font-size: 7pt;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.card-diff.beg {
+  background: rgba(46,125,50,.2);
+  color: var(--gl);
+}
+
+.card-diff.int {
+  background: rgba(255,152,0,.2);
+  color: var(--orange);
+}
+
+.card-diff.adv {
+  background: rgba(233,30,99,.2);
+  color: var(--pl);
+}
+
+.card h3 {
+  font-size: 11pt;
+  color: var(--tx);
+  margin-bottom: 6px;
+}
+
+.card-desc {
+  font-size: 9pt;
+  color: var(--t2);
+  margin-bottom: 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.tag {
+  padding: 1px 8px;
+  border-radius: 8px;
+  font-size: 7pt;
+  background: rgba(233,30,99,.1);
+  color: var(--pl);
+}
+
+.tag.g {
+  background: rgba(46,125,50,.1);
+  color: var(--gl);
+}
+
+.tag.b {
+  background: rgba(92,107,192,.15);
+  color: var(--blue);
+}
+
+.card-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cpbar {
+  flex: 1;
+  height: 6px;
+  background: rgba(255,255,255,.05);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.cpfill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--p), var(--g));
+  border-radius: 3px;
+  transition: width .4s;
+}
+
+.card-pct {
+  font-size: 8pt;
+  color: var(--mt);
+  min-width: 28px;
+  text-align: right;
+}
+
+.card-xp {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  font-size: 7pt;
+  color: var(--mt);
+}
+
+.card-sections {
+  font-size: 8pt;
+  color: var(--mt);
+  margin-bottom: 4px;
+}

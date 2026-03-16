@@ -1,0 +1,89 @@
+/* Pink Galaxy Bible v2 — Theme Variables */
+:root {
+  /* Primary Colors */
+  --p: #e91e63;
+  --pl: #f8bbd0;
+  --pd: #880e4f;
+  --pg: rgba(233,30,99,.25);
+  
+  /* Green Accent */
+  --g: #2e7d32;
+  --gl: #a5d6a7;
+  --gd: #1b5e20;
+  --gg: rgba(46,125,50,.25);
+  
+  /* Background System */
+  --bg: #0a0a12;
+  --s1: #0f0f1e;
+  --s2: #1a1a2e;
+  --s3: #242440;
+  
+  /* Text Colors */
+  --tx: #e8e6f0;
+  --t2: #a8a6b8;
+  --mt: #6c6a7e;
+  
+  /* Border & Effects */
+  --bd: rgba(233,30,99,.18);
+  --r: 12px;
+  
+  /* Universe Colors */
+  --purple: #ab47bc;
+  --blue: #5c6bc0;
+  --cyan: #00acc1;
+  --orange: #ff9800;
+  --yellow: #ffd600;
+  --danger: #ff5252;
+}
+
+/* Global Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Body & Global Typography */
+body {
+  font-family: Calibri, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--tx);
+  overflow-x: hidden;
+  font-size: 11pt;
+  line-height: 1.6;
+}
+
+/* Background Galaxy Effect */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(ellipse at 15% 50%, rgba(233,30,99,.06), transparent 50%),
+              radial-gradient(ellipse at 85% 25%, rgba(46,125,50,.04), transparent 50%);
+}
+
+/* Links */
+a {
+  color: var(--p);
+  text-decoration: none;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-6px); }
+  60% { transform: translateY(-3px); }
+}
+
+@keyframes shimmer {
+  0% { opacity: 0.8; }
+  50% { opacity: 1; }
+  100% { opacity: 0.8; }
+}

@@ -1,0 +1,128 @@
+/* Pink Galaxy Bible v2 — Top Navigation Bar */
+
+.top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: var(--s1);
+  border-bottom: 1px solid var(--bd);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  backdrop-filter: blur(12px);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: bold;
+  font-size: 14pt;
+  color: var(--p);
+}
+
+.logo span {
+  font-size: 20px;
+}
+
+.nav-tabs {
+  display: flex;
+  gap: 2px;
+  margin-left: 20px;
+}
+
+.nav-tab {
+  padding: 6px 16px;
+  border-radius: 8px 8px 0 0;
+  cursor: pointer;
+  font-size: 9.5pt;
+  color: var(--t2);
+  border: 1px solid transparent;
+  border-bottom: none;
+  transition: all .2s;
+  font-family: inherit;
+  background: none;
+}
+
+.nav-tab:hover {
+  color: var(--pl);
+  background: rgba(233,30,99,.06);
+}
+
+.nav-tab.active {
+  color: var(--p);
+  background: var(--s2);
+  border-color: var(--bd);
+}
+
+.top-right {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.search-mini {
+  padding: 6px 14px 6px 30px;
+  background: var(--s2);
+  border: 1px solid var(--bd);
+  border-radius: 20px;
+  color: var(--tx);
+  font-size: 9pt;
+  width: 200px;
+  outline: none;
+  font-family: inherit;
+}
+
+.search-mini:focus {
+  border-color: var(--p);
+  box-shadow: 0 0 10px var(--pg);
+  width: 280px;
+  transition: width .3s;
+}
+
+.search-mini::placeholder {
+  color: var(--mt);
+}
+
+.xp-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: linear-gradient(135deg, var(--pd), var(--p));
+  border-radius: 16px;
+  font-size: 8.5pt;
+  font-weight: bold;
+  color: #fff;
+}
+
+.streak-badge {
+  padding: 4px 10px;
+  background: rgba(255,214,0,.15);
+  border: 1px solid rgba(255,214,0,.3);
+  border-radius: 16px;
+  font-size: 8.5pt;
+  color: var(--yellow);
+}
+
+.tbtn {
+  background: none;
+  border: 1px solid var(--bd);
+  color: var(--t2);
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 9pt;
+  font-family: inherit;
+}
+
+.tbtn:hover {
+  background: var(--p);
+  color: #fff;
+  border-color: var(--p);
+}

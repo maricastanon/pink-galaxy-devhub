@@ -1,0 +1,250 @@
+/* Pink Galaxy Bible v2 — Common Components */
+
+.container {
+  margin-top: 50px;
+  min-height: calc(100vh - 50px);
+  position: relative;
+  z-index: 1;
+}
+
+.view {
+  display: none;
+  padding: 20px;
+  animation: fadeIn .3s;
+}
+
+.view.active {
+  display: block;
+}
+
+/* Buttons */
+.btn {
+  background: linear-gradient(135deg, var(--p), var(--pd));
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 9pt;
+  font-family: inherit;
+  font-weight: bold;
+  transition: all .2s;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(233,30,99,.3);
+}
+
+.btn.secondary {
+  background: var(--s2);
+  color: var(--tx);
+  border: 1px solid var(--bd);
+}
+
+.btn.secondary:hover {
+  background: var(--s3);
+  border-color: var(--p);
+}
+
+.btn.danger {
+  background: linear-gradient(135deg, var(--danger), #d32f2f);
+}
+
+.btn.success {
+  background: linear-gradient(135deg, var(--g), var(--gd));
+}
+
+/* Form Elements */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  font-size: 9pt;
+  color: var(--tx);
+  margin-bottom: 6px;
+  font-weight: bold;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--s2);
+  border: 1px solid var(--bd);
+  border-radius: 8px;
+  color: var(--tx);
+  font-size: 9pt;
+  outline: none;
+  font-family: inherit;
+}
+
+.form-input:focus {
+  border-color: var(--p);
+  box-shadow: 0 0 10px var(--pg);
+}
+
+.form-input::placeholder {
+  color: var(--mt);
+}
+
+/* Notifications */
+.notification {
+  position: fixed;
+  top: 70px;
+  right: 20px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 9pt;
+  font-weight: bold;
+  z-index: 10000;
+  animation: slideIn .3s;
+}
+
+.notification.success {
+  background: var(--g);
+}
+
+.notification.error {
+  background: var(--danger);
+}
+
+.notification.info {
+  background: var(--blue);
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* Loading States */
+.loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--t2);
+  font-size: 9pt;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid var(--p);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Progress Bars */
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255,255,255,.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--p), var(--g));
+  border-radius: 4px;
+  transition: width .4s;
+}
+
+/* Tooltips */
+.tooltip {
+  position: relative;
+  cursor: help;
+}
+
+.tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--s3);
+  color: var(--tx);
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 8pt;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all .2s;
+  z-index: 1000;
+  border: 1px solid var(--bd);
+}
+
+.tooltip:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.8);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.modal.active {
+  display: flex;
+  animation: fadeIn .3s;
+}
+
+.modal-content {
+  background: var(--s1);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  padding: 24px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--bd);
+}
+
+.modal-title {
+  font-size: 14pt;
+  color: var(--p);
+  font-weight: bold;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--mt);
+  font-size: 18pt;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close:hover {
+  color: var(--tx);
+}

@@ -1,0 +1,267 @@
+/* Pink Galaxy Bible v2 — Module Detail View */
+
+.mod-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--t2);
+  font-size: 9pt;
+  cursor: pointer;
+  padding: 8px 0;
+  margin-bottom: 12px;
+}
+
+.mod-back:hover {
+  color: var(--p);
+}
+
+.mod-header {
+  background: linear-gradient(135deg, var(--s1), var(--s2));
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.mod-id {
+  font-family: "Courier New", monospace;
+  font-size: 9pt;
+  color: var(--mt);
+  letter-spacing: 1px;
+}
+
+.mod-title {
+  font-size: 18pt;
+  color: var(--p);
+  margin: 8px 0 12px;
+}
+
+.mod-desc {
+  color: var(--t2);
+  font-size: 11pt;
+  line-height: 1.6;
+}
+
+.mod-meta {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+  font-size: 9pt;
+}
+
+.mod-sections {
+  display: grid;
+  gap: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section {
+  background: var(--s1);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+
+.section-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--bd);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.section-title {
+  font-size: 12pt;
+  color: var(--tx);
+  font-weight: bold;
+}
+
+.section-toggle {
+  font-size: 14pt;
+  color: var(--mt);
+  transition: transform .2s;
+}
+
+.section.expanded .section-toggle {
+  transform: rotate(90deg);
+}
+
+.section-body {
+  display: none;
+  padding: 20px;
+}
+
+.section.expanded .section-body {
+  display: block;
+  animation: fadeIn .3s;
+}
+
+.explanation-tabs {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--bd);
+}
+
+.exp-tab {
+  padding: 8px 16px;
+  border: none;
+  background: none;
+  color: var(--t2);
+  cursor: pointer;
+  font-size: 9pt;
+  font-family: inherit;
+  border-bottom: 2px solid transparent;
+}
+
+.exp-tab:hover {
+  color: var(--pl);
+}
+
+.exp-tab.active {
+  color: var(--p);
+  border-bottom-color: var(--p);
+}
+
+.explanation {
+  display: none;
+  margin-bottom: 20px;
+}
+
+.explanation.active {
+  display: block;
+  animation: fadeIn .3s;
+}
+
+.code-block {
+  background: var(--s2);
+  border: 1px solid var(--bd);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+  font-family: "Courier New", monospace;
+  font-size: 9pt;
+  overflow-x: auto;
+}
+
+.code-block pre {
+  margin: 0;
+  color: var(--tx);
+}
+
+.output-block {
+  background: var(--s3);
+  border: 1px solid rgba(46,125,50,.3);
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 8px;
+  font-family: "Courier New", monospace;
+  font-size: 8pt;
+  color: var(--gl);
+}
+
+.quiz-section {
+  background: var(--s2);
+  border: 1px solid var(--bd);
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 20px;
+}
+
+.quiz-question {
+  font-size: 10pt;
+  color: var(--tx);
+  margin-bottom: 12px;
+  font-weight: bold;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.quiz-option {
+  padding: 8px 12px;
+  background: var(--s1);
+  border: 1px solid var(--bd);
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--t2);
+  font-size: 9pt;
+  transition: all .2s;
+}
+
+.quiz-option:hover {
+  border-color: var(--p);
+  color: var(--tx);
+}
+
+.quiz-option.selected {
+  background: rgba(233,30,99,.1);
+  border-color: var(--p);
+  color: var(--pl);
+}
+
+.quiz-option.correct {
+  background: rgba(46,125,50,.2);
+  border-color: var(--g);
+  color: var(--gl);
+}
+
+.quiz-option.incorrect {
+  background: rgba(255,82,82,.2);
+  border-color: var(--danger);
+  color: #ffcdd2;
+}
+
+.quiz-feedback {
+  display: none;
+  padding: 12px;
+  border-radius: 6px;
+  margin-top: 12px;
+  font-size: 9pt;
+}
+
+.quiz-feedback.correct {
+  background: rgba(46,125,50,.2);
+  color: var(--gl);
+  display: block;
+}
+
+.quiz-feedback.incorrect {
+  background: rgba(255,82,82,.2);
+  color: #ffcdd2;
+  display: block;
+}
+
+.consequence-map {
+  background: var(--s2);
+  border-left: 4px solid var(--orange);
+  padding: 16px;
+  margin: 16px 0;
+  border-radius: 0 8px 8px 0;
+}
+
+.consequence-title {
+  font-size: 10pt;
+  color: var(--orange);
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.xp-reward {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, var(--pd), var(--p));
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 8pt;
+  font-weight: bold;
+  margin-top: 8px;
+}
